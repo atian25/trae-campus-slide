@@ -140,7 +140,9 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
+        run: |
+          set -x
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow 2>&1 | tee /tmp/pages.json || true
 
       - uses: actions/configure-pages@v5
 
@@ -150,3 +152,11 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: 上传 Pages 失败日志
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          { echo '--- enable output'; cat /tmp/pages.json 2>/dev/null; } > release/pages-error.log
+          gh release upload pdf-latest release/pages-error.log --clobber || true
