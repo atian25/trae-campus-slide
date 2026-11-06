@@ -30,9 +30,21 @@ jobs:
         run: npm run build
 
       - name: 导出 PDF
-        run: npm run pdf
+        id: pdf
+        run: |
+          set -o pipefail
+          npm run pdf 2>&1 | tee /tmp/pdf.log
         env:
           CHROME_PATH: /usr/bin/google-chrome
+
+      # 失败时把日志传到 Release，方便直接下载查看（公开仓库不需要登录）
+      - name: 上传失败日志
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tail -200 /tmp/pdf.log > release/ci-error.log 2>/dev/null || echo "no log" > release/ci-error.log
+          gh release upload pdf-latest release/ci-error.log --clobber || gh release create pdf-latest --title "最新 PDF" --notes "CI" --latest
 
       - name: 更新 PDF Release
         env:

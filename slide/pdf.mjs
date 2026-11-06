@@ -11,19 +11,21 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "release", "_pdf", "index.html");
 const OUT = path.join(ROOT, "release", "AI时代的机遇和挑战.pdf");
 // 本机是 macOS 的 Chrome，CI 里是 Ubuntu 的 google-chrome，优先用 CHROME_PATH 指定
-const CHROME =
-  process.env.CHROME_PATH ||
-  [
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "/usr/bin/google-chrome",
-    "/usr/bin/google-chrome-stable",
-    "/usr/bin/chromium",
-    "/usr/bin/chromium-browser",
-  ].find((p) => existsSync(p));
+const candidates = [
+  process.env.CHROME_PATH,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/opt/google/chrome/chrome",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+].filter(Boolean);
+const CHROME = candidates.find((p) => existsSync(p));
 if (!CHROME) {
-  console.error("找不到 Chrome，请设置 CHROME_PATH");
+  console.error("找不到 Chrome，候选路径都不存在：", candidates.join(", "));
   process.exit(1);
 }
+console.log("chrome:", CHROME);
 
 // 1) 高画质构建
 const build = spawnSync(process.execPath, [path.join(ROOT, "slide", "build.ts"), "--hq"], { stdio: "inherit" });
@@ -37,6 +39,9 @@ const chrome = spawn(CHROME, [
   "--remote-debugging-port=0", "--user-data-dir=" + profile,
   "about:blank",
 ], { stdio: ["ignore", "ignore", "pipe"] });
+chrome.on("error", (e) => { console.error("Chrome 启动失败：", e); process.exit(1); });
+let chromeErr = "";
+chrome.stderr.on("data", (d) => { chromeErr += d.toString(); });
 
 const wsUrl = await new Promise((resolve, reject) => {
   let buf = "";
@@ -81,6 +86,7 @@ for (;;) {
 await send("Emulation.setEmulatedMedia", { media: "print" });
 await new Promise((r) => setTimeout(r, 1500));
 
+console.log("printing pdf ...");
 const pdf = await send("Page.printToPDF", {
   printBackground: true,
   preferCSSPageSize: true,
@@ -88,6 +94,11 @@ const pdf = await send("Page.printToPDF", {
   paperHeight: 900 / 96,
   marginTop: 0, marginBottom: 0, marginLeft: 0, marginRight: 0,
 });
+if (pdf.error || !pdf.result?.data) {
+  console.error("printToPDF 失败：", JSON.stringify(pdf).slice(0, 800));
+  console.error("chrome stderr:", chromeErr.slice(-1500));
+  process.exit(1);
+}
 const buf = Buffer.from(pdf.result.data, "base64");
 writeFileSync(OUT, buf);
 console.log(`pdf -> release/AI时代的机遇和挑战.pdf  ${(buf.length / 1024 / 1024).toFixed(2)} MB`);
