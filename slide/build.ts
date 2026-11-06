@@ -12,7 +12,7 @@ const SRC = path.join(ROOT, "slide", "deck.html");
 const HQ = process.argv.includes("--hq");
 const OUT = HQ
   ? path.join(ROOT, "release", "_pdf", "index.html")
-  : path.join(ROOT, "release", "trae-campus-slide-tz", "public", "index.html");
+  : path.join(ROOT, "release", "site", "index.html");
 const BG = "#F7F8F5";
 
 // 按 2 倍屏留余量定宽度上限（页面按 1600×900 排版，案例/学习图显示宽约 690）

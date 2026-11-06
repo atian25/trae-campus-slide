@@ -1,0 +1,63 @@
+name: 构建与部署
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write # 需要写 Release
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建单文件站点
+        run: npm run build
+
+      - name: 导出 PDF
+        run: npm run pdf
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+
+      - name: 更新 PDF Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view pdf-latest >/dev/null 2>&1 ||
+            gh release create pdf-latest --title "最新 PDF" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
+          gh release upload pdf-latest "release/AI时代的机遇和挑战.pdf" --clobber
+          gh release edit pdf-latest --latest
+
+      # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
+      - name: 检查部署密钥
+        id: cf
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::未配置 CLOUDFLARE_API_TOKEN，本次跳过 Cloudflare 部署"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 部署到 Cloudflare Workers
+        if: steps.cf.outputs.ready == 'true'
+        run: npx void deploy --platform cloudflare --dir release/site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

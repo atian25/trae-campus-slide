@@ -1,44 +1,62 @@
 # AI 时代的机遇和挑战：今天的学生，如何走向明天的世界
 
-分享人：天猪 · TRAE Campus
+天猪 · TRAE Campus 高校分享
 
-## 目录结构
+一套 18 页的 16:9 网页幻灯片，纯 HTML/CSS/JS 手写，不依赖前端框架。构建时把图片压缩内嵌成单文件，部署到 Cloudflare Workers。
 
-- `article/`  原文资料（飞书文档同步下来的 markdown 与配图）
-- `slide/`    网页幻灯片
-  - `deck.html`  **唯一源文件**，所有页面、样式、脚本都在这一个文件里
-  - `img/`       配图（`tz_dog7.png` 是天猪抠图的原始素材，`tz-dog-cut.png` 由它去背生成）
-  - `server.mjs` 本地预览用的 Node 静态服务
-  - `build.ts`   发布构建：把图片内嵌成单文件站点
-- `package.json`  脚本入口：`preview` / `build` / `deploy`
-- `release/`  对外产物（18 张 PNG、PDF、单文件 HTML），不进 Git
-  - `trae-campus-slide-tz/` Cloudflare 部署工程（`void.config.ts` + `public/index.html`），同样不进 Git
+- 线上幻灯片：<https://trae-campus-slide-tz.atian25.workers.dev>
+- PDF：[Releases · pdf-latest](https://github.com/atian25/trae-campus-slide/releases/tag/pdf-latest)
 
-## 预览
+## 目录
 
-    npm run preview            # 等价于 node slide/server.mjs，默认 8765
-    # 打开 http://127.0.0.1:8765/
+| 路径 | 说明 |
+| --- | --- |
+| `slide/deck.html` | 幻灯片本体。文件里从上到下是 18 个 `<section class="p">`，一个 section 就是一页，样式和翻页脚本也都在这里 |
+| `slide/img/` | 配图。`deck.html` 里用 `<img src="img/xxx.png">` 引用，构建时统一压缩后内嵌进 HTML |
+| `slide/server.mjs` | 本地预览用的静态服务 |
+| `slide/build.ts` | 构建：压缩图片 → 内嵌成单文件 → `release/site/index.html` |
+| `slide/pdf.mjs` | 导出 PDF：用无头 Chrome 打印单文件版 |
+| `article/` | 分享内容对应的知乎原文快照（Markdown + 17 张配图），方便回头查原始素材 |
+| `release/` | 构建产物，不进 Git：`site/` 单文件站点、PDF、18 张 PNG |
+| `void.config.ts` | Cloudflare 部署配置：worker 名 `trae-campus-slide-tz` 和账号 ID |
 
-操作：← → / 空格 / **鼠标滚轮** 翻页，数字键跳页，Home/End 首末页，Esc 缩略图总览，`?clean` 隐藏页码与底部提示（导出时用）。
+## 本地预览
 
-## 构建与部署
+```sh
+npm install
+npm run preview     # http://127.0.0.1:8765
+```
 
-    npm install                # 首次：装 sharp（图片压缩）与 void（部署）
-    npm run build              # 生成单文件站点 release/trae-campus-slide-tz/public/index.html
-    npm run deploy             # build + void deploy --platform cloudflare
-    npm run pdf                # 高画质 PDF -> release/AI时代的机遇和挑战.pdf
+操作：← → / 空格 / 鼠标滚轮翻页，数字键跳页，Home/End 首末页，Esc 缩略图总览；网址加 `?clean` 隐藏页码和底部提示。
 
-线上：<https://trae-campus-slide-tz.atian25.workers.dev>
+## 修改内容
 
-PDF 由 `slide/pdf.mjs` 生成：先用 `build.ts --hq` 打一版原图分辨率、质量 96 的单文件，再用无头 Chrome 的打印协议导出 18 页（每页 1600×900，`@page` 与 `@media print` 写在 `deck.html` 里）。
+- **改页面**：直接编辑 `slide/deck.html`，一个 `<section class="p">` 是一页，顺序就是放映顺序
+- **改尺寸**：版心固定 1600×900，所有尺寸都写成 `calc(var(--u) * N)`，`--u` 会随窗口自适应，不要写死 px
+- **加图片**：放进 `slide/img/`，在 `deck.html` 里用相对路径引用即可，构建时会自动压缩
+- **配色**：米白底 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`，一页最多两处高亮
 
-## 若干约定
+## 命令
 
-- 版心 1600×900，所有尺寸走 `--u` 流体单位，导出 2 倍图即 3200×1800
-- 单色薄荷绿体系，一页最多两处高亮
-- 不用「——」，标题不重复
+| 命令 | 作用 |
+| --- | --- |
+| `npm run preview` | 启动本地预览（8765 端口） |
+| `npm run build` | 构建单文件站点到 `release/site/` |
+| `npm run deploy` | 构建并部署到 Cloudflare Workers |
+| `npm run pdf` | 生成高画质 PDF 到 `release/` |
 
-## 版本管理
+## 自动部署
 
-Git 已初始化，`release/` 产物、`node_modules/` 依赖目录不入库（见 `.gitignore`）。
-构建脚本是 TypeScript，直接由 Node 24 的 type stripping 运行，无需编译或额外工具链。
+`.github/workflows/deploy.yml`：push 到 `main`（或手动触发）后依次执行
+
+1. `npm ci` + `npm run build`
+2. `void deploy` 发布到 Cloudflare Workers
+3. `npm run pdf` 导出 PDF
+4. 把 PDF 覆盖更新到 Release 标签 `pdf-latest`
+
+需要在仓库 Secrets 里配置 `CLOUDFLARE_API_TOKEN`（模板选 **Edit Cloudflare Workers**）；账号 ID 已写在 `void.config.ts` 里，不需要额外配置。
+
+## 约定
+
+- 不用「——」，标题不重复，语气保持口语化
+- 页码在右上、章节眉标在左上

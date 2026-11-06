@@ -3,16 +3,27 @@
  * 用法：node slide/pdf.mjs   （等价于 npm run pdf）
  */
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "release", "_pdf", "index.html");
 const OUT = path.join(ROOT, "release", "AI时代的机遇和挑战.pdf");
+// 本机是 macOS 的 Chrome，CI 里是 Ubuntu 的 google-chrome，优先用 CHROME_PATH 指定
 const CHROME =
   process.env.CHROME_PATH ||
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+  [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ].find((p) => existsSync(p));
+if (!CHROME) {
+  console.error("找不到 Chrome，请设置 CHROME_PATH");
+  process.exit(1);
+}
 
 // 1) 高画质构建
 const build = spawnSync(process.execPath, [path.join(ROOT, "slide", "build.ts"), "--hq"], { stdio: "inherit" });
