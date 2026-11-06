@@ -21,9 +21,11 @@
          padding:14px 0 18px;border-top:1px solid rgba(255,255,255,.06)}
   .ov-cell{border:0;padding:0;background:none;cursor:pointer;display:block;text-align:left;font:inherit;color:inherit}
   .ov-box{position:relative;width:var(--ovw);height:calc(var(--ovw)*0.5625);overflow:hidden;border-radius:8px;
-          background:#F7F8F5;outline:1px solid rgba(255,255,255,.16);--u:calc(var(--ovw)/1600)}
-  .ov-box>.p{display:block!important;position:static;inset:auto;
-             width:calc(var(--u)*1600);height:calc(var(--u)*900)}
+          background:#F7F8F5;outline:1px solid rgba(255,255,255,.16);--u:1px}
+  /* 缩略图走整体缩放：先按 1600×900 原样排版，再缩到缩略图宽度，避免小字号重排导致文字挤在一起 */
+  .ov-box>.p{display:block!important;position:absolute;left:0;top:0;
+             width:calc(var(--u)*1600);height:calc(var(--u)*900);
+             transform:scale(calc(var(--ovw) / 1600px));transform-origin:0 0}
   .ov-no{display:block;margin-top:9px;font:700 12px/1 "PingFang SC",sans-serif;color:#AEBDB5;letter-spacing:1.5px}
   .ov-cell:hover .ov-box{outline:2px solid rgba(191,242,210,.5)}
   .ov-cell.cur .ov-box{outline:2px solid #BFF2D2}
