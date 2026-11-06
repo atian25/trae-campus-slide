@@ -1,0 +1,16 @@
+{
+  "name": "ai-era-talk",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node slide/build.ts",
+    "preview": "node slide/server.mjs",
+    "deploy": "npm run build && cd release/trae-campus-slide-tz && void deploy --platform cloudflare --dir public"
+  },
+  "dependencies": {
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "void": "1.6.2"
+  }
+}

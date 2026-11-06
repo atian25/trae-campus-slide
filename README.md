@@ -9,24 +9,27 @@
   - `deck.html`  **唯一源文件**，所有页面、样式、脚本都在这一个文件里
   - `img/`       配图（`tz_dog7.png` 是天猪抠图的原始素材，`tz-dog-cut.png` 由它去背生成）
   - `server.mjs` 本地预览用的 Node 静态服务
-  - `build.py`   只负责生成发布单文件（开发时用不到）
+  - `build.ts`   发布构建：把图片内嵌成单文件站点
+- `package.json`  脚本入口：`preview` / `build` / `deploy`
 - `release/`  对外产物（18 张 PNG、PDF、单文件 HTML），不进 Git
-  - `trae-campus-slide-tz/` Cloudflare 部署工程（`public/index.html` 为整份单文件站点），同样不进 Git
+  - `trae-campus-slide-tz/` Cloudflare 部署工程（`void.config.ts` + `public/index.html`），同样不进 Git
 
 ## 预览
 
-    cd slide
-    node server.mjs            # 默认 8765，也可 node server.mjs 8080
+    npm run preview            # 等价于 node slide/server.mjs，默认 8765
     # 打开 http://127.0.0.1:8765/
 
 操作：← → / 空格 / **鼠标滚轮** 翻页，数字键跳页，Home/End 首末页，Esc 缩略图总览，`?clean` 隐藏页码与底部提示（导出时用）。
 
-## 构建与导出（需要时才跑）
+## 构建与部署
 
-    cd slide
-    python3 build.py --publish     # -> ../release/AI时代的机遇和挑战-单文件.html（图片内嵌）
+    npm install                # 首次：装 sharp（图片压缩）与 void（部署）
+    npm run build              # 生成单文件站点 release/trae-campus-slide-tz/public/index.html
+    npm run deploy             # build + void deploy --platform cloudflare
 
-PDF：用单文件版加打印样式（`@page{size:1600px 900px;margin:0}`，每页 `.p` 固定 1600×900 且 `page-break-after:always`），再用 Chrome 无头 `--print-to-pdf --no-pdf-header-footer` 输出。
+线上：<https://trae-campus-slide-tz.atian25.workers.dev>
+
+PDF：用构建出的单文件站点加打印样式（`@page{size:1600px 900px;margin:0}`，每页 `.p` 固定 1600×900 且 `page-break-after:always`），再用 Chrome 无头 `--print-to-pdf --no-pdf-header-footer` 输出。
 
 ## 若干约定
 
@@ -36,4 +39,5 @@ PDF：用单文件版加打印样式（`@page{size:1600px 900px;margin:0}`，每
 
 ## 版本管理
 
-Git 已初始化，`release/` 产物与常见的 Node / Python 依赖目录不入库（见 `.gitignore`）。
+Git 已初始化，`release/` 产物、`node_modules/` 依赖目录不入库（见 `.gitignore`）。
+构建脚本是 TypeScript，直接由 Node 24 的 type stripping 运行，无需编译或额外工具链。
