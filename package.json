@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node slide/build.ts",
     "preview": "node slide/server.mjs",
-    "deploy": "npm run build && cd release/trae-campus-slide-tz && void deploy --platform cloudflare --dir public"
+    "deploy": "npm run build && cd release/trae-campus-slide-tz && void deploy --platform cloudflare --dir public",
+    "pdf": "node slide/pdf.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

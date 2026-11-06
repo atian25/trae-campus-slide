@@ -8,7 +8,11 @@ import sharp from "sharp";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "slide", "deck.html");
-const OUT = path.join(ROOT, "release", "trae-campus-slide-tz", "public", "index.html");
+// --hq：给 PDF 导出用的高画质版本（图片按原图分辨率、质量 96），不参与线上部署
+const HQ = process.argv.includes("--hq");
+const OUT = HQ
+  ? path.join(ROOT, "release", "_pdf", "index.html")
+  : path.join(ROOT, "release", "trae-campus-slide-tz", "public", "index.html");
 const BG = "#F7F8F5";
 
 // 按 2 倍屏留余量定宽度上限（页面按 1600×900 排版，案例/学习图显示宽约 690）
@@ -31,11 +35,12 @@ const KEEP_ALPHA = new Set(["trae.png", "trae-pet-2.png", "tz-dog-cut.png"]);
 async function dataUri(rel: string): Promise<string> {
   const file = path.join(ROOT, "slide", rel);
   const name = path.basename(file);
-  const cap = MAXW[name] ?? 1600;
+  const cap = HQ ? (MAXW[name] ? Math.max(MAXW[name], 2400) : 3200) : (MAXW[name] ?? 1600);
   const img = sharp(file).resize({ width: cap, withoutEnlargement: true });
+  const quality = HQ ? 96 : (QUALITY[name] ?? 88);
   const buf = KEEP_ALPHA.has(name)
     ? await img.png({ compressionLevel: 9 }).toBuffer()
-    : await img.flatten({ background: BG }).jpeg({ quality: QUALITY[name] ?? 88, mozjpeg: true }).toBuffer();
+    : await img.flatten({ background: BG }).jpeg({ quality, mozjpeg: true }).toBuffer();
   const mime = KEEP_ALPHA.has(name) ? "image/png" : "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
 }
@@ -50,4 +55,4 @@ const out = html.replace(/src="(img\/[^"]+)"/g, (_m, ref: string) => `src="${uri
 await mkdir(path.dirname(OUT), { recursive: true });
 await writeFile(OUT, out, "utf8");
 const mb = (Buffer.byteLength(out) / 1024 / 1024).toFixed(2);
-console.log(`build -> ${path.relative(ROOT, OUT)}  ${mb} MB，内嵌 ${refs.length} 张`);
+console.log(`build -> ${path.relative(ROOT, OUT)}  ${mb} MB，内嵌 ${refs.length} 张${HQ ? "（高画质）" : ""}`);

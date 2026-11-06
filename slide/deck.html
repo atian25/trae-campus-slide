@@ -376,6 +376,18 @@
   /* 划线：薄荷色，同页一致 */
   .nowrap{white-space:nowrap}
   .ul{background:linear-gradient(180deg,transparent 58%,#BFF2D2 58%);padding:0 calc(var(--u)*3);border-radius:calc(var(--u)*3);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  /* 导出 PDF：一页一张 1600×900 */
+  @page{size:1600px 900px;margin:0}
+  @media print{
+    html,body{height:auto;overflow:visible;background:#F7F8F5}
+    #viewport{position:static;transform:none;width:auto;height:auto}
+    #pager,#hint,#overview{display:none!important}
+    .p{position:relative!important;display:block!important;inset:auto;
+       width:calc(var(--u)*1600);height:calc(var(--u)*900);overflow:hidden;
+       break-after:page;page-break-after:always}
+    .p:last-of-type{break-after:auto;page-break-after:auto}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
 </style></head><body>
 <div id="viewport">
   <section class="p p7"><div class="slide">

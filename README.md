@@ -26,10 +26,11 @@
     npm install                # 首次：装 sharp（图片压缩）与 void（部署）
     npm run build              # 生成单文件站点 release/trae-campus-slide-tz/public/index.html
     npm run deploy             # build + void deploy --platform cloudflare
+    npm run pdf                # 高画质 PDF -> release/AI时代的机遇和挑战.pdf
 
 线上：<https://trae-campus-slide-tz.atian25.workers.dev>
 
-PDF：用构建出的单文件站点加打印样式（`@page{size:1600px 900px;margin:0}`，每页 `.p` 固定 1600×900 且 `page-break-after:always`），再用 Chrome 无头 `--print-to-pdf --no-pdf-header-footer` 输出。
+PDF 由 `slide/pdf.mjs` 生成：先用 `build.ts --hq` 打一版原图分辨率、质量 96 的单文件，再用无头 Chrome 的打印协议导出 18 页（每页 1600×900，`@page` 与 `@media print` 写在 `deck.html` 里）。
 
 ## 若干约定
 
