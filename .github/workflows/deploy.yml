@@ -71,10 +71,18 @@ jobs:
               gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
             done
 
-            # gh release upload 会把中文名截断，先传英文名再改名
-            gh release upload pdf-latest release/upload.pdf --clobber
+            # gh 会把中文名截成 AI.pdf，改用 curl 直接调接口
+            rel_id=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq .id)
+            curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/pdf" \
+              --data-binary @"release/upload.pdf" \
+              "https://uploads.github.com/repos/$GH_REPO/releases/$rel_id/assets?name=upload.pdf"
+            echo
             aid=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[0].id')
-            gh api -X PATCH "repos/$GH_REPO/releases/assets/$aid" -f "name=$TITLE.pdf"
+            node -e 'require("fs").writeFileSync("/tmp/rename.json", JSON.stringify({ name: process.argv[1] + ".pdf" }))' "$TITLE"
+            curl -sS -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              -H "Content-Type: application/json" --data-binary @/tmp/rename.json \
+              "https://api.github.com/repos/$GH_REPO/releases/assets/$aid"
+            echo
           } 2>&1 | tee /tmp/release.log
 
       - name: 上传 Release 失败日志
