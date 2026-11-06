@@ -11,7 +11,6 @@
 | 在线幻灯片（推荐，国内可访问） | <https://atian25.github.io/trae-campus-slide/> |
 | 在线幻灯片（Cloudflare 备用） | <https://trae-campus-slide-tz.atian25.workers.dev> |
 | PDF（浏览器直接在线看，可下载） | <https://atian25.github.io/trae-campus-slide/AI%20%E6%97%B6%E4%BB%A3%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98%EF%BC%9A%E4%BB%8A%E5%A4%A9%E7%9A%84%E5%AD%A6%E7%94%9F%EF%BC%8C%E5%A6%82%E4%BD%95%E8%B5%B0%E5%90%91%E6%98%8E%E5%A4%A9%E7%9A%84%E4%B8%96%E7%95%8C.pdf> |
-| PDF（GitHub Release 备份） | <https://github.com/atian25/trae-campus-slide/releases/tag/pdf-latest> |
 | 知乎回答 | <https://www.zhihu.com/question/2076658003068052960/answer/2102009083041674168> |
 | 飞书文档 | <https://my.feishu.cn/wiki/KUvWwdDzfiBI2Vkzjzwc7S6SnTe> |
 
@@ -57,11 +56,11 @@ npm run preview     # http://127.0.0.1:8765
 
 `.github/workflows/deploy.yml`，push 到 `main`（或手动触发）后跑两个 job：
 
-**deploy**：`npm ci` → `npm run build` → `npm run pdf` → 更新 Release → `void deploy`（配了 `CLOUDFLARE_API_TOKEN` 才执行）
+**deploy**：`npm ci` → `npm run build` → `npm run pdf` → `void deploy`（配了 `CLOUDFLARE_API_TOKEN` 才执行）
 
 **pages**：`npm ci` → `npm run build` → `npm run pdf` → 发布到 GitHub Pages
 
-PDF 固定覆盖同一个 Release（tag `pdf-latest`），只保留一个 PDF 资产。
+PDF 只通过 GitHub Pages 分发（Release 不给 PDF 资产，因为 GitHub 会把中文文件名剥成 `AI.pdf`）。
 
 ## 约定
 
