@@ -6,12 +6,10 @@
 
 ## 相关链接
 
-| 内容 | 地址 |
-| --- | --- |
-| 在线幻灯片 | <https://atian25.github.io/trae-campus-slide/> |
-| PDF | <https://atian25.github.io/trae-campus-slide/AI%20%E6%97%B6%E4%BB%A3%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98%EF%BC%9A%E4%BB%8A%E5%A4%A9%E7%9A%84%E5%AD%A6%E7%94%9F%EF%BC%8C%E5%A6%82%E4%BD%95%E8%B5%B0%E5%90%91%E6%98%8E%E5%A4%A9%E7%9A%84%E4%B8%96%E7%95%8C.pdf> |
-| 知乎回答 | <https://www.zhihu.com/question/2076658003068052960/answer/2102009083041674168> |
-| 飞书文档 | <https://my.feishu.cn/wiki/KUvWwdDzfiBI2Vkzjzwc7S6SnTe> |
+- 在线幻灯片：<https://atian25.github.io/trae-campus-slide/>
+- PDF：[《AI 时代的机遇和挑战：今天的学生，如何走向明天的世界》](<https://atian25.github.io/trae-campus-slide/AI%20%E6%97%B6%E4%BB%A3%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98%EF%BC%9A%E4%BB%8A%E5%A4%A9%E7%9A%84%E5%AD%A6%E7%94%9F%EF%BC%8C%E5%A6%82%E4%BD%95%E8%B5%B0%E5%90%91%E6%98%8E%E5%A4%A9%E7%9A%84%E4%B8%96%E7%95%8C.pdf>)
+- 知乎：[《知乎问答：在 AI 盛行的时代，大学生到底要学什么、怎么学才不会被淘汰？》](https://www.zhihu.com/question/2076658003068052960/answer/2102009083041674168)
+- 飞书文档：<https://my.feishu.cn/wiki/KUvWwdDzfiBI2Vkzjzwc7S6SnTe>
 
 ## 目录
 
