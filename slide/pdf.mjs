@@ -103,8 +103,11 @@ const buf = Buffer.from(pdf.result.data, "base64");
 writeFileSync(OUT, buf);
 console.log(`pdf -> release/AI时代的机遇和挑战.pdf  ${(buf.length / 1024 / 1024).toFixed(2)} MB`);
 
-// 4) 收尾
+// 4) 收尾（Chrome 可能还在写临时目录，删不掉不算失败）
 ws.close();
 chrome.kill();
-rmSync(profile, { recursive: true, force: true });
+await new Promise((r) => { chrome.once("close", r); setTimeout(r, 3000); });
+try {
+  rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+} catch { /* 临时目录留着无妨 */ }
 rmSync(path.join(ROOT, "release", "_pdf"), { recursive: true, force: true });

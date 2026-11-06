@@ -56,6 +56,7 @@ jobs:
           cp "release/AI时代的机遇和挑战.pdf" release/trae-campus-slide.pdf
           gh release upload pdf-latest release/trae-campus-slide.pdf --clobber
           gh release delete-asset pdf-latest AI.pdf --yes 2>/dev/null || true
+          gh release delete-asset pdf-latest ci-error.log --yes 2>/dev/null || true
           gh release edit pdf-latest --latest
 
       # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
