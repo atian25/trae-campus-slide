@@ -40,7 +40,9 @@ jobs:
         run: |
           gh release view pdf-latest >/dev/null 2>&1 ||
             gh release create pdf-latest --title "最新 PDF" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
-          gh release upload pdf-latest "release/AI时代的机遇和挑战.pdf" --clobber
+          # GitHub 会把非 ASCII 文件名改成 AI.pdf，先复制成英文名再上传
+          cp "release/AI时代的机遇和挑战.pdf" release/trae-campus-slide.pdf
+          gh release upload pdf-latest release/trae-campus-slide.pdf --clobber
           gh release edit pdf-latest --latest
 
       # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
