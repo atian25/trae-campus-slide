@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # 需要写 Release
+  contents: write # 临时：用于删除旧的 PDF Release
 
 concurrency:
   group: deploy
@@ -23,79 +23,24 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: 安装依赖
-        run: npm ci
+      - run: npm ci
+
+      # PDF 已改由 GitHub Pages 分发（那边能保留中文文件名），旧 Release 清理掉
+      - name: 删除旧 PDF Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete pdf-latest --yes --cleanup-tag
 
       - name: 构建单文件站点
         run: npm run build
 
       - name: 导出 PDF
-        id: pdf
-        run: |
-          set -o pipefail
-          npm run pdf 2>&1 | tee /tmp/pdf.log
+        run: npm run pdf
         env:
           CHROME_PATH: /usr/bin/google-chrome
 
-      # 失败时把日志传到 Release，方便直接下载查看（公开仓库不需要登录）
-      - name: 上传失败日志
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          TITLE: "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
-        run: |
-          tail -200 /tmp/pdf.log > release/ci-error.log 2>/dev/null || echo "no log" > release/ci-error.log
-          gh release view pdf-latest >/dev/null 2>&1 ||
-            gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建。" --latest
-          gh release upload pdf-latest release/ci-error.log --clobber
-
-      # 固定一个 release（tag: pdf-latest），每次覆盖里面的 PDF
-      - name: 更新 PDF Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          TITLE: "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
-        run: |
-          set -o pipefail
-          {
-            set -x
-            cp "release/$TITLE.pdf" release/upload.pdf
-
-            gh release view pdf-latest >/dev/null 2>&1 ||
-              gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
-            gh release edit pdf-latest --title "$TITLE" --latest
-
-            # 清掉旧资产，保证每次只有一个 PDF
-            for aid in $(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[].id'); do
-              gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
-            done
-
-            # gh 会把中文名截成 AI.pdf，改用 curl 直接调接口
-            rel_id=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq .id)
-            curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/pdf" \
-              --data-binary @"release/upload.pdf" \
-              "https://uploads.github.com/repos/$GH_REPO/releases/$rel_id/assets?name=upload.pdf"
-            echo
-            aid=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[0].id')
-            # GitHub 会把资产名里的非 ASCII 字符剥掉（中文名会变成 AI.pdf），
-            # 所以资产名用英文，中文标题放在 release 标题和 label 上
-            node -e 'require("fs").writeFileSync("/tmp/rename.json", JSON.stringify({ name: "trae-campus-slide.pdf", label: process.argv[1] }))' "$TITLE"
-            curl -sS -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-              -H "Content-Type: application/json" --data-binary @/tmp/rename.json \
-              "https://api.github.com/repos/$GH_REPO/releases/assets/$aid"
-            echo
-          } 2>&1 | tee /tmp/release.log
-
-      - name: 上传 Release 失败日志
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tail -200 /tmp/release.log > release/release-error.log 2>/dev/null || echo "no log" > release/release-error.log
-          gh release upload pdf-latest release/release-error.log --clobber || true
-
-      # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
+      # 没配 Cloudflare 密钥时跳过部署
       - name: 检查部署密钥
         id: cf
         env:
@@ -113,11 +58,12 @@ jobs:
         run: npx void deploy --platform cloudflare --dir release/site
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  # GitHub Pages：国内可直接访问的镜像
+
+  # GitHub Pages：国内可访问，PDF 用中文文件名
   pages:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 失败时要往 Release 传日志
+      contents: read
       pages: write
       id-token: write
     environment:
@@ -136,14 +82,6 @@ jobs:
       - name: 构建单文件站点
         run: npm run build
 
-      - name: 开启 Pages（未开启时自动创建）
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -x
-          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow 2>&1 | tee /tmp/pages.json || true
-
       - name: 导出 PDF
         run: npm run pdf
         env:
@@ -157,11 +95,3 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: 上传 Pages 失败日志
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          { echo '--- enable output'; cat /tmp/pages.json 2>/dev/null; } > release/pages-error.log
-          gh release upload pdf-latest release/pages-error.log --clobber || true
