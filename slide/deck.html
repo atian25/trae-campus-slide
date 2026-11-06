@@ -225,6 +225,14 @@
   .p8 h1,.p9 h1,.p10 h1{font-size:calc(var(--u)*46);line-height:1.38;letter-spacing:-1px;font-weight:800;margin-top:calc(var(--u)*14)}
   .p8 .sub,.p9 .sub,.p10 .sub{margin-top:calc(var(--u)*14);font-size:calc(var(--u)*20);color:#4A544E;line-height:1.6}
   .p8 .slide>div:first-child,.p9 .slide>div:first-child,.p10 .slide>div:first-child{padding-bottom:calc(var(--u)*26);border-bottom:calc(var(--u)*1) solid #D9E1DC}
+  .p8 .slide>div:first-child{position:relative}
+  /* 楔子页：跳转原文的按钮 */
+  .p8 .cta{position:absolute;right:0;bottom:calc(var(--u)*34);display:inline-flex;align-items:center;gap:calc(var(--u)*12);
+    font-size:calc(var(--u)*21);font-weight:700;color:#0B4A32;background:#BFF2D2;padding:calc(var(--u)*16) calc(var(--u)*30);
+    border-radius:calc(var(--u)*100);text-decoration:none;white-space:nowrap;letter-spacing:.2px;
+    box-shadow:0 calc(var(--u)*8) calc(var(--u)*22) rgba(11,58,41,.10)}
+  .p8 .cta:hover{background:#A6ECC0}
+  .p8 .cta svg{width:calc(var(--u)*20);height:calc(var(--u)*20);flex:none}
 
   /* 封面 */
   .p7 .slide{width:calc(var(--u)*1600);height:calc(var(--u)*900);padding:0 calc(var(--u)*96);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;position:relative;background:#F7F8F5;font-family:"PingFang SC","Hiragino Sans GB",sans-serif;overflow:hidden}
@@ -408,6 +416,7 @@
       <div class="eyebrow"><span class="dot"></span>楔子</div>
       <h1>迷茫的大学生</h1>
       <p class="sub">最近参加了好几场 TRAE Campus 走进校园活动，明显感觉到不少大学生的迷茫。<br>仅从一名从业者的视角，分享下自己的观察和思考，未必能给出好的解法，希望能给同学们一些启发。</p>
+      <a class="cta" href="https://www.zhihu.com/question/2076658003068052960/answer/2102009083041674168" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="#0B4A32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>查看 Slide 对应的完整文章</a>
     </div>
     <div class="shot"><img src="img/research-crop.png" alt="TRAE Campus 调研"></div>
 </div></section>
