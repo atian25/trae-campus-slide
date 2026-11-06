@@ -29,6 +29,11 @@ jobs:
 
       - run: npm ci
 
+      - name: 安装中文字体
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk fonts-noto-color-emoji
+
       - name: 构建单文件站点
         run: npm run build
 
