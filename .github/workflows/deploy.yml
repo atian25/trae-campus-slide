@@ -78,7 +78,9 @@ jobs:
               "https://uploads.github.com/repos/$GH_REPO/releases/$rel_id/assets?name=upload.pdf"
             echo
             aid=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[0].id')
-            node -e 'require("fs").writeFileSync("/tmp/rename.json", JSON.stringify({ name: process.argv[1] + ".pdf" }))' "$TITLE"
+            # GitHub 会把资产名里的非 ASCII 字符剥掉（中文名会变成 AI.pdf），
+            # 所以资产名用英文，中文标题放在 release 标题和 label 上
+            node -e 'require("fs").writeFileSync("/tmp/rename.json", JSON.stringify({ name: "trae-campus-slide.pdf", label: process.argv[1] }))' "$TITLE"
             curl -sS -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
               -H "Content-Type: application/json" --data-binary @/tmp/rename.json \
               "https://api.github.com/repos/$GH_REPO/releases/assets/$aid"
