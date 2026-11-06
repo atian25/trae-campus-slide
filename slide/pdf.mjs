@@ -32,14 +32,15 @@ if (build.status !== 0) process.exit(build.status ?? 1);
 // 2) 起一个带调试端口的无头 Chrome
 const profile = mkdtempSync(path.join(tmpdir(), "deck-pdf-"));
 const chrome = spawn(CHROME, [
-  "--headless=new", "--no-sandbox", "--hide-scrollbars",
+  "--headless=new", "--no-sandbox", "--hide-scrollbars", "--disable-gpu",
+  "--disable-dev-shm-usage", "--no-first-run", "--no-default-browser-check",
   "--remote-debugging-port=0", "--user-data-dir=" + profile,
   "about:blank",
 ], { stdio: ["ignore", "ignore", "pipe"] });
 
 const wsUrl = await new Promise((resolve, reject) => {
   let buf = "";
-  const timer = setTimeout(() => reject(new Error("Chrome 启动超时")), 20000);
+  const timer = setTimeout(() => reject(new Error("Chrome 启动超时")), 60000);
   chrome.stderr.on("data", (d) => {
     buf += d.toString();
     const m = buf.match(/DevTools listening on (ws:\/\/\S+)/);
@@ -65,7 +66,18 @@ const send = (method, params = {}) =>
 
 await send("Page.enable");
 await send("Page.navigate", { url: "file://" + SRC + "?clean" });
-await new Promise((r) => setTimeout(r, 6000));
+
+// 等页面和所有内嵌图片真正就绪，CI 机器比本机慢
+const deadline = Date.now() + 60000;
+for (;;) {
+  const st = await send("Runtime.evaluate", {
+    expression: "document.readyState === 'complete' && [...document.images].every(i => i.complete && i.naturalWidth > 0)",
+    returnByValue: true,
+  });
+  if (st.result?.result?.value === true) break;
+  if (Date.now() > deadline) throw new Error("页面加载超时");
+  await new Promise((r) => setTimeout(r, 500));
+}
 await send("Emulation.setEmulatedMedia", { media: "print" });
 await new Promise((r) => setTimeout(r, 1500));
 
