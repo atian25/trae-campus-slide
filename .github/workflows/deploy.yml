@@ -29,10 +29,16 @@ jobs:
 
       - run: npm ci
 
-      - name: 安装中文字体
+      - name: 安装思源黑体
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk fonts-noto-color-emoji
+          sudo apt-get install -y --no-install-recommends unzip fonts-noto-color-emoji
+          curl -sSL --retry 3 -o /tmp/shs.zip \
+            https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/09_SourceHanSansSC.zip
+          sudo mkdir -p /usr/share/fonts/opentype/source-han-sans
+          sudo unzip -oq /tmp/shs.zip -d /usr/share/fonts/opentype/source-han-sans
+          sudo fc-cache -f
+          fc-list | grep -i "source han" | head -3
 
       - name: 构建单文件站点
         run: npm run build
