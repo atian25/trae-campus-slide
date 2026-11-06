@@ -1,11 +1,6 @@
 # ---- 产物（不入库）----
 release/
 
-# ---- Void 部署缓存 ----
-.void/
-.void-wrangler.jsonc
-.cloudflare/
-
 # ---- 系统 ----
 .DS_Store
 

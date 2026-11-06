@@ -22,7 +22,6 @@
 | `slide/pdf.mjs` | 导出 PDF：用无头 Chrome 打印，同时放一份到 `release/site/` |
 | `article/` | 分享内容对应的原文快照（Markdown + 17 张配图），方便回头查原始素材 |
 | `release/` | 构建产物，不进 Git：`site/` 站点目录（含 PDF）、PDF |
-| `void.config.ts` | Cloudflare 部署配置：worker 名 `trae-campus-slide-tz` 和账号 ID |
 
 ## 本地预览
 
@@ -46,18 +45,15 @@ npm run preview     # http://127.0.0.1:8765
 | --- | --- |
 | `npm run preview` | 启动本地预览（8765 端口） |
 | `npm run build` | 构建站点到 `release/site/` |
-| `npm run deploy` | 构建并部署到 Cloudflare Workers |
 | `npm run pdf` | 生成高画质 PDF（`release/` 与 `release/site/` 各一份） |
 
 ## 自动部署
 
-`.github/workflows/deploy.yml`，push 到 `main`（或手动触发）后跑两个 job：
+`.github/workflows/deploy.yml`，push 到 `main`（或手动触发）后执行：
 
-**deploy**：`npm ci` → `npm run build` → `npm run pdf` → `void deploy`（配了 `CLOUDFLARE_API_TOKEN` 才执行）
+`npm ci` → `npm run build` → `npm run pdf` → 发布到 GitHub Pages
 
-**pages**：`npm ci` → `npm run build` → `npm run pdf` → 发布到 GitHub Pages
-
-PDF 只通过 GitHub Pages 分发（Release 不给 PDF 资产，因为 GitHub 会把中文文件名剥成 `AI.pdf`）。
+站点和 PDF 都随 Pages 一起发，PDF 用中文文件名（GitHub Release 会把非 ASCII 文件名剥掉，所以不走 Release）。
 
 ## 约定
 

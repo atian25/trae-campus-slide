@@ -5,13 +5,9 @@
   "scripts": {
     "build": "node slide/build.ts",
     "preview": "node slide/server.mjs",
-    "deploy": "npm run build && void deploy --platform cloudflare --dir release/site",
     "pdf": "node slide/pdf.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"
-  },
-  "devDependencies": {
-    "void": "1.6.2"
   }
 }
