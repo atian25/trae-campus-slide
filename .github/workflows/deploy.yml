@@ -71,12 +71,19 @@ jobs:
               gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
             done
 
-            # 直接用 URL 编码的中文名上传，看 GitHub 是否保留原始文件名
+            # gh 会把中文名截成 AI.pdf，改用 curl 直接调接口
             rel_id=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq .id)
-            asset_name=$(node -e "process.stdout.write(encodeURIComponent(process.argv[1]))" "$TITLE.pdf")
             curl -sS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/pdf" \
               --data-binary @"release/upload.pdf" \
-              "https://uploads.github.com/repos/$GH_REPO/releases/$rel_id/assets?name=$asset_name"
+              "https://uploads.github.com/repos/$GH_REPO/releases/$rel_id/assets?name=upload.pdf"
+            echo
+            aid=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[0].id')
+            # GitHub 会把资产名里的非 ASCII 字符剥掉（中文名会变成 AI.pdf），
+            # 所以资产名用英文，中文标题放在 release 标题和 label 上
+            node -e 'require("fs").writeFileSync("/tmp/rename.json", JSON.stringify({ name: "trae-campus-slide.pdf", label: process.argv[1] }))' "$TITLE"
+            curl -sS -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              -H "Content-Type: application/json" --data-binary @/tmp/rename.json \
+              "https://api.github.com/repos/$GH_REPO/releases/assets/$aid"
             echo
           } 2>&1 | tee /tmp/release.log
 
