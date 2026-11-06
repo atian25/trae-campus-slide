@@ -117,7 +117,7 @@ jobs:
   pages:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # 失败时要往 Release 传日志
       pages: write
       id-token: write
     environment:
