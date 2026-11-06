@@ -42,22 +42,36 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
         run: |
           tail -200 /tmp/pdf.log > release/ci-error.log 2>/dev/null || echo "no log" > release/ci-error.log
-          gh release upload pdf-latest release/ci-error.log --clobber || gh release create pdf-latest --title "最新 PDF" --notes "CI" --latest
+          gh release view pdf-latest >/dev/null 2>&1 ||
+            gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建。" --latest
+          gh release upload pdf-latest release/ci-error.log --clobber
 
+      # 固定一个 release（tag: pdf-latest），每次覆盖里面的 PDF
       - name: 更新 PDF Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
         run: |
+          PDF="release/$TITLE.pdf"
+
           gh release view pdf-latest >/dev/null 2>&1 ||
-            gh release create pdf-latest --title "最新 PDF" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
-          # GitHub 会把非 ASCII 文件名改成 AI.pdf，先复制成英文名再上传
-          cp "release/AI时代的机遇和挑战.pdf" release/trae-campus-slide.pdf
-          gh release upload pdf-latest release/trae-campus-slide.pdf --clobber
-          gh release delete-asset pdf-latest AI.pdf --yes 2>/dev/null || true
-          gh release delete-asset pdf-latest ci-error.log --yes 2>/dev/null || true
-          gh release edit pdf-latest --latest
+            gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
+          gh release edit pdf-latest --title "$TITLE" --latest
+
+          rel_id=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq .id)
+          # 清掉旧资产，保证每次只有一个 PDF
+          for aid in $(gh api "repos/$GH_REPO/releases/$rel_id/assets" --jq '.[].id'); do
+            gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
+          done
+          # gh release upload 会把中文名截断，这里走 API 显式指定资产名
+          name=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$(basename "$PDF")")
+          gh api -X POST -H "Content-Type: application/pdf" \
+            "repos/$GH_REPO/releases/$rel_id/assets?name=$name" --input "$PDF"
 
       # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
       - name: 检查部署密钥

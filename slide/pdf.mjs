@@ -9,7 +9,7 @@ import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(ROOT, "release", "_pdf", "index.html");
-const OUT = path.join(ROOT, "release", "AI时代的机遇和挑战.pdf");
+const OUT = path.join(ROOT, "release", "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界.pdf");
 // 本机是 macOS 的 Chrome，CI 里是 Ubuntu 的 google-chrome，优先用 CHROME_PATH 指定
 const candidates = [
   process.env.CHROME_PATH,
@@ -101,7 +101,7 @@ if (pdf.error || !pdf.result?.data) {
 }
 const buf = Buffer.from(pdf.result.data, "base64");
 writeFileSync(OUT, buf);
-console.log(`pdf -> release/AI时代的机遇和挑战.pdf  ${(buf.length / 1024 / 1024).toFixed(2)} MB`);
+console.log(`pdf -> ${path.relative(ROOT, OUT)}  ${(buf.length / 1024 / 1024).toFixed(2)} MB`);
 
 // 4) 收尾（Chrome 可能还在写临时目录，删不掉不算失败）
 ws.close();
