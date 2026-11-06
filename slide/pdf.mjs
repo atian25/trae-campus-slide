@@ -3,7 +3,7 @@
  * 用法：node slide/pdf.mjs   （等价于 npm run pdf）
  */
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -101,6 +101,11 @@ if (pdf.error || !pdf.result?.data) {
 }
 const buf = Buffer.from(pdf.result.data, "base64");
 writeFileSync(OUT, buf);
+
+// 同时放一份进站点目录，部署后可以用中文文件名在线看/下载
+const SITE_DIR = path.join(ROOT, "release", "site");
+mkdirSync(SITE_DIR, { recursive: true });
+copyFileSync(OUT, path.join(SITE_DIR, path.basename(OUT)));
 console.log(`pdf -> ${path.relative(ROOT, OUT)}  ${(buf.length / 1024 / 1024).toFixed(2)} MB`);
 
 // 4) 收尾（Chrome 可能还在写临时目录，删不掉不算失败）
