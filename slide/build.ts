@@ -19,7 +19,7 @@ const BG = "#F7F8F5";
 const MAXW: Record<string, number> = {
   "learn-1.png": 1600, "learn-2.png": 1600, "learn-3.png": 1600, "learn-4.png": 1600,
   "case-1.png": 1600, "case-2.png": 1600, "case-3.png": 1600, "case-4.png": 1600,
-  "research-crop.png": 1806, "quote.png": 1983,
+  "research-crop.png": 2186, "quote.png": 1983,
 };
 
 // 截图类（文字多）给更高画质，避免小字出现压缩噪点
