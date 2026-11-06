@@ -11,6 +11,7 @@
   - `server.mjs` 本地预览用的 Node 静态服务
   - `build.py`   只负责生成发布单文件（开发时用不到）
 - `release/`  对外产物（18 张 PNG、PDF、单文件 HTML），不进 Git
+  - `trae-campus-slide-tz/` Cloudflare 部署工程（`public/index.html` 为整份单文件站点），同样不进 Git
 
 ## 预览
 
