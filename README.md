@@ -2,15 +2,14 @@
 
 天猪 · TRAE Campus 高校分享
 
-一套 18 页的 16:9 网页幻灯片，纯 HTML/CSS/JS 手写，不依赖前端框架。构建时把图片压缩内嵌成单文件，部署到 GitHub Pages 和 Cloudflare Workers。
+一套 18 页的 16:9 网页幻灯片，纯 HTML/CSS/JS 手写，不依赖前端框架。构建时把图片压缩内嵌成单文件，部署到 GitHub Pages。
 
 ## 相关链接
 
 | 内容 | 地址 |
 | --- | --- |
-| 在线幻灯片（推荐，国内可访问） | <https://atian25.github.io/trae-campus-slide/> |
-| 在线幻灯片（Cloudflare 备用） | <https://trae-campus-slide-tz.atian25.workers.dev> |
-| PDF（浏览器直接在线看，可下载） | <https://atian25.github.io/trae-campus-slide/AI%20%E6%97%B6%E4%BB%A3%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98%EF%BC%9A%E4%BB%8A%E5%A4%A9%E7%9A%84%E5%AD%A6%E7%94%9F%EF%BC%8C%E5%A6%82%E4%BD%95%E8%B5%B0%E5%90%91%E6%98%8E%E5%A4%A9%E7%9A%84%E4%B8%96%E7%95%8C.pdf> |
+| 在线幻灯片 | <https://atian25.github.io/trae-campus-slide/> |
+| PDF | <https://atian25.github.io/trae-campus-slide/AI%20%E6%97%B6%E4%BB%A3%E7%9A%84%E6%9C%BA%E9%81%87%E5%92%8C%E6%8C%91%E6%88%98%EF%BC%9A%E4%BB%8A%E5%A4%A9%E7%9A%84%E5%AD%A6%E7%94%9F%EF%BC%8C%E5%A6%82%E4%BD%95%E8%B5%B0%E5%90%91%E6%98%8E%E5%A4%A9%E7%9A%84%E4%B8%96%E7%95%8C.pdf> |
 | 知乎回答 | <https://www.zhihu.com/question/2076658003068052960/answer/2102009083041674168> |
 | 飞书文档 | <https://my.feishu.cn/wiki/KUvWwdDzfiBI2Vkzjzwc7S6SnTe> |
 
