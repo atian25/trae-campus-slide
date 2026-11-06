@@ -11,11 +11,18 @@ const SRC = path.join(ROOT, "slide", "deck.html");
 const OUT = path.join(ROOT, "release", "trae-campus-slide-tz", "public", "index.html");
 const BG = "#F7F8F5";
 
-// 仅发布态使用：按显示尺寸压缩（开发态预览始终用原图）
+// 按 2 倍屏留余量定宽度上限（页面按 1600×900 排版，案例/学习图显示宽约 690）
 const MAXW: Record<string, number> = {
-  "research-crop.png": 1600,
-  "learn-1.png": 900, "learn-2.png": 900, "learn-3.png": 900, "learn-4.png": 900,
-  "case-1.png": 1400, "case-2.png": 1400, "case-3.png": 1400, "case-4.png": 1400,
+  "learn-1.png": 1600, "learn-2.png": 1600, "learn-3.png": 1600, "learn-4.png": 1600,
+  "case-1.png": 1600, "case-2.png": 1600, "case-3.png": 1600, "case-4.png": 1600,
+  "research-crop.png": 1806, "quote.png": 1983,
+};
+
+// 截图类（文字多）给更高画质，避免小字出现压缩噪点
+const QUALITY: Record<string, number> = {
+  "learn-1.png": 92, "learn-2.png": 92, "learn-3.png": 92, "learn-4.png": 92,
+  "case-1.png": 90, "case-2.png": 90, "case-3.png": 90, "case-4.png": 90,
+  "research-crop.png": 92, "quote.png": 92,
 };
 
 // 带透明通道的图必须保留 alpha：jpg 会合成底色，配合 mix-blend-mode 会露出方框
@@ -28,7 +35,7 @@ async function dataUri(rel: string): Promise<string> {
   const img = sharp(file).resize({ width: cap, withoutEnlargement: true });
   const buf = KEEP_ALPHA.has(name)
     ? await img.png({ compressionLevel: 9 }).toBuffer()
-    : await img.flatten({ background: BG }).jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+    : await img.flatten({ background: BG }).jpeg({ quality: QUALITY[name] ?? 88, mozjpeg: true }).toBuffer();
   const mime = KEEP_ALPHA.has(name) ? "image/png" : "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
 }
