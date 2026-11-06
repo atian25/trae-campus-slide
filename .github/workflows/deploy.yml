@@ -57,21 +57,33 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TITLE: "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
         run: |
-          PDF="release/$TITLE.pdf"
+          set -o pipefail
+          {
+            set -x
+            cp "release/$TITLE.pdf" release/upload.pdf
 
-          gh release view pdf-latest >/dev/null 2>&1 ||
-            gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
-          gh release edit pdf-latest --title "$TITLE" --latest
+            gh release view pdf-latest >/dev/null 2>&1 ||
+              gh release create pdf-latest --title "$TITLE" --notes "由 GitHub Actions 自动构建，每次 push 到 main 覆盖更新。" --latest
+            gh release edit pdf-latest --title "$TITLE" --latest
 
-          rel_id=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq .id)
-          # 清掉旧资产，保证每次只有一个 PDF
-          for aid in $(gh api "repos/$GH_REPO/releases/$rel_id/assets" --jq '.[].id'); do
-            gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
-          done
-          # gh release upload 会把中文名截断，这里走 API 显式指定资产名
-          name=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$(basename "$PDF")")
-          gh api -X POST -H "Content-Type: application/pdf" \
-            "repos/$GH_REPO/releases/$rel_id/assets?name=$name" --input "$PDF"
+            # 清掉旧资产，保证每次只有一个 PDF
+            for aid in $(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[].id'); do
+              gh api -X DELETE "repos/$GH_REPO/releases/assets/$aid"
+            done
+
+            # gh release upload 会把中文名截断，先传英文名再改名
+            gh release upload pdf-latest release/upload.pdf --clobber
+            aid=$(gh api "repos/$GH_REPO/releases/tags/pdf-latest" --jq '.assets[0].id')
+            gh api -X PATCH "repos/$GH_REPO/releases/assets/$aid" -f "name=$TITLE.pdf"
+          } 2>&1 | tee /tmp/release.log
+
+      - name: 上传 Release 失败日志
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tail -200 /tmp/release.log > release/release-error.log 2>/dev/null || echo "no log" > release/release-error.log
+          gh release upload pdf-latest release/release-error.log --clobber || true
 
       # 没配 Cloudflare 密钥时跳过部署，保证 PDF 依然能发出去
       - name: 检查部署密钥
