@@ -41,6 +41,18 @@
   .ov-cell:hover .ov-box{outline:2px solid rgba(191,242,210,.5)}
   .ov-cell.cur .ov-box{outline:2px solid #BFF2D2}
   .ov-cell.cur .ov-no{color:#BFF2D2}
+  /* 学习案例截图：点击放大，便于讲图 */
+  .p img.zoom{cursor:zoom-in}
+  #lightbox{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;
+            gap:14px;padding:4vh 3vw;background:rgba(8,14,11,.94);cursor:zoom-out}
+  #lightbox.on{display:flex}
+  #lightbox img{max-width:94vw;max-height:82vh;width:auto;height:auto;display:block;background:#fff;border-radius:10px;
+                box-shadow:0 24px 80px rgba(0,0,0,.5)}
+  #lbcap{margin:0;color:#C9D6CF;font:600 15px/1.4 "PingFang SC",sans-serif;letter-spacing:1px;text-align:center}
+  #lbclose{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;width:42px;height:42px;border-radius:50%;
+           border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#EAF2ED;font:300 24px/1 sans-serif;cursor:pointer}
+  #lbclose:hover{background:rgba(255,255,255,.16)}
+  html.lb-open #pager,html.lb-open #hint,html.lb-open #ovbtn{display:none}
   #overview::after{content:'ESC 关闭 · 点击缩略图跳转';position:fixed;right:26px;bottom:22px;
     font:600 12px/1 "PingFang SC",sans-serif;color:#7F8F87;letter-spacing:1.5px}
   #ovbar.on{display:flex}
@@ -398,7 +410,7 @@
   @media print{
     html,body{height:auto;overflow:visible;background:#F7F8F5}
     #viewport{position:static;transform:none;width:auto;height:auto}
-    #pager,#hint,#overview,#ovbtn{display:none!important}
+    #pager,#hint,#overview,#ovbtn,#lightbox{display:none!important}
     .p{position:relative!important;display:block!important;inset:auto;
        width:calc(var(--u)*1600);height:calc(var(--u)*900);overflow:hidden;
        break-after:page;page-break-after:always}
@@ -573,11 +585,11 @@
 
     <div class="cases">
       <div class="case">
-        <div class="shot"><img src="img/learn-1.png" alt="让 AI 讲解专业基础"></div>
+        <div class="shot"><img class="zoom" src="img/learn-1.png" alt="让 AI 讲解专业基础" title="点击放大"></div>
         <div class="txt"><h3><span class="no">01</span>学习专业基础</h3><p>让 AI 把抽象的原理做成交互演示，方便理解，提升学习效率。</p></div>
       </div>
       <div class="case">
-        <div class="shot"><img src="img/learn-2.png" alt="让 AI 解读论文文献"></div>
+        <div class="shot"><img class="zoom" src="img/learn-2.png" alt="让 AI 解读论文文献" title="点击放大"></div>
         <div class="txt"><h3><span class="no">02</span>解读论文文献</h3><p>让 AI 梳理论文思路、解释概念、画思维导图，带着疑问交互式问答。</p></div>
       </div>
     </div>
@@ -592,11 +604,11 @@
 
     <div class="cases">
       <div class="case">
-        <div class="shot"><img src="img/learn-3.png" alt="用 AI 读懂开源项目"></div>
+        <div class="shot"><img class="zoom" src="img/learn-3.png" alt="用 AI 读懂开源项目" title="点击放大"></div>
         <div class="txt"><h3><span class="no">03</span>参与开源项目</h3><p>让 AI 结合代码画出架构图和调用流程，找到关键实现，再自己动手修改和验证。</p></div>
       </div>
       <div class="case">
-        <div class="shot"><img src="img/learn-4.png" alt="用 AI 处理实验数据"></div>
+        <div class="shot"><img class="zoom" src="img/learn-4.png" alt="用 AI 处理实验数据" title="点击放大"></div>
         <div class="txt"><h3><span class="no">04</span>处理实验数据</h3><p>让 AI 整理数据、编写分析脚本，从各个维度可视化分析数据，并输出报告。</p></div>
       </div>
     </div>
@@ -810,6 +822,11 @@
   总览
 </button>
 <div id="hint">← → 翻页 · ESC 总览</div>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="查看大图" aria-hidden="true">
+  <button id="lbclose" type="button" aria-label="关闭">×</button>
+  <img id="lbimg" alt="">
+  <p id="lbcap"></p>
+</div>
 <script>
 (function(){
   var slides=[].slice.call(document.querySelectorAll('.p'));
@@ -869,7 +886,25 @@
   if(ovclose) ovclose.addEventListener('click',function(){ toggleOverview(false); });
   // 触屏没有 Esc：点空白处也关掉总览
   ov.addEventListener('click',function(e){ if(e.target===ov||e.target===ovScroll) toggleOverview(false); });
+  // 学习案例截图：点图放大，点任意处 / Esc 关闭
+  var lb=document.getElementById('lightbox'), lbimg=document.getElementById('lbimg'), lbcap=document.getElementById('lbcap');
+  function closeLightbox(){ lb.classList.remove('on'); lb.setAttribute('aria-hidden','true'); document.documentElement.classList.remove('lb-open'); }
+  function openLightbox(img){
+    lbimg.src=img.src; lbimg.alt=img.alt||''; lbcap.textContent=img.alt||'';
+    lb.classList.add('on'); lb.setAttribute('aria-hidden','false'); document.documentElement.classList.add('lb-open');
+  }
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(!t||!t.closest) return;
+    var zoom=t.closest('#viewport img.zoom');
+    if(zoom){ e.preventDefault(); openLightbox(zoom); return; }
+    if(lb.classList.contains('on')) closeLightbox();
+  });
   document.addEventListener('keydown',function(e){
+    if(lb.classList.contains('on')){
+      if(e.key==='Escape'){e.preventDefault();closeLightbox();}
+      return;
+    }
     if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'||e.key==='ArrowDown'){e.preventDefault();show(i+1);}
     else if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp'){e.preventDefault();show(i-1);}
     else if(e.key>='1'&&e.key<='9'){show(parseInt(e.key,10)-1);}
@@ -890,6 +925,8 @@
   window.addEventListener('wheel', function(e){
     var ov = document.getElementById('overview');
     if(ov && ov.classList.contains('on')) return;
+    var lb = document.getElementById('lightbox');
+    if(lb && lb.classList.contains('on')) return;
     acc += e.deltaY;
     var now = Date.now();
     if(Math.abs(acc) < 30) return;
@@ -913,7 +950,7 @@
     return !!(ov && ov.classList.contains('on'));
   }
   function blocked(el){
-    return !!(el && el.closest && el.closest('a,button,input,select,textarea,[role=button],#pager,#hint'));
+    return !!(el && el.closest && el.closest('a,button,input,select,textarea,[role=button],#pager,#hint,#lightbox'));
   }
   function go(dir){
     document.dispatchEvent(new KeyboardEvent('keydown', {key: dir > 0 ? 'ArrowRight' : 'ArrowLeft'}));
@@ -942,6 +979,8 @@
       return;
     }
     if(!moved && dt < 400){
+      // 点在可放大的图上：交给 click 打开大图，不触发点两侧翻页
+      if(t.target && t.target.closest && t.target.closest('img.zoom')) return;
       var w = window.innerWidth, x = t.clientX;
       if(x < w * 0.3){ e.preventDefault(); go(-1); }
       else if(x > w * 0.7){ e.preventDefault(); go(1); }
