@@ -1,10 +1,12 @@
 // 极简静态服务：node server.mjs [端口]，默认 8765，强制不缓存
+// 默认只监听本机；手机/局域网预览用 HOST=0.0.0.0 node server.mjs 8765
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 
 const root = process.cwd();
 const port = Number(process.argv[2] || process.env.PORT || 8765);
+const host = process.env.HOST || '127.0.0.1';
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -38,6 +40,6 @@ http.createServer(async (req, res) => {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end('404');
   }
-}).listen(port, '127.0.0.1', () => {
-  console.log('serving http://127.0.0.1:' + port + '/');
+}).listen(port, host, () => {
+  console.log('serving http://' + host + ':' + port + '/');
 });
