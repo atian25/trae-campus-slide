@@ -23,7 +23,7 @@
          -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);cursor:pointer}
   #ovbtn svg{width:13px;height:13px;flex:none}
   .touch #ovbtn{display:inline-flex}
-  #overview{--ovw:260px;position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:#101714}
+  #overview{--ovw:260px;--ovs:.1625;position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:#101714}
   #overview.on{display:flex}
   #overview .ov-scroll{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,var(--ovw));
             gap:28px;justify-content:center;align-content:start;padding:32px 48px 20px}
@@ -36,7 +36,7 @@
   /* 缩略图走整体缩放：先按 1600×900 原样排版，再缩到缩略图宽度，避免小字号重排导致文字挤在一起 */
   .ov-box>.p{display:block!important;position:absolute;left:0;top:0;
              width:calc(var(--u)*1600);height:calc(var(--u)*900);
-             transform:scale(calc(var(--ovw) / 1600px));transform-origin:0 0}
+             transform:scale(var(--ovs));transform-origin:0 0}
   .ov-no{display:block;margin-top:9px;font:700 12px/1 "PingFang SC",sans-serif;color:#AEBDB5;letter-spacing:1.5px}
   .ov-cell:hover .ov-box{outline:2px solid rgba(191,242,210,.5)}
   .ov-cell.cur .ov-box{outline:2px solid #BFF2D2}
@@ -48,6 +48,7 @@
   #ovclose{display:none;margin-left:10px;padding:7px 14px;border:1px solid rgba(255,255,255,.18);border-radius:999px;
            background:rgba(255,255,255,.06);color:#DCE7E1;font:600 12px/1 "PingFang SC",sans-serif;letter-spacing:1px;cursor:pointer}
   .touch #ovclose{display:inline-flex}
+  .touch #overview::after{display:none}
   @media (max-width:700px){
     #overview .ov-scroll{padding:18px 16px 10px;gap:18px}
     #overview::after{display:none}
@@ -836,7 +837,9 @@
     var cw=Math.round((window.innerWidth-32-18)/2);
     ovrange.value=String(Math.max(150, Math.min(220, cw)));
   }
-  function applyOvSize(v){ ov.style.setProperty('--ovw', v+'px'); try{localStorage.setItem('ov-size', v);}catch(e){} }
+  // 注意：不要用 calc(var(--ovw)/1600px) 求比例，length/length 除法是 CSS Values 4 才有的，
+  // 鸿蒙自带浏览器等旧内核不认，会整条 transform 失效、缩略图按 1:1 裁切。这里由 JS 算好无单位比例。
+  function applyOvSize(v){ ov.style.setProperty('--ovw', v+'px'); ov.style.setProperty('--ovs', String(v/1600)); try{localStorage.setItem('ov-size', v);}catch(e){} }
   applyOvSize(parseInt(ovrange.value,10));
   ovrange.addEventListener('input', function(){ applyOvSize(parseInt(ovrange.value,10)); });
   var ovOn=false;

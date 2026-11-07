@@ -13,6 +13,7 @@
 
 - 单文件 16:9 幻灯片：`slide/deck.html`，一个 `<section class="p">` 一页，共 18 页。
 - 所有尺寸都基于 `--u`（1600×900 画布单位）。**新增样式必须写 `calc(var(--u)*N)`，不要写死 px**，否则手机缩放时字距、边距会错位（2026-11 就踩过：固定 `letter-spacing:-2.5px` 导致手机标题挤在一起）。
+- 概览缩略图缩放用 JS 算好的无单位 `--ovs`（`transform:scale(var(--ovs))`）。**不要写 `calc(长度 / 长度)`**：length/length 除法是 CSS Values 4 才支持的，鸿蒙自带浏览器等旧内核会整条 `transform` 失效，缩略图按 1:1 裁切（2026-11 实测）。
 - 预览：`cd slide && node server.mjs 8765`；手机/局域网访问加 `HOST=0.0.0.0`。
 - 构建：`npm run build`；导出 PDF：`npm run pdf`。
 - 配色：米白 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`；一页最多两处高亮。
