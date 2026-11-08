@@ -1,0 +1,49 @@
+<!-- @dsCard group="Layouts" height=460 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>TRAE Campus — Content Page</title>
+<link rel="stylesheet" href="../../tokens.css">
+</head>
+<body style="margin:0;background:transparent;font-family:var(--font-sans)">
+<div style="width:480px;height:270px;overflow:hidden;position:relative">
+  <!-- 1920×1080 canvas, scaled to 25%: 480×270 -->
+  <div style="position:absolute;top:0;left:0;width:1920px;height:1080px;transform:scale(0.25);transform-origin:top left;box-sizing:border-box;background:var(--surface);color:var(--text-ink);font-family:var(--font-sans);padding:67px 77px 62px 77px;display:flex;flex-direction:column;gap:41px">
+
+    <!-- header: 210px (eyebrow 24 + title 56/1.38 + sub 24/1.6 + 31 padding + 1px line) -->
+    <div style="display:flex;flex-direction:column;padding-bottom:31px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:13px;height:13px;border-radius:50%;background:var(--accent-brand)"></div>
+        <p style="margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:2.4px;color:var(--accent-eyebrow)">时代变革</p>
+      </div>
+      <h1 style="margin:0;font-size:56px;line-height:1.38;font-weight:800;letter-spacing:-1.2px;color:var(--text-ink);padding-top:17px">每个时代都有挑战和机遇</h1>
+      <p style="margin:0;font-size:24px;line-height:1.6;color:var(--text-body-soft);padding-top:17px">AI 正在重塑世界，并在指数级进化中，这是既定事实，也是大势所趋。</p>
+    </div>
+
+    <!-- body: 700px, 图文两栏 768 + 67 + rest -->
+    <div style="flex:1;display:grid;grid-template-columns:768px 1fr;gap:67px;align-items:center">
+
+      <!-- 图表/插图槽：图片不随本系统分发，用占位块说明尺寸 -->
+      <div style="box-sizing:border-box;width:768px;height:301px;background:var(--surface-card-alt);border:1px dashed var(--line);border-radius:var(--radius-figure);display:flex;align-items:center;justify-content:center">
+        <p style="margin:0;font-size:24px;line-height:1.7;color:var(--text-subtle)">图表占位 · 768×301</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;padding-right:34px">
+        <div style="padding:24px 0;border-top:1px solid var(--line)">
+          <h3 style="margin:0;width:max-content;font-size:30px;line-height:1.55;font-weight:800;letter-spacing:-0.4px;color:var(--text-ink);background:linear-gradient(180deg,transparent 62%,var(--accent-highlight) 62%);padding:0 5px">以史为鉴，可知兴衰</h3>
+          <p style="margin:0;font-size:24px;line-height:1.9;color:var(--text-body);padding-left:22px;padding-top:18px">汽车取代马车，带动了驾驶、维修和交通服务；互联网冲击传统行业，也带来了电商等新机会，催生了以 UP 主为代表的新职业。技术变革会改变工作的价值，也让过去做不到、做不起的事变得可行。</p>
+        </div>
+        <div style="padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+          <h3 style="margin:0;width:max-content;font-size:30px;line-height:1.55;font-weight:800;letter-spacing:-0.4px;color:var(--text-ink);background:linear-gradient(180deg,transparent 62%,var(--accent-highlight) 62%);padding:0 5px">不要怀疑 AI 的智商</h3>
+          <p style="margin:0;font-size:24px;line-height:1.9;color:var(--text-body);padding-left:22px;padding-top:18px">AI 已经能完成很多专业领域的复杂任务。从编程、画图、视频制作，到结合工具参与自动化、3D 打印和机器人控制，它的能力正从数字世界延伸到物理世界。</p>
+          <p style="margin:0;font-size:24px;line-height:1.9;color:var(--text-body);padding-left:22px;padding-top:18px">有些人用着用着，就会忍不住骂 AI。我反而会先从自己身上找问题：是不是模型没选对？是不是上下文信息没给够？是不是要求没有表达清楚？</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

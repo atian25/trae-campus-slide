@@ -1,0 +1,152 @@
+/* TRAE Campus — generated from tokens.json */
+:root {
+  /* color · surfaces */
+  --surface: #F7F8F5;
+  --surface-card: #EAECEA;
+  --surface-card-alt: #E8EDEA;
+  --surface-card-mint: #E5EEE8;
+  --surface-mint: #DFF1E6;
+  --surface-inverse: #0B3A29;
+  --surface-inverse-deep: #101714;
+  /* color · text */
+  --text-ink: #141C18;
+  --text-heading: #0B3A29;
+  --text-body: #3B463F;
+  --text-body-soft: #4A544E;
+  --text-muted: #5A645E;
+  --text-subtle: #63736B;
+  --text-on-mint: #0B4A32;
+  /* color · accents, lines, inverse, neutrals */
+  --accent-brand: #2FAE72;
+  --accent-text: #17754A;
+  --accent-eyebrow: #3C6B52;
+  --accent-highlight: #BFF2D2;
+  --line: #D9E1DC;
+  --line-soft: #DCE3DE;
+  --inverse-text: #D6EFE2;
+  --inverse-label: #7FB49A;
+  --neutral-graphic: #9BA8A1;
+
+  /* type · sizes (--text-body is the body COLOR token, so the body size is --text-body-size) */
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', system-ui, sans-serif;
+  --text-display: 104px;
+  --text-display-leading: 1.22;
+  --text-display-weight: 800;
+  --text-display-tracking: -3px;
+  --text-title: 56px;
+  --text-title-leading: 1.38;
+  --text-title-weight: 800;
+  --text-title-tracking: -1.2px;
+  --text-card: 41px;
+  --text-card-leading: 1.3;
+  --text-card-weight: 800;
+  --text-card-tracking: -0.5px;
+  --text-lead: 30px;
+  --text-lead-leading: 1.55;
+  --text-lead-weight: 800;
+  --text-lead-tracking: -0.4px;
+  --text-body-size: 25px;
+  --text-body-leading: 1.9;
+  --text-body-weight: 400;
+  --text-body-tracking: 0;
+  --text-caption: 24px;
+  --text-caption-leading: 1.7;
+  --text-caption-weight: 400;
+  --text-caption-tracking: 0;
+  --text-label: 24px;
+  --text-label-leading: 1.2;
+  --text-label-weight: 600;
+  --text-label-tracking: 2.4px;
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 17px;
+  --space-5: 22px;
+  --space-6: 26px;
+  --space-7: 29px;
+  --space-8: 31px;
+  --space-9: 41px;
+  --space-10: 48px;
+  --space-11: 56px;
+  --space-12: 67px;
+
+  /* radius */
+  --radius-tag: 8px;
+  --radius-icon: 13px;
+  --radius-image: 14px;
+  --radius-figure: 17px;
+  --radius-card-alt: 22px;
+  --radius-card: 24px;
+  --radius-pill: 999px;
+
+  /* size */
+  --canvas-w: 1920px;
+  --canvas-h: 1080px;
+  --content-w: 1766px;
+  --content-h: 951px;
+  --page-pad-top: 67px;
+  --page-pad-x: 77px;
+  --page-pad-bottom: 62px;
+  --header-h: 210px;
+  --body-h: 700px;
+  --cover-avatar-w: 190px;
+  --cover-pet-w: 780px;
+  --case-shot-h: 502px;
+  --case-shot-tall-h: 538px;
+
+  /* shadow */
+  --shadow-elevation: 0 12px 41px rgba(11, 59, 41, 0.10);
+}
+
+/* 7 type tiers; each class binds one tokens.json style */
+.display {
+  font-family: var(--font-sans);
+  font-size: var(--text-display);
+  line-height: var(--text-display-leading);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+}
+.title {
+  font-family: var(--font-sans);
+  font-size: var(--text-title);
+  line-height: var(--text-title-leading);
+  font-weight: var(--text-title-weight);
+  letter-spacing: var(--text-title-tracking);
+}
+.card {
+  font-family: var(--font-sans);
+  font-size: var(--text-card);
+  line-height: var(--text-card-leading);
+  font-weight: var(--text-card-weight);
+  letter-spacing: var(--text-card-tracking);
+}
+.lead {
+  font-family: var(--font-sans);
+  font-size: var(--text-lead);
+  line-height: var(--text-lead-leading);
+  font-weight: var(--text-lead-weight);
+  letter-spacing: var(--text-lead-tracking);
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  font-weight: var(--text-body-weight);
+  letter-spacing: var(--text-body-tracking);
+}
+.caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  line-height: var(--text-caption-leading);
+  font-weight: var(--text-caption-weight);
+  letter-spacing: var(--text-caption-tracking);
+}
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  line-height: var(--text-label-leading);
+  font-weight: var(--text-label-weight);
+  letter-spacing: var(--text-label-tracking);
+}

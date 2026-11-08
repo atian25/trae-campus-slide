@@ -1,0 +1,25 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-08T10:36:00Z"
+  },
+  "title": "TRAE Campus",
+  "namespace": "traecampus",
+  "libraries": [],
+  "sections": {},
+  "groups": [],
+  "assetGroups": {},
+  "blobs": {},
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "lastChange": {
+    "by": "天猪",
+    "at": "2026-11-08T10:45:54Z",
+    "via": "DeepSeek Harness",
+    "note": "从 slide/deck.html 沉淀 TRAE Campus 设计系统"
+  }
+}

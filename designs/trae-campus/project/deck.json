@@ -1,0 +1,44 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-11-08T10:36:00Z" },
+  "lists": "css",
+  "title": "TRAE Campus · AI 时代的机遇和挑战",
+  "order": [
+    "cover",
+    "about",
+    "prelude",
+    "path",
+    "dilemma",
+    "era",
+    "learn",
+    "learn-ai-1",
+    "learn-ai-2",
+    "ipo",
+    "practice",
+    "cases-1",
+    "cases-2",
+    "threshold",
+    "campus",
+    "token",
+    "future",
+    "faq"
+  ],
+  "cover": "cover",
+  "sections": {
+    "s1": { "description": "开场：TRAE Campus 与分享者天猪的介绍", "start": "cover" },
+    "s2": { "description": "挑战：传统成长路径正在失效", "start": "path" },
+    "s3": { "description": "时代：AI 既是挑战也是机遇", "start": "era" },
+    "s4": { "description": "应对之策：学习、实践与校园支持", "start": "learn" },
+    "s5": { "description": "收尾：心态与 FAQ", "start": "future" }
+  },
+  "faces": {},
+  "designSystems": [
+    {
+      "title": "TRAE Campus",
+      "namespace": "traecampus",
+      "artifact": "designs/trae-campus/design-system",
+      "version": null,
+      "copiedAt": "2026-11-08T10:47:00Z"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+<!-- @dsCard group="Layouts" height=460 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>TRAE Campus — Card Grid</title>
+<link rel="stylesheet" href="../../tokens.css">
+</head>
+<body style="margin:0;background:transparent;font-family:var(--font-sans)">
+<div style="width:480px;height:270px;overflow:hidden;position:relative">
+  <!-- 1920×1080 canvas, scaled to 25%: 480×270 -->
+  <div style="position:absolute;top:0;left:0;width:1920px;height:1080px;transform:scale(0.25);transform-origin:top left;box-sizing:border-box;background:var(--surface);color:var(--text-ink);font-family:var(--font-sans);padding:67px 77px 62px 77px;display:flex;flex-direction:column;gap:41px">
+
+    <!-- header: 210px -->
+    <div style="display:flex;flex-direction:column;padding-bottom:31px;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:13px;height:13px;border-radius:50%;background:var(--accent-brand)"></div>
+        <p style="margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:2.4px;color:var(--accent-eyebrow)">传统打怪升级路线</p>
+      </div>
+      <h1 style="margin:0;font-size:56px;line-height:1.38;font-weight:800;letter-spacing:-1.2px;color:var(--text-ink);padding-top:17px">传统的「大学生 → 程序员」成长路径</h1>
+      <p style="margin:0;font-size:24px;line-height:1.6;color:var(--text-body-soft);padding-top:17px">先学基础，再积累实践，凭潜力获得机会，最后在真实工作中逐步成长。</p>
+    </div>
+
+    <!-- body: 700px, 2×2 grid, gap 43 -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:43px">
+
+      <div style="background:var(--surface-card);border-radius:var(--radius-card);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+          <p style="margin:0;font-size:24px;line-height:1.2;font-weight:800;letter-spacing:1.2px;color:var(--text-subtle)">01</p>
+          <div style="width:50px;height:50px;border-radius:var(--radius-icon);background:var(--surface);display:flex;align-items:center;justify-content:center">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" style="display:block;stroke:var(--text-on-mint);stroke-width:1.8;stroke-linecap:round"><path d="M4 5.5A2 2 0 0 1 6 3.5h13v17H6a2 2 0 0 1-2-2z"/><path d="M8 8h7M8 12h7"/></svg>
+          </div>
+          <h2 style="margin:0;font-size:41px;line-height:1.3;font-weight:800;letter-spacing:-0.5px;color:var(--text-ink)">课内：<span style="color:var(--accent-text)">夯实基础</span></h2>
+        </div>
+        <p style="margin:0;font-size:25px;line-height:1.95;color:var(--text-body);padding-left:42px">学习数理知识、计算机原理、数据结构与编程语言，<br>通过项目和刷算法题练习。</p>
+      </div>
+
+      <div style="background:var(--surface-card-alt);border-radius:var(--radius-card);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+          <p style="margin:0;font-size:24px;line-height:1.2;font-weight:800;letter-spacing:1.2px;color:var(--text-subtle)">02</p>
+          <div style="width:50px;height:50px;border-radius:var(--radius-icon);background:var(--surface);display:flex;align-items:center;justify-content:center">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" style="display:block;stroke:var(--text-on-mint);stroke-width:1.8;stroke-linecap:round"><path d="M3 12h4l2.5-6 5 12L17 12h4"/></svg>
+          </div>
+          <h2 style="margin:0;font-size:41px;line-height:1.3;font-weight:800;letter-spacing:-0.5px;color:var(--text-ink)">课外：<span style="color:var(--accent-text)">拓展视野</span></h2>
+        </div>
+        <p style="margin:0;font-size:25px;line-height:1.95;color:var(--text-body);padding-left:42px">参与开源社区和业界大会，动手实践、输出学习心得文章，<br>从而积累经验和人脉。</p>
+      </div>
+
+      <div style="background:var(--surface-card-mint);border-radius:var(--radius-card);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+          <p style="margin:0;font-size:24px;line-height:1.2;font-weight:800;letter-spacing:1.2px;color:var(--text-subtle)">03</p>
+          <div style="width:50px;height:50px;border-radius:var(--radius-icon);background:var(--surface);display:flex;align-items:center;justify-content:center">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" style="display:block;stroke:var(--text-on-mint);stroke-width:1.8;stroke-linecap:round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/></svg>
+          </div>
+          <h2 style="margin:0;font-size:41px;line-height:1.3;font-weight:800;letter-spacing:-0.5px;color:var(--text-ink)">校招：<span style="color:var(--accent-text)">争取实习</span></h2>
+        </div>
+        <p style="margin:0;font-size:25px;line-height:1.95;color:var(--text-body);padding-left:42px">通过学业表现、算法面试和实践经历，向企业展示基础、潜力、<br>好奇心和执行力。</p>
+      </div>
+
+      <div style="background:var(--surface-mint);border-radius:var(--radius-card);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+        <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+          <p style="margin:0;font-size:24px;line-height:1.2;font-weight:800;letter-spacing:1.2px;color:var(--text-subtle)">04</p>
+          <div style="width:50px;height:50px;border-radius:var(--radius-icon);background:var(--surface);display:flex;align-items:center;justify-content:center">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" style="display:block;stroke:var(--text-on-mint);stroke-width:1.8;stroke-linecap:round"><path d="M4 20V9l8-5 8 5v11z"/><path d="M9.5 20v-6h5v6"/></svg>
+          </div>
+          <h2 style="margin:0;font-size:41px;line-height:1.3;font-weight:800;letter-spacing:-0.5px;color:var(--text-ink)">职场：<span style="color:var(--accent-text)">打怪升级</span></h2>
+        </div>
+        <p style="margin:0;font-size:25px;line-height:1.95;color:var(--text-body);padding-left:42px">在企业里跟着导师做项目，通过结对编程、代码评审<br>熟悉工程流程，提升业务理解、沟通协作和独立交付能力。</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
