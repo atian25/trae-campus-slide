@@ -76,7 +76,8 @@ await send("Page.navigate", { url: "file://" + SRC + "?clean" });
 const deadline = Date.now() + 60000;
 for (;;) {
   const st = await send("Runtime.evaluate", {
-    expression: "document.readyState === 'complete' && [...document.images].every(i => i.complete && i.naturalWidth > 0)",
+    // 忽略没有 src 的占位图（如 lightbox 里的 <img id="lbimg">），否则 naturalWidth 永远是 0
+    expression: "document.readyState === 'complete' && [...document.images].filter(i => i.getAttribute('src')).every(i => i.complete && i.naturalWidth > 0)",
     returnByValue: true,
   });
   if (st.result?.result?.value === true) break;
