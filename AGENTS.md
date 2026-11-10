@@ -9,6 +9,14 @@
 - 提交信息用中文，一行说清「做了什么 / 为什么」，必要时补正文。
 - 提交前跑 `git status`，确认没有把 `.tmp-test/`、临时截图等带进去。
 
+## designs/（claude-slides 幻灯片）
+
+`designs/` 下是用 **claude-slides** 重建的幻灯片（`trae-campus/`，19 页）与**设计系统**（`trae-campus-ds/`），
+和老的 `slide/deck.html` 是两套产物，构建/预览/规则都不同。
+
+它有独立的协作约定（**文案归人在编辑器里改、结构/样式归 AI**；编辑器会整页重写文件）：
+见 [`designs/AGENTS.md`](designs/AGENTS.md)。在本目录工作时先读它。
+
 ## 项目速览
 
 - 单文件 16:9 幻灯片：`slide/deck.html`，一个 `<section class="p">` 一页，共 18 页。

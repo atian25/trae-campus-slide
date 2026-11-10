@@ -1,0 +1,98 @@
+<!-- @dsCard group="Layouts" width=960 height=540 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>CardGrid — 2×2 卡片</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 960px; height: 540px; overflow: hidden; background: #F7F8F5; }
+  .stage { width: 960px; height: 540px; overflow: hidden; position: relative; }
+  .page {
+    position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+    transform: scale(.5); transform-origin: 0 0; overflow: hidden;
+    background: var(--surface, #F7F8F5); color: var(--text-ink, #141C18);
+    font-family: var(--font-sans, 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', system-ui, sans-serif);
+    padding: 67px 77px 62px 77px; box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .mark { background: linear-gradient(180deg, transparent 60%, var(--accent-mint, #BFF2D2) 60%); padding: 0 4px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="page">
+
+  <div style="display:flex;flex-direction:column;gap:17px;padding-bottom:31px;border-bottom:1px solid var(--line,#D9E1DC)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+      <p style="margin:0;font-size:24px;line-height:1;font-weight:600;letter-spacing:2.4px;color:var(--accent-eyebrow,#3C6B52)">传统打怪升级路线</p>
+    </div>
+    <h1 style="margin:0;font-size:56px;line-height:1.35;letter-spacing:-1.2px;font-weight:800;color:var(--text-ink,#141C18)">传统的「大学生 → 程序员」成长路径</h1>
+    <p style="margin:0;font-size:24px;line-height:1.7;color:var(--text-body-soft,#4A544E)">先学基础，再积累实践，凭潜力获得机会，最后在真实工作中逐步成长。</p>
+  </div>
+
+  <!-- 2×2 卡片：gap 43，卡片 22 圆角 / 48×53 内距，四张底色循环 -->
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:43px;padding-top:41px">
+
+    <div style="background:var(--surface-card,#EAECEA);border-radius:var(--radius-22,22px);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+        <p style="margin:0;font-size:24px;line-height:1;font-weight:800;letter-spacing:1.2px;color:var(--text-muted,#63736B)">01</p>
+        <div style="width:50px;height:50px;border-radius:var(--radius-13,13px);background:var(--white,#FFFFFF);display:flex;align-items:center;justify-content:center">
+          <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:0px">
+          <p style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">课内：</p>
+          <p class="mark" style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">夯实基础</p>
+        </div>
+      </div>
+      <p style="margin:0;font-size:25px;line-height:1.75;color:var(--text-body,#3B463F);padding-left:42px">学习数理知识、计算机原理、数据结构与编程语言，通过项目和刷算法题练习。</p>
+    </div>
+
+    <div style="background:var(--surface-card-alt,#E8EDEA);border-radius:var(--radius-22,22px);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+        <p style="margin:0;font-size:24px;line-height:1;font-weight:800;letter-spacing:1.2px;color:var(--text-muted,#63736B)">02</p>
+        <div style="width:50px;height:50px;border-radius:var(--radius-13,13px);background:var(--white,#FFFFFF);display:flex;align-items:center;justify-content:center">
+          <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:0px">
+          <p style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">课外：</p>
+          <p class="mark" style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">拓展视野</p>
+        </div>
+      </div>
+      <p style="margin:0;font-size:25px;line-height:1.75;color:var(--text-body,#3B463F);padding-left:42px">参与开源社区和业界大会，动手实践、输出学习心得文章，从而积累经验和人脉。</p>
+    </div>
+
+    <div style="background:var(--surface-card-tint,#E5EEE8);border-radius:var(--radius-22,22px);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+        <p style="margin:0;font-size:24px;line-height:1;font-weight:800;letter-spacing:1.2px;color:var(--text-muted,#63736B)">03</p>
+        <div style="width:50px;height:50px;border-radius:var(--radius-13,13px);background:var(--white,#FFFFFF);display:flex;align-items:center;justify-content:center">
+          <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:0px">
+          <p style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">校招：</p>
+          <p class="mark" style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">争取实习</p>
+        </div>
+      </div>
+      <p style="margin:0;font-size:25px;line-height:1.75;color:var(--text-body,#3B463F);padding-left:42px">通过学业表现、算法面试和实践经历，向企业展示基础、潜力、好奇心和执行力。</p>
+    </div>
+
+    <div style="background:var(--surface-mint,#DFF1E6);border-radius:var(--radius-22,22px);padding:48px 53px;display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:center;gap:22px;padding-bottom:22px">
+        <p style="margin:0;font-size:24px;line-height:1;font-weight:800;letter-spacing:1.2px;color:var(--text-muted,#63736B)">04</p>
+        <div style="width:50px;height:50px;border-radius:var(--radius-13,13px);background:var(--white,#FFFFFF);display:flex;align-items:center;justify-content:center">
+          <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:0px">
+          <p style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">职场：</p>
+          <p class="mark" style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--text-ink,#141C18)">打怪升级</p>
+        </div>
+      </div>
+      <p style="margin:0;font-size:25px;line-height:1.75;color:var(--text-body,#3B463F);padding-left:42px">在企业里跟着导师做项目，通过结对编程、代码评审熟悉工程流程，提升业务理解、沟通协作和独立交付能力。</p>
+    </div>
+
+  </div>
+</div>
+</div>
+</body>
+</html>

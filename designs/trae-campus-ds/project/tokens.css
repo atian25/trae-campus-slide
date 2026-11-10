@@ -1,0 +1,148 @@
+/* TRAE Campus — generated from tokens.json */
+:root, [data-theme="light"] {
+  --surface: #F7F8F5;
+  --surface-card: #EAECEA;
+  --surface-card-alt: #E8EDEA;
+  --surface-card-tint: #E5EEE8;
+  --surface-mint: #DFF1E6;
+  --surface-inverse: #0B3A29;
+  --text-ink: #141C18;
+  --text-ink-deep: #0B3A29;
+  --text-body: #3B463F;
+  --text-body-soft: #4A544E;
+  --text-body-quiet: #5A645E;
+  --text-muted: #63736B;
+  --text-faint: #A7B3AC;
+  --accent-brand: #2FAE72;
+  --accent-brand-deep: #17754A;
+  --accent-eyebrow: #3C6B52;
+  --accent-mint: #BFF2D2;
+  --accent-mint-soft: #A6ECC0;
+  --inverse-text: #D6EFE2;
+  --inverse-muted: #7FB49A;
+  --line: #D9E1DC;
+  --line-soft: #DCE3DE;
+  --white: #FFFFFF;
+  --card-lift: 0px 10px 34px rgba(11,58,41,0.10);
+
+  /* 兼容别名：外部静态页可沿用 --color-* 命名，值仍指向同名色板 token */
+  --color-surface: var(--surface);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-alt: var(--surface-card-alt);
+  --color-surface-card-tint: var(--surface-card-tint);
+  --color-surface-mint: var(--surface-mint);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-text-ink: var(--text-ink);
+  --color-text-ink-deep: var(--text-ink-deep);
+  --color-text-body: var(--text-body);
+  --color-text-body-soft: var(--text-body-soft);
+  --color-text-body-quiet: var(--text-body-quiet);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-accent-brand: var(--accent-brand);
+  --color-accent-brand-deep: var(--accent-brand-deep);
+  --color-accent-eyebrow: var(--accent-eyebrow);
+  --color-accent-mint: var(--accent-mint);
+  --color-accent-mint-soft: var(--accent-mint-soft);
+  --color-inverse-text: var(--inverse-text);
+  --color-inverse-muted: var(--inverse-muted);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-white: var(--white);
+}
+
+:root {
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-96: 96px;
+
+  --radius-8: 8px;
+  --radius-13: 13px;
+  --radius-14: 14px;
+  --radius-17: 17px;
+  --radius-19: 19px;
+  --radius-22: 22px;
+  --radius-pill: 999px;
+
+  --canvas-w: 1920px;
+  --canvas-h: 1080px;
+  --page-pad-top: 67px;
+  --page-pad-x: 77px;
+  --page-pad-bottom: 62px;
+  --content-w: 1766px;
+  --body-h: 746px;
+  --header-pad-bottom: 31px;
+  --header-gap: 17px;
+  --two-col-left: 768px;
+  --two-col-gap: 67px;
+  --grid-gap: 43px;
+  --cover-pad-x: 115px;
+
+  --font-sans: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', system-ui, sans-serif;
+  --font-mono: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+.display {
+  font-family: var(--font-sans);
+  font-size: 104px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -3px;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 56px;
+  line-height: 1.35;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+}
+
+.card {
+  font-family: var(--font-sans);
+  font-size: 41px;
+  line-height: 1.4;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.lead {
+  font-family: var(--font-sans);
+  font-size: 30px;
+  line-height: 1.5;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.body {
+  font-family: var(--font-sans);
+  font-size: 25px;
+  line-height: 1.75;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.caption {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 2.4px;
+}

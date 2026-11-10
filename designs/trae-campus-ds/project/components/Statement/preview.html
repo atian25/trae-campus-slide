@@ -1,0 +1,49 @@
+<!-- @dsCard group="Layouts" width=960 height=540 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Statement — 反白大字</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 960px; height: 540px; overflow: hidden; background: #0B3A29; }
+  .stage { width: 960px; height: 540px; overflow: hidden; position: relative; }
+  .page {
+    position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+    transform: scale(.5); transform-origin: 0 0; overflow: hidden;
+    background: var(--surface-inverse, #0B3A29); color: var(--inverse-text, #D6EFE2);
+    font-family: var(--font-sans, 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', system-ui, sans-serif);
+    padding: 108px 144px; box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="page">
+
+  <!-- 反白页不带页头：左上角只留 wordmark，主体垂直居中 -->
+  <div style="position:absolute;left:144px;top:108px;display:flex;align-items:center;gap:12px">
+    <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+    <p style="margin:0;font-size:24px;line-height:1;font-weight:600;letter-spacing:2.4px;color:var(--inverse-muted,#7FB49A)">TRAE CAMPUS</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:32px;max-width:1632px">
+
+    <p style="margin:0;font-size:24px;line-height:1;font-weight:700;letter-spacing:2.4px;color:var(--inverse-muted,#7FB49A)">结语 · 保持终身学习</p>
+
+    <p style="margin:0;font-size:104px;line-height:1.2;letter-spacing:-3px;font-weight:800;color:var(--inverse-text,#D6EFE2)">自然选择号，<span style="color:var(--accent-mint,#BFF2D2)">前进四</span>！</p>
+
+    <p style="margin:0;font-size:41px;line-height:1.4;letter-spacing:-0.6px;font-weight:800;color:var(--inverse-text,#D6EFE2)">仰望星空，保持终身学习的心态。</p>
+
+    <div style="margin-top:32px">
+      <div style="width:320px;height:8px;border-radius:var(--radius-pill,999px);background:var(--accent-mint,#BFF2D2)"></div>
+    </div>
+
+    <p style="margin:0;font-size:25px;line-height:1.95;color:var(--inverse-muted,#7FB49A);max-width:1240px">历史的车轮滚滚向前，碾过一个又一个的人物和时代，渺小与伟大，卑鄙或高尚，失败和成功。调整好心态，不要逃避，也不要气馁。</p>
+
+  </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!-- @dsCard group="Layouts" width=960 height=540 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>ContentPage — 页头 + 双栏图文</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 960px; height: 540px; overflow: hidden; background: #F7F8F5; }
+  .stage { width: 960px; height: 540px; overflow: hidden; position: relative; }
+  .page {
+    position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+    transform: scale(.5); transform-origin: 0 0; overflow: hidden;
+    background: var(--surface, #F7F8F5); color: var(--text-ink, #141C18);
+    font-family: var(--font-sans, 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans SC', system-ui, sans-serif);
+    padding: 67px 77px 62px 77px; box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .mint { background: linear-gradient(180deg, transparent 60%, var(--accent-mint, #BFF2D2) 60%); padding: 0 4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="page">
+
+  <!-- 页头配方：13 圆点 + label / title / caption，17 行距，31 下内距 + 1px 分类线 -->
+  <div style="display:flex;flex-direction:column;gap:17px;padding-bottom:31px;border-bottom:1px solid var(--line,#D9E1DC)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:13px;height:13px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+      <p style="margin:0;font-size:24px;line-height:1;font-weight:600;letter-spacing:2.4px;color:var(--accent-eyebrow,#3C6B52)">时代变革</p>
+    </div>
+    <h1 style="margin:0;font-size:56px;line-height:1.35;letter-spacing:-1.2px;font-weight:800;color:var(--text-ink,#141C18)">每个时代都有挑战和机遇</h1>
+    <p style="margin:0;font-size:24px;line-height:1.7;color:var(--text-body-soft,#4A544E)">AI 正在重塑世界，并在指数级进化中，这是既定事实，也是大势所趋。</p>
+  </div>
+
+  <!-- 双栏图文：768 + 67 + 1fr，左图右文，整体垂直居中 -->
+  <div style="flex:1;display:grid;grid-template-columns:768px 1fr;gap:67px;align-items:center;padding-top:10px">
+
+    <!-- 左列：768 图区（本系统不含图片，用品牌色块占位） -->
+    <div style="display:flex;flex-direction:column;gap:26px">
+      <div style="position:relative;width:768px;height:520px;background:var(--surface-card-tint,#E5EEE8);border-radius:var(--radius-22,22px);overflow:hidden">
+        <div style="position:absolute;right:0;bottom:0;width:340px;height:520px;background:var(--surface-inverse,#0B3A29);border-radius:22px 0 0 0">
+          <div style="position:absolute;right:60px;bottom:60px;width:170px;height:170px;border-radius:var(--radius-pill,999px);background:var(--accent-mint,#BFF2D2)"></div>
+        </div>
+        <div style="position:absolute;right:380px;bottom:300px;width:150px;height:150px;border-radius:var(--radius-22,22px);background:var(--surface-card,#EAECEA)"></div>
+        <div style="position:absolute;right:520px;bottom:80px;width:56px;height:56px;border-radius:var(--radius-pill,999px);background:var(--accent-brand,#2FAE72)"></div>
+        <p style="position:absolute;left:40px;bottom:32px;margin:0;font-size:24px;line-height:1;font-weight:600;letter-spacing:2.4px;color:var(--text-muted,#63736B)">图片位 768 × 520</p>
+      </div>
+      <p style="margin:0;font-size:24px;line-height:1.7;color:var(--text-body-quiet,#5A645E);text-align:center">每个时代都有每个时代的困难，也有独属于那个时代的红利，既是挑战，也是机遇。</p>
+    </div>
+
+    <!-- 右列：1–2 个 item，行间 1px line -->
+    <div style="display:flex;flex-direction:column">
+      <div style="padding:24px 0;border-top:1px solid var(--line,#D9E1DC)">
+        <h3 style="margin:0 0 14px 0;font-size:30px;line-height:1.5;font-weight:800;letter-spacing:-0.4px;color:var(--text-ink-deep,#0B3A29)">以史为鉴，<span class="mint">可知兴衰</span></h3>
+        <p style="margin:0;font-size:25px;line-height:1.85;color:var(--text-body,#3B463F)">汽车取代马车，带动了驾驶、维修和交通服务；互联网冲击传统行业，也带来了电商等新机会，催生了以 UP 主为代表的新职业。</p>
+      </div>
+      <div style="padding:24px 0;border-top:1px solid var(--line,#D9E1DC);border-bottom:1px solid var(--line,#D9E1DC)">
+        <h3 style="margin:0 0 14px 0;font-size:30px;line-height:1.5;font-weight:800;letter-spacing:-0.4px;color:var(--text-ink-deep,#0B3A29)">不要怀疑 <span style="color:var(--accent-brand-deep,#17754A)">AI 的智商</span></h3>
+        <p style="margin:0;font-size:25px;line-height:1.85;color:var(--text-body,#3B463F)">AI 已经能完成很多专业领域的复杂任务。从编程、画图、视频制作，到结合工具参与自动化、3D 打印和机器人控制，它的能力正从数字世界延伸到物理世界。</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</body>
+</html>

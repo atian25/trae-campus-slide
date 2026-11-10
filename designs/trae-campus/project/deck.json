@@ -1,0 +1,78 @@
+{
+  "v": 4,
+  "attachments": {},
+  "cover": "cover",
+  "createdOnFiles": {
+    "at": "2026-11-09T03:40:00Z",
+    "v": 1
+  },
+  "designSystems": [
+    {
+      "artifact": "designs/trae-campus-ds",
+      "copiedAt": "2026-11-09T03:55:00Z",
+      "namespace": "traecampus",
+      "title": "TRAE Campus",
+      "version": null
+    }
+  ],
+  "faces": {
+    "noto-sans-sc": {
+      "family": "Noto Sans SC",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap"
+    }
+  },
+  "lists": "css",
+  "order": [
+    "cover",
+    "about-me",
+    "preface",
+    "path",
+    "dilemma",
+    "eras",
+    "knowledge-v2",
+    "ipo-v2",
+    "learn-1",
+    "learn-2",
+    "mindset",
+    "practice",
+    "cases-1",
+    "cases-2",
+    "threshold",
+    "campus",
+    "campus-tokens",
+    "farewell",
+    "faq"
+  ],
+  "sections": {
+    "campus": {
+      "before": null,
+      "description": "TRAE Campus 校园计划",
+      "start": "threshold"
+    },
+    "change": {
+      "description": "时代变革中，AI 重塑了知识的生产与消费方式。",
+      "start": "eras"
+    },
+    "close": {
+      "before": null,
+      "description": "结语",
+      "start": "farewell"
+    },
+    "old-path": {
+      "before": null,
+      "description": "传统的打怪升级路线，正在慢慢被挑战",
+      "start": "path"
+    },
+    "opening": {
+      "before": null,
+      "description": "封面：AI 时代的机遇和挑战",
+      "start": "cover"
+    },
+    "practice": {
+      "before": null,
+      "description": "工欲善其事，必先利其器，借助 AI 帮助我们学习和实践",
+      "start": "learn-1"
+    }
+  },
+  "title": "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
+}

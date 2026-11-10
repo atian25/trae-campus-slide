@@ -5,7 +5,10 @@
   "scripts": {
     "build": "node slide/build.ts",
     "preview": "node slide/server.mjs",
-    "pdf": "node slide/pdf.mjs"
+    "pdf": "node slide/pdf.mjs",
+    "deck:check": "node tools/deck.mjs check",
+    "deck:open": "node tools/deck.mjs open",
+    "deck:render": "node tools/deck.mjs render"
   },
   "dependencies": {
     "sharp": "^0.34.4"
