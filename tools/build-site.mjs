@@ -134,24 +134,26 @@ const html = `<!doctype html>
 html,body{height:100%;overflow:hidden;background:#EBECEA;
   font-family:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Source Han Sans SC',system-ui,sans-serif;
   -webkit-text-size-adjust:100%}
-/* ---------- 只读视图 ---------- */
-#bar{position:fixed;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;
-  background:#F4F5F3;border-bottom:1px solid #DDE2DE;z-index:5;font-size:13px;color:#3B463F}
-#ro{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid #CFD7D2;border-radius:999px;
-  background:#fff;color:#54605A;letter-spacing:.02em}
-#pos{color:#7C8A83;letter-spacing:.04em}
-#bar .spacer{flex:1}
+/* ---------- 顶栏：只留页码 + 两个动作，任何宽度都不换行 ---------- */
+#bar{position:fixed;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:#F4F5F3;border-bottom:1px solid #DDE2DE;z-index:5;
+  font-size:13px;color:#3B463F;white-space:nowrap;overflow:hidden}
+#pos{color:#5C6B63;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+#ro{color:#93A097;letter-spacing:.02em}
+#bar .spacer{flex:1;min-width:8px}
 #bar a,#bar button{appearance:none;border:1px solid #CFD7D2;background:#fff;color:#26302B;font:inherit;
-  padding:6px 13px;border-radius:999px;cursor:pointer;text-decoration:none}
+  padding:6px 13px;border-radius:999px;cursor:pointer;text-decoration:none;flex:none;white-space:nowrap}
 #bar a:hover,#bar button:hover{background:#EDF3EF;border-color:#B9C7BF}
 #present{background:#0B3A29;color:#EAF3ED;border-color:#0B3A29}
 #present:hover{background:#123B29}
+/* ---------- 画布区 ---------- */
 #stage{position:fixed;left:0;right:0;top:52px;bottom:150px;display:flex;align-items:center;justify-content:center;
   background:#EBECEA;transition:background .2s}
 #canvas{width:1920px;height:1080px;transform-origin:center center;flex:none;position:relative;
   box-shadow:0 4px 28px rgba(20,40,30,.13);background:#F7F8F5}
-#rail{position:fixed;left:0;right:0;bottom:0;height:150px;display:flex;align-items:center;gap:10px;
-  padding:0 14px 0 8px;background:#F4F5F3;border-top:1px solid #DDE2DE;z-index:5}
+/* ---------- 缩略图滑轨 ---------- */
+#rail{position:fixed;left:0;right:0;bottom:0;height:150px;display:flex;align-items:center;gap:8px;
+  padding:0 12px 0 6px;background:#F4F5F3;border-top:1px solid #DDE2DE;z-index:5}
 #rail-track{display:flex;gap:10px;overflow-x:auto;scrollbar-width:thin;padding:12px 4px;flex:1;align-items:center}
 #rail-track::-webkit-scrollbar{height:8px}
 #rail-track::-webkit-scrollbar-thumb{background:#C9D3CC;border-radius:4px}
@@ -162,22 +164,33 @@ html,body{height:100%;overflow:hidden;background:#EBECEA;
 .thumb-cap{display:block;margin-top:5px;font-size:11px;color:#8A968F;letter-spacing:.04em}
 .thumb.active .thumb-frame{outline-color:#2FAE72}
 .thumb.active .thumb-cap{color:#17754A}
-.thumb:hover .thumb-frame{outline-color:#9FD8B8}
-#rail-actions{display:flex;flex-direction:column;gap:6px;flex:none;padding:0 6px}
+#rail-actions{display:flex;flex-direction:row;gap:6px;flex:none;padding:0 2px}
 #rail-actions button,#rail-toggle{appearance:none;border:1px solid #CFD7D2;background:#fff;color:#3B463F;
-  font:inherit;font-size:12px;padding:5px 10px;border-radius:8px;cursor:pointer}
-#rail-actions button:hover{background:#EDF3EF}
-#rail-toggle{flex:none;align-self:flex-start;margin-top:14px}
-/* 折叠滑轨 */
+  font:inherit;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+#rail-actions button:hover,#rail-toggle:hover{background:#EDF3EF}
+#rail-toggle{flex:none;align-self:center}
+/* 收起滑轨 */
 body.no-rail #rail{height:0;padding:0;overflow:hidden;border-top:0}
+body.no-rail #rail-track,body.no-rail #rail-actions{display:none}
 body.no-rail #stage{bottom:0}
-body.no-rail #rail-toggle{position:fixed;left:14px;bottom:14px;z-index:6;margin:0}
-/* 页码/提示（只读视图里显示） */
-#hint{color:#9AA69F;font-size:12px;letter-spacing:.03em}
+body.no-rail #rail-toggle{position:fixed;left:12px;bottom:12px;z-index:6;box-shadow:0 2px 8px rgba(20,40,30,.16)}
+/* ---------- 首屏提示（浮在画布下方，自动淡出） ---------- */
+#coach{position:fixed;left:50%;transform:translateX(-50%);bottom:166px;z-index:6;
+  padding:8px 16px;border-radius:999px;background:rgba(11,58,41,.86);color:#EAF3ED;font-size:12px;
+  letter-spacing:.03em;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#coach.show{opacity:1}
+body.no-rail #coach{bottom:16px}
 /* ---------- 演示态 ---------- */
-body.mode-present #bar,body.mode-present #rail,body.mode-present #rail-toggle{display:none}
+body.mode-present #bar,body.mode-present #rail,body.mode-present #rail-toggle,body.mode-present #coach{display:none}
 body.mode-present #stage{top:0;bottom:0;background:#000}
 body.mode-present #canvas{box-shadow:none}
+/* 演示态的退出入口（触屏没有 Esc） */
+#exit-present{position:fixed;top:14px;right:14px;z-index:8;display:none}
+body.mode-present #exit-present{display:block}
+#exit-present button{appearance:none;border:1px solid rgba(255,255,255,.28);background:rgba(20,20,20,.72);
+  color:#F2F5F3;font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;
+  opacity:0;transition:opacity .25s;backdrop-filter:blur(6px)}
+body.present-ui #exit-present button{opacity:1}
 /* ---------- 总览网格 ---------- */
 #overview{position:fixed;inset:0;z-index:9;background:#0B0B0B;padding:26px 26px 40px;overflow:auto;display:none}
 body.mode-overview #overview{display:block}
@@ -196,10 +209,22 @@ body.mode-overview #overview{display:block}
 @keyframes push{from{opacity:.2;transform:translateX(4%)}to{opacity:1;transform:translateX(0)}}
 x-icon{display:inline-flex;align-items:center;justify-content:center;font-family:'AnthropiconsFZ',sans-serif;
   font-style:normal;font-weight:400;line-height:1;font-variant-ligatures:none;overflow:hidden}
+/* ---------- 窄屏（手机） ---------- */
+@media (max-width: 900px){
+  #bar{height:44px;padding:0 10px;gap:8px;font-size:12px}
+  #bar a,#bar button{padding:5px 11px;font-size:12px}
+  #ro{display:none}
+  #stage{top:44px;bottom:132px}
+  #rail{height:132px;padding:0 8px 0 4px}
+  .thumb-frame{width:150px}
+  #coach{bottom:148px;font-size:11px;padding:7px 12px}
+  body.no-rail #stage{bottom:0}
+  body.no-rail #coach{bottom:14px}
+}
 @media print{
   @page{size:1920px 1080px;margin:0}
   html,body{background:#fff;overflow:visible;height:auto}
-  #bar,#rail,#rail-toggle,#overview{display:none!important}
+  #bar,#rail,#rail-toggle,#overview,#coach,#exit-present{display:none!important}
   #stage{position:static;display:block;background:#fff;top:auto;bottom:auto}
   #canvas{transform:none!important;width:1920px;height:auto;box-shadow:none;position:static}
   .page{display:block!important;position:relative;break-after:page;page-break-after:always;animation:none!important}
@@ -208,9 +233,8 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 </head>
 <body>
 <div id="bar">
-  <span id="ro">Read-only</span>
   <span id="pos">1 / ${order.length}</span>
-  <span id="hint"></span>
+  <span id="ro">只读视图</span>
   <span class="spacer"></span>
   <a id="pdf" href="${encodeURIComponent(title + ".pdf")}" download>下载 PDF</a>
   <button id="present" type="button">▶ 演示</button>
@@ -220,12 +244,15 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 ${pages}
 </div></div>
 
+<p id="coach">← → / 滚轮翻页 · 点缩略图跳页</p>
+
 <div id="rail">
-  <button id="rail-toggle" type="button" title="折叠/展开缩略图">收起</button>
+  <button id="rail-toggle" type="button">收起</button>
   <div id="rail-track"></div>
-  <div id="rail-actions"><button id="grid-btn" type="button" title="网格总览">总览</button></div>
+  <div id="rail-actions"><button id="grid-btn" type="button">总览</button></div>
 </div>
 
+<div id="exit-present"><button id="exit-btn" type="button">✕ 退出演示</button></div>
 <div id="overview"><p id="ov-hint"></p><div id="grid"></div></div>
 
 <script>
@@ -245,11 +272,14 @@ const pos = document.getElementById('pos');
 const track = document.getElementById('rail-track');
 const grid = document.getElementById('grid');
 const overview = document.getElementById('overview');
+const coach = document.getElementById('coach');
+const railToggle = document.getElementById('rail-toggle');
 let cur = 0;
 let mode = 'view';            // view | present | overview
 const clamp = (n) => Math.max(0, Math.min(pages.length - 1, n));
+const isNarrow = () => matchMedia('(max-width: 900px)').matches;
+const isTouch = () => matchMedia('(pointer: coarse)').matches;
 
-/* ---------- 缩放 ---------- */
 function fit() {
   const s = Math.min(stage.clientWidth / 1920, stage.clientHeight / 1080);
   canvas.style.transform = 'scale(' + s + ')';
@@ -264,7 +294,15 @@ function scaleThumbs() {
   }
 }
 
-/* ---------- 翻页 ---------- */
+/* 收起/展开滑轨 */
+function setRail(collapsed) {
+  document.body.classList.toggle('no-rail', collapsed);
+  railToggle.textContent = collapsed ? '缩略图' : '收起';
+  requestAnimationFrame(fit);
+}
+railToggle.addEventListener('click', () => setRail(!document.body.classList.contains('no-rail')));
+
+/* 翻页 */
 function show(n, opts) {
   const o = opts || {};
   cur = clamp(n);
@@ -279,18 +317,17 @@ function show(n, opts) {
     }
   });
   pos.textContent = (cur + 1) + ' / ' + pages.length;
-  for (const el of document.querySelectorAll('.thumb')) {
-    el.classList.toggle('active', (+el.dataset.i) === cur);
-  }
-  document.getElementById('hint').textContent = mode === 'view' ? '滚轮 / ← → 翻页 · 点缩略图跳页' : '';
+  for (const el of document.querySelectorAll('.thumb')) el.classList.toggle('active', (+el.dataset.i) === cur);
   const active = track.querySelector('.thumb.active');
-  if (active && !o.noScroll) active.scrollIntoView({ inline: 'center', block: 'nearest' });
+  if (active && !o.noScroll && !document.body.classList.contains('no-rail')) {
+    active.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
   const g = grid.querySelector('.thumb.active');
   if (g) g.scrollIntoView({ block: 'nearest' });
   if (o.push !== false) history.replaceState(null, '', '#slide-' + (cur + 1));
 }
 
-/* ---------- 缩略图（滑轨 + 网格） ---------- */
+/* 缩略图 */
 function makeThumb(i, page) {
   const btn = document.createElement('button');
   btn.type = 'button'; btn.className = 'thumb'; btn.dataset.i = String(i);
@@ -316,37 +353,51 @@ function buildGrid() {
   scaleThumbs();
 }
 
-/* ---------- 模式 ---------- */
+/* 首屏提示：出现 4s 后淡出，任何交互也淡出 */
+let coachTimer = 0;
+function flashCoach() {
+  coach.classList.add('show');
+  clearTimeout(coachTimer);
+  coachTimer = setTimeout(() => coach.classList.remove('show'), 4000);
+}
+function hideCoach() { clearTimeout(coachTimer); coach.classList.remove('show'); }
+
+/* 模式 */
 function setMode(m) {
   mode = m;
   document.body.classList.toggle('mode-present', m === 'present');
   document.body.classList.toggle('mode-overview', m === 'overview');
+  document.body.classList.remove('present-ui');
   if (m === 'overview') buildGrid();
-  document.getElementById('hint').textContent =
-    m === 'view' ? '滚轮 / ← → 翻页 · 点缩略图跳页' : '';
+  if (m !== 'view') hideCoach();
   requestAnimationFrame(() => { fit(); show(cur, { noScroll: true, push: false }); });
 }
 function enterPresent() {
   setMode('present');
-  if (document.documentElement.requestFullscreen) {
+  if (isNarrow()) setRail(true);
+  if (!isTouch() && document.documentElement.requestFullscreen) {
     document.documentElement.requestFullscreen().catch(() => {});
   }
+  flashPresentUi();
 }
 function exitPresent() {
   setMode('view');
+  document.body.classList.remove('present-ui');
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
 }
+/* 演示态里点一下画面：短暂显示退出按钮（触屏唯一出路） */
+let uiTimer = 0;
+function flashPresentUi() {
+  if (mode !== 'present') return;
+  document.body.classList.add('present-ui');
+  clearTimeout(uiTimer);
+  uiTimer = setTimeout(() => document.body.classList.remove('present-ui'), 3000);
+}
+document.getElementById('exit-btn').addEventListener('click', (e) => { e.stopPropagation(); exitPresent(); });
 
-/* ---------- 交互 ---------- */
-document.getElementById('present').addEventListener('click', enterPresent);
+document.getElementById('present').addEventListener('click', (e) => { e.stopPropagation(); enterPresent(); });
 document.getElementById('grid-btn').addEventListener('click', () => setMode('overview'));
-const railToggle = document.getElementById('rail-toggle');
-railToggle.addEventListener('click', () => {
-  const collapsed = document.body.classList.toggle('no-rail');
-  railToggle.textContent = collapsed ? '展开' : '收起';
-  requestAnimationFrame(fit);
-});
-addEventListener('resize', fit);
+addEventListener('resize', () => { if (!document.body.classList.contains('no-rail') && isNarrow()) setRail(true); fit(); });
 document.addEventListener('fullscreenchange', () => requestAnimationFrame(fit));
 
 addEventListener('keydown', (e) => {
@@ -360,14 +411,13 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (mode === 'overview') return;
-  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown') { e.preventDefault(); show(cur + 1); }
-  else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(cur - 1); }
-  else if (k === 'Home') show(0);
-  else if (k === 'End') show(pages.length - 1);
-  else if (/^[1-9]$/.test(k)) show(+k - 1);
+  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown') { e.preventDefault(); show(cur + 1); hideCoach(); }
+  else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(cur - 1); hideCoach(); }
+  else if (k === 'Home') { show(0); hideCoach(); }
+  else if (k === 'End') { show(pages.length - 1); hideCoach(); }
+  else if (/^[1-9]$/.test(k)) { show(+k - 1); hideCoach(); }
 });
 
-// 滚轮翻页（节流）
 let wheelAt = 0;
 addEventListener('wheel', (e) => {
   if (mode !== 'view') return;
@@ -375,28 +425,39 @@ addEventListener('wheel', (e) => {
   const now = Date.now();
   if (now - wheelAt < 450 || Math.abs(e.deltaY) < 8) return;
   wheelAt = now;
+  hideCoach();
   show(cur + (e.deltaY > 0 ? 1 : -1));
 }, { passive: true });
 
-// 点画面左右两侧翻页（只读视图与演示态都支持）
 addEventListener('click', (e) => {
   if (mode === 'overview') { if (e.target === overview) setMode('view'); return; }
-  if (e.target.closest('#bar') || e.target.closest('#rail') || e.target.closest('a')) return;
+  if (e.target.closest('#bar') || e.target.closest('#rail') || e.target.closest('#exit-present') || e.target.closest('a')) return;
+  if (mode === 'present') flashPresentUi();   // 演示态：点一下先亮出退出入口，同时照常翻页
+  hideCoach();
   if (e.clientX > innerWidth * 0.62) show(cur + 1);
   else if (e.clientX < innerWidth * 0.38) show(cur - 1);
 });
 
-// 触屏滑动
 let sx = 0, sy = 0;
 addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
 addEventListener('touchend', (e) => {
   const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
+  if (mode === 'present') {
+    if (dy > 90 && Math.abs(dy) > Math.abs(dx)) { exitPresent(); return; }   // 下拉退出演示
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
+    flashPresentUi();
+    return;
+  }
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { hideCoach(); show(cur + (dx < 0 ? 1 : -1)); }
 }, { passive: true });
+document.addEventListener('touchmove', () => flashPresentUi(), { passive: true });
 
+/* 启动：窄屏默认收起滑轨；首屏给一次翻页提示 */
+if (isNarrow()) setRail(true);
 fit();
 const fromHash = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
 show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+setTimeout(flashCoach, 400);
 addEventListener('hashchange', () => {
   const n = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
   if (Number.isFinite(n)) show(n - 1, { noScroll: true });
