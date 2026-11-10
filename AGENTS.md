@@ -29,7 +29,8 @@
 | `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、`build-site.mjs`（站点 + PDF）。
-- 图标字体与字形表从本机 claude-slides 安装读取（`CLAUDE_SLIDES_SKILL` 可指定），不往仓库拷字体。
+- 图标字体与字形表内置在 `tools/assets/`（anthropicons.woff2 + json），CI 无需装 claude-slides；
+  本地若想用安装里的新版可删掉这两个文件，脚本会回落到 `CLAUDE_SLIDES_SKILL` / `~/.agents/skills/claude-slides`。
 - 发布：push 到 `main` 触发 `.github/workflows/deploy.yml` → `npm ci` + `npm run site` → GitHub Pages。
 
 ## 验收
