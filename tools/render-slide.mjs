@@ -19,6 +19,8 @@ import { spawnSync } from "node:child_process";
 const REPO = path.resolve(import.meta.dirname, "..");
 const DECK = path.resolve(REPO, process.env.DECK_ROOT || "slide");
 const OUTDIR = path.join(REPO, ".tmp-test/render");
+const LOCAL_FONT = path.join(REPO, "tools/assets/anthropicons.woff2");
+const LOCAL_MAP = path.join(REPO, "tools/assets/anthropicons.json");
 const FONT_LINK =
   "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap";
 
@@ -55,6 +57,7 @@ function findChrome() {
 
 /** 图标名 → 字形码位：从编辑器 bundle 里扒出来（30 个名字，格式文档里规定的那套） */
 function iconMap() {
+  if (fs.existsSync(LOCAL_MAP)) return JSON.parse(fs.readFileSync(LOCAL_MAP, "utf8"));
   const assets = path.join(findSkill(), "scripts/editor/assets");
   const bundle = fs.readdirSync(assets).find((f) => /^index-.*\.js$/.test(f));
   if (!bundle) throw new Error(`编辑器 assets 目录里没有 index-*.js: ${assets}`);
@@ -67,6 +70,7 @@ function iconMap() {
 
 /** 编辑器默认图标字体 Anthropicons-Variable 以 base64 内嵌在其 CSS 里，直接取出来用 */
 function iconFontDataUrl() {
+  if (fs.existsSync(LOCAL_FONT)) return `data:font/woff2;base64,${fs.readFileSync(LOCAL_FONT).toString("base64")}`;
   const assets = path.join(findSkill(), "scripts/editor/assets");
   const css = fs.readdirSync(assets).find((f) => /^index-.*\.css$/.test(f));
   if (!css) throw new Error(`编辑器 assets 目录里没有 index-*.css: ${assets}`);

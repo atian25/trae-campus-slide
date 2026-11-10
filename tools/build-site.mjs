@@ -23,7 +23,10 @@ const DECK = path.resolve(REPO, process.env.DECK_ROOT || "slide");
 const SITE = path.join(REPO, "release/site");
 const ART_ASSETS = path.join(SITE, "assets");
 
-// ---------- 从 claude-slides 安装里取图标字体与字形表 ----------
+// ---------- 图标字体与字形表：优先用仓库内的 tools/assets（CI 也能用），没有再从本机安装里取 ----------
+const LOCAL_FONT = path.join(REPO, "tools/assets/anthropicons.woff2");
+const LOCAL_MAP = path.join(REPO, "tools/assets/anthropicons.json");
+
 function findSkill() {
   const candidates = [
     process.env.CLAUDE_SLIDES_SKILL,
@@ -38,14 +41,19 @@ function findSkill() {
       if (fs.existsSync(path.join(c, "scripts/artifact.mjs"))) return c;
     }
   }
-  throw new Error("找不到 claude-slides 安装目录；用 CLAUDE_SLIDES_SKILL=<目录> 指定。");
+  return null;
 }
 
 function iconFontAndMap() {
-  const assets = path.join(findSkill(), "scripts/editor/assets");
+  if (fs.existsSync(LOCAL_FONT) && fs.existsSync(LOCAL_MAP)) {
+    const b64 = fs.readFileSync(LOCAL_FONT).toString("base64");
+    return { font: `data:font/woff2;base64,${b64}`, map: JSON.parse(fs.readFileSync(LOCAL_MAP, "utf8")) };
+  }
+  const skill = findSkill();
+  if (!skill) throw new Error("没有 tools/assets/anthropicons.*，也找不到 claude-slides 安装目录。");
+  const assets = path.join(skill, "scripts/editor/assets");
   const css = fs.readdirSync(assets).find((f) => /^index-.*\.css$/.test(f));
   const bundle = fs.readdirSync(assets).find((f) => /^index-.*\.js$/.test(f));
-  if (!css || !bundle) throw new Error(`编辑器 assets 目录不完整: ${assets}`);
   const cssText = fs.readFileSync(path.join(assets, css), "utf8");
   const m = /font-family:\s*Anthropicons-Variable\s*;\s*src:\s*url\((data:font\/woff2;base64,[^)]+)\)/.exec(cssText);
   if (!m) throw new Error("编辑器 CSS 里没找到 Anthropicons-Variable 的 base64 字体。");
