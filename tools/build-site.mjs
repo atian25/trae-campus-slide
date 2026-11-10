@@ -126,6 +126,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B3A29">
 <title>${title}</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNERkYxRTYiLz48cmVjdCB4PSI5IiB5PSIxNSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjM0IiByeD0iNyIgZmlsbD0iI0Y3RjhGNSIgc3Ryb2tlPSIjMEIzQTI5IiBzdHJva2Utd2lkdGg9IjYiLz48cGF0aCBkPSJNMjUgMjdsNiA1LTYgNS02LTV6IiBmaWxsPSIjMEIzQTI5Ii8+PHBhdGggZD0iTTQwIDI3bDYgNS02IDUtNi01eiIgZmlsbD0iIzBCM0EyOSIvPjwvc3ZnPg==">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap">
 <style>
 @font-face{font-family:'AnthropiconsFZ';src:url(${iconFont}) format('woff2');font-weight:400 700;font-display:block}
@@ -148,6 +149,15 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
   color:#E8EFEA;font:inherit;padding:6px 14px;border-radius:999px;cursor:pointer}
 .ui button:hover{background:rgba(255,255,255,.12)}
 .hint{opacity:.55}
+#overview{position:fixed;inset:0;z-index:9;background:#0B3A29;padding:26px 26px 80px;overflow:auto}
+#overview.hidden{display:none}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.thumb{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;position:relative;display:block}
+.thumb-frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.thumb-inner{width:1920px;height:1080px;transform-origin:top left;pointer-events:none}
+.thumb-cap{display:block;margin-top:6px;color:#CBD9D0;font-size:12px;letter-spacing:.06em}
+.thumb:hover .thumb-frame{outline:2px solid #7FE3AE}
+#ov-hint{margin:0 0 16px;color:#CBD9D0;font-size:13px;letter-spacing:.06em}
 @media print{
   @page{size:1920px 1080px;margin:0}
   html,body{background:#fff;overflow:visible;height:auto}
@@ -156,6 +166,7 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
   .page{display:block!important;break-after:page;page-break-after:always}
   .page>section{break-inside:avoid}
   .ui{display:none!important}
+  #overview{display:none!important}
 }
 </style>
 </head>
@@ -163,10 +174,12 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 <div id="stage"><div id="canvas">
 ${pages}
 </div></div>
+<div id="overview" class="hidden"><p id="ov-hint"></p><div id="grid"></div></div>
 <div class="ui">
   <span id="pos">1 / ${order.length}</span>
   <span class="spacer"></span>
-  <span class="hint">← → 翻页 · 数字跳页 · 触屏左右滑动</span>
+  <span class="hint">← → / 滚轮 翻页 · 数字跳页 · Esc 总览</span>
+  <button id="overview-btn" type="button">总览</button>
   <button id="prev" type="button">上一页</button>
   <button id="next" type="button">下一页</button>
 </div>
@@ -220,6 +233,59 @@ addEventListener('touchend', (e) => {
   const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
   if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
 }, { passive: true });
+// 滚轮翻页（节流，避免一次手势跳多页）
+let wheelAt = 0;
+addEventListener('wheel', (e) => {
+  if (!overview.classList.contains('hidden')) return;
+  const now = Date.now();
+  if (now - wheelAt < 450 || Math.abs(e.deltaY) < 8) return;
+  wheelAt = now;
+  show(cur + (e.deltaY > 0 ? 1 : -1));
+}, { passive: true });
+
+// 总览：把所有页克隆成缩略图网格
+const overview = document.getElementById('overview');
+const grid = document.getElementById('grid');
+let built = false;
+function thumbScale() {
+  const w = grid.firstElementChild?.getBoundingClientRect().width || 280;
+  return w / 1920;
+}
+function scaleThumbs() {
+  const s = thumbScale();
+  for (const el of grid.querySelectorAll('.thumb-inner')) el.style.transform = 'scale(' + s + ')';
+}
+function buildOverview() {
+  if (built) return;
+  built = true;
+  pages.forEach((page, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'thumb';
+    const frame = document.createElement('div'); frame.className = 'thumb-frame';
+    const inner = document.createElement('div'); inner.className = 'thumb-inner';
+    const clone = page.querySelector('section').cloneNode(true);
+    clone.removeAttribute('id');
+    inner.appendChild(clone); frame.appendChild(inner);
+    const cap = document.createElement('span'); cap.className = 'thumb-cap';
+    cap.textContent = (i + 1) + ' / ' + pages.length;
+    btn.appendChild(frame); btn.appendChild(cap);
+    btn.addEventListener('click', () => { toggleOverview(false); show(i); });
+    grid.appendChild(btn);
+  });
+  scaleThumbs();
+  document.getElementById('ov-hint').textContent = '共 ' + pages.length + ' 页 · 点击缩略图跳转 · Esc 或点空白处关闭';
+}
+function toggleOverview(force) {
+  const on = force === undefined ? overview.classList.contains('hidden') : force;
+  if (on) buildOverview();
+  overview.classList.toggle('hidden', !on);
+  if (on) { scaleThumbs(); grid.querySelectorAll('.thumb')[cur]?.scrollIntoView({ block: 'center' }); }
+}
+document.getElementById('overview-btn').addEventListener('click', () => toggleOverview());
+addEventListener('resize', () => { if (!overview.classList.contains('hidden')) scaleThumbs(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overview.classList.contains('hidden')) toggleOverview(false); });
+overview.addEventListener('click', (e) => { if (e.target === overview) toggleOverview(false); });
+
 fit();
 show((parseInt(location.hash.replace('#', ''), 10) || 1) - 1);
 addEventListener('hashchange', () => show((parseInt(location.hash.replace('#', ''), 10) || 1) - 1, false));

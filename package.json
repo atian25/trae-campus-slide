@@ -6,7 +6,8 @@
     "deck:check": "node tools/deck.mjs check",
     "deck:open": "node tools/deck.mjs open",
     "deck:render": "node tools/deck.mjs render",
-    "site": "node tools/build-site.mjs"
+    "site": "node tools/build-site.mjs",
+    "preview": "node tools/serve.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

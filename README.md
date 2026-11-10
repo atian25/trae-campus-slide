@@ -30,6 +30,8 @@
 ```sh
 npm ci
 npm run deck:open     # 起编辑器（127.0.0.1），在里面改文案 / 拖版式
+npm run site          # 构建站点 + PDF
+npm run preview       # http://127.0.0.1:8765 看构建结果
 ```
 
 编辑器里改完直接保存即可，想给 AI 改结构就让它读 `slide/AGENTS.md` 的约定。
@@ -42,8 +44,10 @@ npm run deck:open     # 起编辑器（127.0.0.1），在里面改文案 / 拖�
 | `npm run deck:check` | 校验草稿，`problems` 必须为 0 |
 | `npm run deck:render` | 把每页渲染成 1920×1080 PNG（`.tmp-test/render/`，可选单页：`-- <id>`） |
 | `npm run site` | 构建 `release/site/`（站点 + PDF），部署用 |
+| `npm run preview` | 起本地预览 `http://127.0.0.1:8765`（服务 `release/site/`，`-- --host 0.0.0.0` 可局域网） |
 
-操作（线上）：← → / 空格翻页，数字键跳页，Home/End 首末页；手机上左右滑动或点屏幕两侧翻页。网址 `#7` 直达第 7 页。
+操作：← → / 空格 / 滚轮翻页，数字键跳页，Home/End 首末页，**Esc 或右下角「总览」看缩略图网格**；
+手机上左右滑动或点屏幕两侧翻页。网址 `#7` 直达第 7 页。
 
 ## 修改内容
 
