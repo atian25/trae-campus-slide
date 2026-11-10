@@ -46,7 +46,11 @@ npm run preview       # http://127.0.0.1:8765 看构建结果
 | `npm run site` | 构建 `release/site/`（站点 + PDF），部署用 |
 | `npm run preview` | 起本地预览 `http://127.0.0.1:8765`（服务 `release/site/`，`-- --host 0.0.0.0` 可局域网） |
 
-线上就是 **claude-slides 的 present 形态**：黑底 letterbox、没有控制条，只用键盘/点击/滑动。
+线上按 claude-slides 的**只读视图 + 演示**两层来做（与 skill 的 viewer 角色一致）：
+
+- **只读视图**（默认）：顶部 `Read-only` 标 + 页码 + 「▶ 演示」+「下载 PDF」，底部**缩略图滑轨**（点击跳页、可「收起」），右上「总览」开网格视图。
+- **演示**：点 ▶ 进纯黑 letterbox 全屏，无控件；← → / 空格翻页，Esc 回到只读视图。
+- 只读视图里也支持滚轮 / ← → / 数字键 / Home End，点画面两侧、触屏滑动翻页；`#slide-7` 直达第 7 页。
 
 操作：← → / 空格 / PageUp PageDown 翻页，Home/End 首末页，数字键跳页，
 **Esc（或 `o`）打开缩略图总览**（再按 Esc / 点空白关闭），`#slide-7` 直达第 7 页；
