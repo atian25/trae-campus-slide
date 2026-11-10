@@ -46,8 +46,11 @@ npm run preview       # http://127.0.0.1:8765 看构建结果
 | `npm run site` | 构建 `release/site/`（站点 + PDF），部署用 |
 | `npm run preview` | 起本地预览 `http://127.0.0.1:8765`（服务 `release/site/`，`-- --host 0.0.0.0` 可局域网） |
 
-操作：← → / 空格 / 滚轮翻页，数字键跳页，Home/End 首末页，**Esc 或右下角「总览」看缩略图网格**；
-手机上左右滑动或点屏幕两侧翻页。网址 `#7` 直达第 7 页。
+线上就是 **claude-slides 的 present 形态**：黑底 letterbox、没有控制条，只用键盘/点击/滑动。
+
+操作：← → / 空格 / PageUp PageDown 翻页，Home/End 首末页，数字键跳页，
+**Esc（或 `o`）打开缩略图总览**（再按 Esc / 点空白关闭），`#slide-7` 直达第 7 页；
+手机上左右滑动或点屏幕两侧翻页。动鼠标时右下角出现页码，停 1.5s 自动淡出。
 
 ## 修改内容
 

@@ -119,54 +119,54 @@ function slideHtml(id) {
 const { font: iconFont, map: iconMap } = iconFontAndMap();
 const pages = order.map(slideHtml).join("\n");
 
+const ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNERkYxRTYiLz48cmVjdCB4PSI5IiB5PSIxNSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjM0IiByeD0iNyIgZmlsbD0iI0Y3RjhGNSIgc3Ryb2tlPSIjMEIzQTI5IiBzdHJva2Utd2lkdGg9IjYiLz48cGF0aCBkPSJNMjUgMjdsNiA1LTYgNS02LTV6IiBmaWxsPSIjMEIzQTI5Ii8+PHBhdGggZD0iTTQwIDI3bDYgNS02IDUtNi01eiIgZmlsbD0iIzBCM0EyOSIvPjwvc3ZnPg==';
 const html = `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0B3A29">
+<meta name="theme-color" content="#000000">
 <title>${title}</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNERkYxRTYiLz48cmVjdCB4PSI5IiB5PSIxNSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjM0IiByeD0iNyIgZmlsbD0iI0Y3RjhGNSIgc3Ryb2tlPSIjMEIzQTI5IiBzdHJva2Utd2lkdGg9IjYiLz48cGF0aCBkPSJNMjUgMjdsNiA1LTYgNS02LTV6IiBmaWxsPSIjMEIzQTI5Ii8+PHBhdGggZD0iTTQwIDI3bDYgNS02IDUtNi01eiIgZmlsbD0iIzBCM0EyOSIvPjwvc3ZnPg==">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap">
+<link rel="icon" type="image/svg+xml" href="${ICON}">
 <style>
 @font-face{font-family:'AnthropiconsFZ';src:url(${iconFont}) format('woff2');font-weight:400 700;font-display:block}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{margin:0;height:100%;background:#0B3A29;overflow:hidden;
+html,body{height:100%;background:#000;overflow:hidden;
   font-family:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Source Han Sans SC',system-ui,sans-serif;
-  -webkit-text-size-adjust:100%}
-#stage{position:fixed;left:0;right:0;top:0;bottom:56px;display:flex;align-items:center;justify-content:center}
-#canvas{width:1920px;height:1080px;transform-origin:center center;flex:none}
-.page{display:none;position:relative;width:1920px;height:1080px;overflow:hidden}
+  -webkit-text-size-adjust:100%;cursor:default}
+/* 演示态：整页只有一个居中的 1920×1080 画布，四周黑色 letterbox（与 claude-slides 的 present 一致） */
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#canvas{width:1920px;height:1080px;transform-origin:center center;flex:none;position:relative}
+.page{display:none;position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;background:#F7F8F5}
 .page.on{display:block}
 .page>section{width:1920px;height:1080px}
+.page.fade{animation:fade .28s ease both}
+.page.push{animation:push .32s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes push{from{opacity:.2;transform:translateX(4%)}to{opacity:1;transform:translateX(0)}}
 x-icon{display:inline-flex;align-items:center;justify-content:center;font-family:'AnthropiconsFZ',sans-serif;
   font-style:normal;font-weight:400;line-height:1;font-variant-ligatures:none;overflow:hidden}
-.ui{position:fixed;left:0;right:0;bottom:0;padding:14px 20px;display:flex;align-items:center;gap:16px;
-  color:#E8EFEA;font-size:13px;letter-spacing:.04em;pointer-events:none;
-  background:linear-gradient(to top,rgba(11,58,41,.55),rgba(11,58,41,0))}
-.ui .spacer{flex:1}
-.ui button{pointer-events:auto;appearance:none;border:1px solid rgba(232,239,234,.35);background:rgba(11,58,41,.35);
-  color:#E8EFEA;font:inherit;padding:6px 14px;border-radius:999px;cursor:pointer}
-.ui button:hover{background:rgba(255,255,255,.12)}
-.hint{opacity:.55}
-#overview{position:fixed;inset:0;z-index:9;background:#0B3A29;padding:26px 26px 80px;overflow:auto}
+/* 页码：平时隐形，动鼠标时淡入，和旧版那条绿底控制栏不同 */
+#pos{position:fixed;right:22px;bottom:16px;color:rgba(255,255,255,.62);font-size:13px;letter-spacing:.08em;
+  opacity:0;transition:opacity .4s;pointer-events:none}
+#pos.show{opacity:1}
+/* 总览：深色缩略图网格，Esc / o 切换 */
+#overview{position:fixed;inset:0;z-index:9;background:#0B0B0B;padding:26px 26px 40px;overflow:auto}
 #overview.hidden{display:none}
+#ov-hint{margin:0 0 16px;color:rgba(255,255,255,.5);font-size:13px;letter-spacing:.06em}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-.thumb{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;position:relative;display:block}
-.thumb-frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.thumb{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block}
+.thumb-frame{width:100%;aspect-ratio:16/9;overflow:hidden;background:#111;box-shadow:0 2px 12px rgba(0,0,0,.6)}
 .thumb-inner{width:1920px;height:1080px;transform-origin:top left;pointer-events:none}
-.thumb-cap{display:block;margin-top:6px;color:#CBD9D0;font-size:12px;letter-spacing:.06em}
-.thumb:hover .thumb-frame{outline:2px solid #7FE3AE}
-#ov-hint{margin:0 0 16px;color:#CBD9D0;font-size:13px;letter-spacing:.06em}
+.thumb-cap{display:block;margin-top:6px;color:rgba(255,255,255,.45);font-size:12px}
+.thumb:hover .thumb-frame,.thumb:focus-visible .thumb-frame{outline:2px solid #7FE3AE;outline-offset:2px}
 @media print{
   @page{size:1920px 1080px;margin:0}
   html,body{background:#fff;overflow:visible;height:auto}
-  #stage{position:static;display:block;bottom:auto}
-  #canvas{transform:none!important;width:1920px;height:auto}
-  .page{display:block!important;break-after:page;page-break-after:always}
-  .page>section{break-inside:avoid}
-  .ui{display:none!important}
-  #overview{display:none!important}
+  #stage{position:static;display:block}
+  #canvas{transform:none!important;width:1920px;height:auto;position:static}
+  .page{display:block!important;position:relative;break-after:page;page-break-after:always;animation:none!important}
+  #overview,#pos{display:none!important}
 }
 </style>
 </head>
@@ -174,15 +174,8 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 <div id="stage"><div id="canvas">
 ${pages}
 </div></div>
+<p id="pos"></p>
 <div id="overview" class="hidden"><p id="ov-hint"></p><div id="grid"></div></div>
-<div class="ui">
-  <span id="pos">1 / ${order.length}</span>
-  <span class="spacer"></span>
-  <span class="hint">← → / 滚轮 翻页 · 数字跳页 · Esc 总览</span>
-  <button id="overview-btn" type="button">总览</button>
-  <button id="prev" type="button">上一页</button>
-  <button id="next" type="button">下一页</button>
-</div>
 <script>
 const CP = ${JSON.stringify(iconMap)};
 for (const el of document.querySelectorAll('x-icon')) {
@@ -192,68 +185,55 @@ for (const el of document.querySelectorAll('x-icon')) {
   el.style.fontSize = h;               // 字形按 em 框缩放，和编辑器一致
   if (!el.style.width) el.style.width = h;
 }
+
 const pages = [...document.querySelectorAll('.page')];
 const canvas = document.getElementById('canvas');
-const pos = document.getElementById('pos');
-let cur = 0;
-const clamp = (n) => Math.max(0, Math.min(pages.length - 1, n));
 const stage = document.getElementById('stage');
+const pos = document.getElementById('pos');
+const overview = document.getElementById('overview');
+const grid = document.getElementById('grid');
+let cur = 0;
+
+const clamp = (n) => Math.max(0, Math.min(pages.length - 1, n));
 function fit() {
   const s = Math.min(stage.clientWidth / 1920, stage.clientHeight / 1080);
   canvas.style.transform = 'scale(' + s + ')';
 }
 function show(n, push) {
-  cur = clamp(n);
-  pages.forEach((p, i) => p.classList.toggle('on', i === cur));
+  const next = clamp(n);
+  if (next === cur && pages[cur].classList.contains('on')) return;
+  const dir = next > cur ? 'push' : 'push';
+  cur = next;
+  pages.forEach((p, i) => {
+    const on = i === cur;
+    p.classList.toggle('on', on);
+    p.classList.remove('fade', 'push');
+    if (on) {
+      const tr = p.dataset.transition || '';
+      if (tr === 'fade') p.classList.add('fade');
+      else if (tr === 'push') p.classList.add('push');
+    }
+  });
   pos.textContent = (cur + 1) + ' / ' + pages.length;
-  if (push !== false) history.replaceState(null, '', '#' + (cur + 1));
+  if (push !== false) history.replaceState(null, '', '#slide-' + (cur + 1));
 }
-addEventListener('resize', fit);
-addEventListener('keydown', (e) => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  const k = e.key;
-  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown') { e.preventDefault(); show(cur + 1); }
-  else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(cur - 1); }
-  else if (k === 'Home') show(0);
-  else if (k === 'End') show(pages.length - 1);
-  else if (/^[1-9]$/.test(k)) show((+k - 1));
-});
-document.getElementById('next').addEventListener('click', () => show(cur + 1));
-document.getElementById('prev').addEventListener('click', () => show(cur - 1));
-// 点屏幕左右三分之一翻页
-addEventListener('click', (e) => {
-  if (e.target.closest('.ui')) return;
-  if (e.clientX > innerWidth * 0.62) show(cur + 1);
-  else if (e.clientX < innerWidth * 0.38) show(cur - 1);
-});
-// 触屏滑动
-let sx = 0, sy = 0;
-addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-addEventListener('touchend', (e) => {
-  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
-}, { passive: true });
-// 滚轮翻页（节流，避免一次手势跳多页）
-let wheelAt = 0;
-addEventListener('wheel', (e) => {
-  if (!overview.classList.contains('hidden')) return;
-  const now = Date.now();
-  if (now - wheelAt < 450 || Math.abs(e.deltaY) < 8) return;
-  wheelAt = now;
-  show(cur + (e.deltaY > 0 ? 1 : -1));
-}, { passive: true });
 
-// 总览：把所有页克隆成缩略图网格
-const overview = document.getElementById('overview');
-const grid = document.getElementById('grid');
-let built = false;
-function thumbScale() {
-  const w = grid.firstElementChild?.getBoundingClientRect().width || 280;
-  return w / 1920;
+// 页码只在动鼠标时淡入
+let hideTimer = 0;
+function revealPos() {
+  pos.classList.add('show');
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => pos.classList.remove('show'), 1500);
 }
+addEventListener('mousemove', revealPos);
+addEventListener('resize', fit);
+
+// —— 总览 ——
+let built = false;
 function scaleThumbs() {
-  const s = thumbScale();
-  for (const el of grid.querySelectorAll('.thumb-inner')) el.style.transform = 'scale(' + s + ')';
+  const el = grid.firstElementChild;
+  const w = el ? el.getBoundingClientRect().width : 280;
+  for (const t of grid.querySelectorAll('.thumb-inner')) t.style.transform = 'scale(' + (w / 1920) + ')';
 }
 function buildOverview() {
   if (built) return;
@@ -272,23 +252,58 @@ function buildOverview() {
     btn.addEventListener('click', () => { toggleOverview(false); show(i); });
     grid.appendChild(btn);
   });
+  document.getElementById('ov-hint').textContent =
+    '共 ' + pages.length + ' 页 · 点击缩略图跳转 · Esc 或点空白处关闭';
   scaleThumbs();
-  document.getElementById('ov-hint').textContent = '共 ' + pages.length + ' 页 · 点击缩略图跳转 · Esc 或点空白处关闭';
 }
 function toggleOverview(force) {
   const on = force === undefined ? overview.classList.contains('hidden') : force;
   if (on) buildOverview();
   overview.classList.toggle('hidden', !on);
   if (on) { scaleThumbs(); grid.querySelectorAll('.thumb')[cur]?.scrollIntoView({ block: 'center' }); }
+  else { revealPos(); }
 }
-document.getElementById('overview-btn').addEventListener('click', () => toggleOverview());
-addEventListener('resize', () => { if (!overview.classList.contains('hidden')) scaleThumbs(); });
-addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overview.classList.contains('hidden')) toggleOverview(false); });
-overview.addEventListener('click', (e) => { if (e.target === overview) toggleOverview(false); });
+
+// —— 交互：键位与 claude-slides 的 present 一致（← → 翻页，Esc 退出/总览） ——
+addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  const inOverview = !overview.classList.contains('hidden');
+  if (k === 'Escape') { e.preventDefault(); toggleOverview(!inOverview); return; }
+  if (inOverview) return;
+  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown') { e.preventDefault(); show(cur + 1); }
+  else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(cur - 1); }
+  else if (k === 'Home') show(0);
+  else if (k === 'End') show(pages.length - 1);
+  else if (k === 'o' || k === 'O') toggleOverview(true);
+  else if (/^[1-9]$/.test(k)) show(+k - 1);
+});
+// 点屏幕左右两侧翻页（演示时没有可见控件）
+addEventListener('click', (e) => {
+  if (!overview.classList.contains('hidden')) {
+    if (e.target === overview) toggleOverview(false);
+    return;
+  }
+  if (e.target.closest('.thumb')) return;
+  if (e.clientX > innerWidth * 0.62) show(cur + 1);
+  else if (e.clientX < innerWidth * 0.38) show(cur - 1);
+});
+// 触屏滑动
+let sx = 0, sy = 0;
+addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
+}, { passive: true });
+document.addEventListener('fullscreenchange', fit);
 
 fit();
-show((parseInt(location.hash.replace('#', ''), 10) || 1) - 1);
-addEventListener('hashchange', () => show((parseInt(location.hash.replace('#', ''), 10) || 1) - 1, false));
+const fromHash = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
+show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+addEventListener('hashchange', () => {
+  const n = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
+  if (Number.isFinite(n)) show(n - 1, false);
+});
 </script>
 </body>
 </html>`;
