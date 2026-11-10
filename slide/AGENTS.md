@@ -1,6 +1,6 @@
-# designs/ 协作约定（人 ↔ AI）
+#  协作约定（人 ↔ AI）
 
-这份文件管 `designs/` 下的东西：**claude-slides 幻灯片**（`trae-campus/`）与**设计系统**（`trae-campus-ds/`）。
+这份文件管 `slide/` 下的东西：**claude-slides 幻灯片**（`trae-campus/`）与**设计系统**（`trae-campus-ds/`）。
 仓库根的 [`AGENTS.md`](../AGENTS.md) 管的是老的 `slide/deck.html` 那套（`--u` 单位、Pages 发布）；两边不冲突时各自生效。
 
 ---
@@ -34,8 +34,8 @@
 
 ```bash
 # 1. 读索引和要改的页
-cat designs/trae-campus/project/deck.json
-cat designs/trae-campus/project/slides/<id>.html
+cat slide/project/deck.json
+cat slide/project/slides/<id>.html
 
 # 2. 改完必须 check 到 problems: 0
 npm run deck:check
@@ -49,14 +49,14 @@ npm run deck:render              # 全部
 - 局域网分享（按角色出链接）：`node tools/deck.mjs share`
 - 这些脚本是 `tools/deck.mjs` 的薄封装，内部调用本机 claude-slides 的 `artifact.mjs`；
   找不到安装目录时用 `CLAUDE_SLIDES_SKILL=<目录>` 指定。
-- **改完不要自动提交**：这个 deck 属于「大改动」，按根 `AGENTS.md` 的规则等人确认（现在整份 `designs/` 都还是未跟踪状态）。
+- **改完不要自动提交**：这个 deck 属于「大改动」，按根 `AGENTS.md` 的规则等人确认（现在整份 `slide/` 都还是未跟踪状态）。
 
 ## 4. 样式规范看哪儿
 
-- **版式 / 字号 / 间距 / 页面预算 / 版式配方**：`designs/trae-campus/TYPOGRAPHY.md`
+- **版式 / 字号 / 间距 / 页面预算 / 版式配方**：`slide/TYPOGRAPHY.md`
   - §5.9 高亮（薄荷划线）的 stop 换算公式 —— 换行高就要重算，别照抄百分比
   - §5.10 链接写法 —— `<a>` 只能拿一条 plain underline，线色靠 anchor 的 `color` 染
-- **色板 / 字阶 / token / 比例规则**：`designs/trae-campus-ds/project/README.md`
+- **色板 / 字阶 / token / 比例规则**：`design-system/project/README.md`
 - 速查：字号只用 **24 / 25 / 30 / 41 / 56 / 104**；正文最小 24。
 
 ## 5. 踩过的坑（别重复）
@@ -71,14 +71,14 @@ npm run deck:render              # 全部
 ## 6. 不要碰的
 
 - `project/assets/`（图片 blob）、`project/ds/`（设计系统拷贝）：由工具写。
-- 运行时 sidecar：`comments.json`、`.sharing.json`、`.artifact-server.json`、`.artifact-server.log`、`history/`、`exports/` —— 已在 `designs/trae-campus/.gitignore` 里。
+- 运行时 sidecar：`comments.json`、`.sharing.json`、`.artifact-server.json`、`.artifact-server.log`、`history/`、`exports/` —— 已在 `slide/.gitignore` 里。
 - 增删页只改两处：`project/slides/<id>.html` 文件 + `project/deck.json` 的 `order`（`cover` / `sections.start` 指向的 id 也要跟着改）。
 
 ## 7. 现状（2026-11-10）
 
-- `designs/trae-campus/`：**19 页**（1600×900 单文件版是 18 页，这里把第 7、8 页换成了改版，
+- `slide/`：**19 页**（1600×900 单文件版是 18 页，这里把第 7、8 页换成了改版，
   另新增 1 页 `mindset`）。页面顺序见 `project/deck.json` 的 `order`。
-- `designs/trae-campus-ds/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
+- `design-system/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
 - 验证/渲染脚本在 `tools/`，npm 脚本见 §3；`tools/render-slide.mjs` 会从本机 claude-slides 安装里读
   图标字体（Anthropicons-Variable）和字形表，不往仓库里拷字体。
 - 老的 `slide/deck.html`（18 页单文件版）保持不动，Pages 仍发布那版。

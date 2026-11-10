@@ -2,7 +2,7 @@
 
 天猪 · TRAE Campus 高校分享
 
-一套 18 页的 16:9 网页幻灯片，纯 HTML/CSS/JS 手写，不依赖前端框架。构建时把图片压缩内嵌成单文件，部署到 GitHub Pages。
+一套 19 页的 16:9 幻灯片，用 [claude-slides](https://claude.ai) 的 Slides artifact 格式维护（`project/deck.json` + 一页一个 HTML，全内联样式、1920×1080 固定画布），本地用自带的编辑器改，构建成站点 + PDF 后部署到 GitHub Pages。
 
 ## 相关链接
 
@@ -15,43 +15,49 @@
 
 | 路径 | 说明 |
 | --- | --- |
-| `slide/deck.html` | 幻灯片本体。文件里从上到下是 18 个 `<section class="p">`，一个 section 就是一页，样式和翻页脚本也都在这里 |
-| `slide/img/` | 配图。`deck.html` 里用 `<img src="img/xxx.png">` 引用，构建时统一压缩后内嵌进 HTML |
-| `slide/server.mjs` | 本地预览用的静态服务 |
-| `slide/build.ts` | 构建：压缩图片 → 内嵌成单文件 → `release/site/index.html` |
-| `slide/pdf.mjs` | 导出 PDF：用无头 Chrome 打印，同时放一份到 `release/site/` |
+| `slide/project/deck.json` | 幻灯片索引：`order`（放映顺序）、封面、字体、已装的设计系统 |
+| `slide/project/slides/*.html` | 一页一个文件，`<section>` 里全是内联样式；画布 1920×1080 |
+| `slide/project/assets/` | 配图（内容寻址的 blob，页面里写 `/_blob/<id>`） |
+| `slide/TYPOGRAPHY.md` | 排版规范：字号档位、间距、页面预算、版式配方、高亮与链接写法 |
+| `slide/AGENTS.md` | 与 AI 协作的约定（文案在编辑器里改、结构样式交给 AI 等） |
+| `design-system/` | TRAE Campus 设计系统（色板 / 字阶 / 间距 / 圆角 token + 组件预览） |
+| `tools/` | 校验、起编辑器、渲染预览、构建站点与 PDF 的脚本 |
 | `article/` | 分享内容对应的原文快照（Markdown + 17 张配图），方便回头查原始素材 |
-| `release/` | 构建产物，不进 Git：`site/` 站点目录（含 PDF）、PDF |
+| `release/` | 构建产物，不进 Git：`site/` 站点目录（含 PDF） |
 
-## 本地预览
+## 本地编辑
 
 ```sh
-npm install
-npm run preview     # http://127.0.0.1:8765
+npm ci
+npm run deck:open     # 起编辑器（127.0.0.1），在里面改文案 / 拖版式
 ```
 
-操作：← → / 空格 / 鼠标滚轮翻页，数字键跳页，Home/End 首末页，Esc 缩略图总览；手机上左右滑动或点击屏幕两侧翻页，左下角「总览」看缩略图；学习案例的 4 张截图可点击放大（Esc / 点任意处关闭）；网址加 `?clean` 隐藏页码和底部提示。
-
-## 修改内容
-
-- **改页面**：直接编辑 `slide/deck.html`，一个 `<section class="p">` 是一页，顺序就是放映顺序
-- **改尺寸**：版心固定 1600×900，所有尺寸都写成 `calc(var(--u) * N)`，`--u` 会随窗口自适应，不要写死 px
-- **加图片**：放进 `slide/img/`，在 `deck.html` 里用相对路径引用即可，构建时会自动压缩
-- **配色**：米白底 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`，一页最多两处高亮
+编辑器里改完直接保存即可，想给 AI 改结构就让它读 `slide/AGENTS.md` 的约定。
 
 ## 命令
 
 | 命令 | 作用 |
 | --- | --- |
-| `npm run preview` | 启动本地预览（8765 端口） |
-| `npm run build` | 构建站点到 `release/site/` |
-| `npm run pdf` | 生成高画质 PDF（`release/` 与 `release/site/` 各一份） |
+| `npm run deck:open` | 起 claude-slides 编辑器（本机 127.0.0.1） |
+| `npm run deck:check` | 校验草稿，`problems` 必须为 0 |
+| `npm run deck:render` | 把每页渲染成 1920×1080 PNG（`.tmp-test/render/`，可选单页：`-- <id>`） |
+| `npm run site` | 构建 `release/site/`（站点 + PDF），部署用 |
+
+操作（线上）：← → / 空格翻页，数字键跳页，Home/End 首末页；手机上左右滑动或点屏幕两侧翻页。网址 `#7` 直达第 7 页。
+
+## 修改内容
+
+- **改文案**：编辑器里直接改（推荐），或改 `slide/project/slides/<id>.html`
+- **改版式**：字号只用 24 / 25 / 30 / 41 / 56 / 104，间距、页面预算和现成配方见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md)
+- **加页面**：新增 `slide/project/slides/<id>.html`，再把 id 加进 `project/deck.json` 的 `order`
+- **加图片**：用编辑器上传（会落到 `project/assets/`），页面里用 `/_blob/<id>` 引用
+- **配色**：米白底 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`，一页最多两处高亮
 
 ## 自动部署
 
 `.github/workflows/deploy.yml`，push 到 `main`（或手动触发）后执行：
 
-`npm ci` → `npm run build` → `npm run pdf` → 发布到 GitHub Pages
+`npm ci` → `npm run site`（构建站点 + 用无头 Chrome 打印 PDF）→ 发布到 GitHub Pages
 
 站点和 PDF 都随 Pages 一起发，PDF 用中文文件名（GitHub Release 会把非 ASCII 文件名剥掉，所以不走 Release）。
 
@@ -59,3 +65,4 @@ npm run preview     # http://127.0.0.1:8765
 
 - 不用「——」，标题不重复，语气保持口语化
 - 页码在右上、章节眉标在左上
+- 改完 deck 记得 `npm run deck:check`；文案改完让 AI 重新读文件再改结构（编辑器会整页重写）

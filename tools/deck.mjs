@@ -10,7 +10,7 @@
  *   node tools/deck.mjs list            列出本机可用的设计系统
  *
  * 环境变量：
- *   DECK_ROOT            草稿目录，默认 designs/trae-campus
+ *   DECK_ROOT            草稿目录，默认 slide
  *   CLAUDE_SLIDES_SKILL  claude-slides skill 目录（默认自动探测 ~/.agents/skills/claude-slides
  *                        和 ~/.dsh/profiles/*​/node_modules/dsh-claude-slides）
  */
@@ -20,7 +20,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const REPO = path.resolve(import.meta.dirname, "..");
-const DECK = path.resolve(REPO, process.env.DECK_ROOT || "designs/trae-campus");
+const DECK = path.resolve(REPO, process.env.DECK_ROOT || "slide");
 
 /** 找到 claude-slides 的安装目录（含 scripts/artifact.mjs 与 editor/assets/） */
 function findSkill() {

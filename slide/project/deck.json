@@ -8,7 +8,7 @@
   },
   "designSystems": [
     {
-      "artifact": "designs/trae-campus-ds",
+      "artifact": "design-system",
       "copiedAt": "2026-11-09T03:55:00Z",
       "namespace": "traecampus",
       "title": "TRAE Campus",

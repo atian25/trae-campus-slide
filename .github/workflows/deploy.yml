@@ -40,11 +40,8 @@ jobs:
           sudo fc-cache -f
           fc-list | grep -i "source han" | head -3
 
-      - name: 构建单文件站点
-        run: npm run build
-
-      - name: 导出 PDF
-        run: npm run pdf
+      - name: 构建站点与 PDF
+        run: npm run site
         env:
           CHROME_PATH: /usr/bin/google-chrome
 

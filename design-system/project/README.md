@@ -239,17 +239,17 @@ TRAE Campus 校园分享的视觉系统。它从单文件幻灯片 `slide/deck.h
 
 ## 9. Consuming this system
 
-**装进 claude-slides deck**（本仓库的 `designs/trae-campus`）：
+**装进 claude-slides deck**（本仓库的 `slide`）：
 
-1. 复制 tokens：`designs/trae-campus-ds/project/tokens.json` → `designs/trae-campus/project/ds/traecampus/tokens.json`（目录名必须是 `traecampus`）。
-2. 在 `designs/trae-campus/project/deck.json` 里登记：
+1. 复制 tokens：`design-system/project/tokens.json` → `slide/project/ds/traecampus/tokens.json`（目录名必须是 `traecampus`）。
+2. 在 `slide/project/deck.json` 里登记：
 
    ```json
    "designSystems": [
      {
        "title": "TRAE Campus",
        "namespace": "traecampus",
-       "artifact": "designs/trae-campus-ds",
+       "artifact": "design-system",
        "version": "1",
        "copiedAt": "2026-11-09T03:46:55Z"
      }
@@ -257,7 +257,7 @@ TRAE Campus 校园分享的视觉系统。它从单文件幻灯片 `slide/deck.h
    ```
 
 3. 页面里照旧写最终 px 值（claude-slides 的 slide 格式不支持 `var()`）。tokens 是取值依据，不是运行时依赖：`768 + 67` 的两栏、`43` 的网格间距、`22` 的卡片圆角都从 tokens 抄数。
-4. 校验：`node /Users/tz/.agents/skills/claude-slides/scripts/artifact.mjs check designs/trae-campus` —— `designSystems` 记录与 `project/ds/traecampus/tokens.json` 两者齐，主题/取色菜单才会出现这套 token。
+4. 校验：`node /Users/tz/.agents/skills/claude-slides/scripts/artifact.mjs check slide` —— `designSystems` 记录与 `project/ds/traecampus/tokens.json` 两者齐，主题/取色菜单才会出现这套 token。
 
 **用在静态页 / 预览页**：
 

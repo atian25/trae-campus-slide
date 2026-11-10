@@ -9,25 +9,31 @@
 - 提交信息用中文，一行说清「做了什么 / 为什么」，必要时补正文。
 - 提交前跑 `git status`，确认没有把 `.tmp-test/`、临时截图等带进去。
 
-## designs/（claude-slides 幻灯片）
+## slide/（幻灯片）与 design-system/
 
-`designs/` 下是用 **claude-slides** 重建的幻灯片（`trae-campus/`，19 页）与**设计系统**（`trae-campus-ds/`），
-和老的 `slide/deck.html` 是两套产物，构建/预览/规则都不同。
+- `slide/`：幻灯片本体，claude-slides 的 Slides artifact 格式（`project/deck.json` + 一页一个 HTML，
+  1920×1080 固定画布、全内联样式）。19 页，顺序见 `project/deck.json` 的 `order`。
+- `design-system/`：TRAE Campus 设计系统（token + 组件预览），deck 里装了一份拷贝在 `slide/project/ds/traecampus/`。
+- **协作约定**（文案在编辑器里改、结构/样式交给 AI、编辑器会整页重写文件）见 [`slide/AGENTS.md`](slide/AGENTS.md)，
+  在 `slide/` 下工作时先读它。
+- 排版规范见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md)：字号只用 24 / 25 / 30 / 41 / 56 / 104，
+  间距用 `gap`/`padding`（`margin` 无效），页面预算 = 页头约 205 + 正文 746 + 页脚 62。
 
-它有独立的协作约定（**文案归人在编辑器里改、结构/样式归 AI**；编辑器会整页重写文件）：
-见 [`designs/AGENTS.md`](designs/AGENTS.md)。在本目录工作时先读它。
+## 常用命令
 
-## 项目速览
+| 命令 | 作用 |
+| --- | --- |
+| `npm run deck:open` | 起 claude-slides 编辑器（只有 `127.0.0.1` 能用；局域网需 https） |
+| `npm run deck:check` | 校验草稿，`problems` 必须为 0 才提交 |
+| `npm run deck:render` | 每页渲染成 1920×1080 PNG（`.tmp-test/render/`；`-- <id>` 渲染单页） |
+| `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
 
-- 单文件 16:9 幻灯片：`slide/deck.html`，一个 `<section class="p">` 一页，共 18 页。
-- 所有尺寸都基于 `--u`（1600×900 画布单位）。**新增样式必须写 `calc(var(--u)*N)`，不要写死 px**，否则手机缩放时字距、边距会错位（2026-11 就踩过：固定 `letter-spacing:-2.5px` 导致手机标题挤在一起）。
-- 概览缩略图缩放用 JS 算好的无单位 `--ovs`（`transform:scale(var(--ovs))`）。**不要写 `calc(长度 / 长度)`**：length/length 除法是 CSS Values 4 才支持的，鸿蒙自带浏览器等旧内核会整条 `transform` 失效，缩略图按 1:1 裁切（2026-11 实测）。
-- 预览：`cd slide && node server.mjs 8765`；手机/局域网访问加 `HOST=0.0.0.0`。
-- 构建：`npm run build`；导出 PDF：`npm run pdf`。
-- 配色：米白 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`；一页最多两处高亮。
+- 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、`build-site.mjs`（站点 + PDF）。
+- 图标字体与字形表从本机 claude-slides 安装读取（`CLAUDE_SLIDES_SKILL` 可指定），不往仓库拷字体。
+- 发布：push 到 `main` 触发 `.github/workflows/deploy.yml` → `npm ci` + `npm run site` → GitHub Pages。
 
 ## 验收
 
-- 至少验证两个尺寸：桌面 `1600×900` 与手机竖屏 `390×844`，确认 18 页无溢出、文字不重叠。
-- 手机端交互要能完成：翻页（左右滑动 / 点两侧）、打开并关闭总览。
-- 桌面快捷键：`←` `→` / 空格翻页、数字键跳页、`Esc` 总览。
+- `npm run deck:check` 的 `problems` 为 0，且没有任何 `排版` / 警告 note。
+- 改了版式就 `npm run deck:render`，检查页面内容不溢出（内容下沿 ≤ 1018px，安全线）。
+- 改完文案至少看一眼渲染图；不要在编辑器开着的同一页上做批量结构改动。

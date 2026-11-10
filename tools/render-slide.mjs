@@ -17,7 +17,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 const REPO = path.resolve(import.meta.dirname, "..");
-const DECK = path.resolve(REPO, process.env.DECK_ROOT || "designs/trae-campus");
+const DECK = path.resolve(REPO, process.env.DECK_ROOT || "slide");
 const OUTDIR = path.join(REPO, ".tmp-test/render");
 const FONT_LINK =
   "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap";
