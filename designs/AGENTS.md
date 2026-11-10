@@ -76,8 +76,8 @@ npm run deck:render              # 全部
 
 ## 7. 现状（2026-11-10）
 
-- `designs/trae-campus/`：**21 页**。新增/改版：`knowledge-v2`（第 7 页）、`ipo-v2`（第 8 页）、`mindset`（第 11 页）；
-  旧版 `knowledge`（第 10 页）、`ipo`（第 13 页）暂时留着做备份，定稿后删。
+- `designs/trae-campus/`：**19 页**（1600×900 单文件版是 18 页，这里把第 7、8 页换成了改版，
+  另新增 1 页 `mindset`）。页面顺序见 `project/deck.json` 的 `order`。
 - `designs/trae-campus-ds/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
 - 验证/渲染脚本在 `tools/`，npm 脚本见 §3；`tools/render-slide.mjs` 会从本机 claude-slides 安装里读
   图标字体（Anthropicons-Variable）和字形表，不往仓库里拷字体。
