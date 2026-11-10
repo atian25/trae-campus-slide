@@ -22,6 +22,11 @@ const REPO = path.resolve(import.meta.dirname, "..");
 const DECK = path.resolve(REPO, process.env.DECK_ROOT || "slide");
 const SITE = path.join(REPO, "release/site");
 const ART_ASSETS = path.join(SITE, "assets");
+// 部署时的图片文件名：tools/asset-names.json 里给的那些语义名，没登记的退回 blob id
+const ASSET_NAMES = (() => {
+  const f = path.join(REPO, "tools/asset-names.json");
+  try { return JSON.parse(fs.readFileSync(f, "utf8")); } catch { return {}; }
+})();
 
 // ---------- 图标字体与字形表：优先用仓库内的 tools/assets（CI 也能用），没有再从本机安装里取 ----------
 const LOCAL_FONT = path.join(REPO, "tools/assets/anthropicons.woff2");
@@ -90,9 +95,8 @@ if (fs.existsSync(blobDir)) {
     // 版式按 1920×1080 排版，最长边 2400 已经够（2 倍屏余量）
     let img = sharp(src);
     if (meta.width > MAXW) img = img.resize({ width: MAXW, withoutEnlargement: true });
-    const outName = meta.hasAlpha
-      ? `${m[1]}.png`
-      : `${m[1]}.jpg`;
+    const stem = ASSET_NAMES[m[1]] || m[1];
+    const outName = meta.hasAlpha ? `${stem}.png` : `${stem}.jpg`;
     const buf = meta.hasAlpha
       ? await img.png({ compressionLevel: 9 }).toBuffer()
       : await img.flatten({ background: "#F7F8F5" }).jpeg({ quality: 90, mozjpeg: true }).toBuffer();

@@ -35,3 +35,6 @@ env/
 .vscode/
 .idea/
 *.swp
+
+# ---- Agent 工作树 ----
+.agents/
