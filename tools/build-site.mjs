@@ -117,7 +117,20 @@ function slideHtml(id) {
 }
 
 const { font: iconFont, map: iconMap } = iconFontAndMap();
-const pages = order.map(slideHtml).join("\n");
+
+/** 编辑器里「隐藏」的页（<section ... hidden>）不进站点 / PDF */
+function isHidden(id) {
+  const file = path.join(DECK, "project/slides", `${id}.html`);
+  const html = fs.readFileSync(file, "utf8");
+  const tag = (html.match(/<section\b([^>]*)>/) || [])[1] || "";
+  // 只看属性区，避免把 style 里的 overflow:hidden 当成隐藏标记
+  const attrs = tag.replace(/style="[^"]*"/g, "");
+  return /(^|\s)hidden(\s|=|$)/.test(attrs);
+}
+const visibleOrder = order.filter((id) => !isHidden(id));
+const pages = visibleOrder.map(slideHtml).join("\n");
+const pageCount = visibleOrder.length;
+if (!pageCount) throw new Error("所有页都被隐藏了");
 
 const ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNERkYxRTYiLz48cmVjdCB4PSI5IiB5PSIxNSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjM0IiByeD0iNyIgZmlsbD0iI0Y3RjhGNSIgc3Ryb2tlPSIjMEIzQTI5IiBzdHJva2Utd2lkdGg9IjYiLz48cGF0aCBkPSJNMjUgMjdsNiA1LTYgNS02LTV6IiBmaWxsPSIjMEIzQTI5Ii8+PHBhdGggZD0iTTQwIDI3bDYgNS02IDUtNi01eiIgZmlsbD0iIzBCM0EyOSIvPjwvc3ZnPg==';
 const html = `<!doctype html>
@@ -233,7 +246,7 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 </head>
 <body>
 <div id="bar">
-  <span id="pos">1 / ${order.length}</span>
+  <span id="pos">1 / ${pageCount}</span>
   <span id="ro">只读视图</span>
   <span class="spacer"></span>
   <a id="pdf" href="${encodeURIComponent(title + ".pdf")}" download>下载 PDF</a>
@@ -468,7 +481,7 @@ addEventListener('hashchange', () => {
 
 fs.writeFileSync(path.join(SITE, "index.html"), html);
 const mb = (Buffer.byteLength(html) / 1024).toFixed(0);
-console.log(`site -> release/site/index.html  ${mb} KB，${order.length} 页，图片 ${blobFiles.size} 张`);
+console.log(`site -> release/site/index.html  ${mb} KB，${pageCount} 页，图片 ${blobFiles.size} 张`);
 
 // ---------- PDF：同一个页面打印 ----------
 function findChrome() {

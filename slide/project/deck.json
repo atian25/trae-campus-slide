@@ -34,10 +34,11 @@
     "learn-1",
     "learn-2",
     "mindset",
-    "practice",
+    "practice-2",
     "cases-1",
     "cases-2",
-    "threshold",
+    "competition",
+    "start",
     "campus",
     "campus-tokens",
     "farewell",
@@ -47,7 +48,7 @@
     "campus": {
       "before": null,
       "description": "TRAE Campus 校园计划",
-      "start": "threshold"
+      "start": "campus"
     },
     "change": {
       "description": "时代变革中，AI 重塑了知识的生产与消费方式。",
