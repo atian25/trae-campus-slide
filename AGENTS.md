@@ -30,7 +30,7 @@
 | `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765） |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
-  `build-site.mjs`（站点 + PDF；页面是 claude-slides 的「只读视图 + 演示」两层：缩略图滑轨 / ▶ 演示 / Esc 网格）、`serve.mjs`（本地预览）。
+  `build-site.mjs`（站点 + PDF；播放层对齐 claude-slides 导出的 Web page：黑底一屏一页 / 竖屏纵向滚动 / 右下角页码 / f 全屏）、`serve.mjs`（本地预览）。
 - 图标字体与字形表内置在 `tools/assets/`（anthropicons.woff2 + json），CI 无需装 claude-slides；
   本地若想用安装里的新版可删掉这两个文件，脚本会回落到 `CLAUDE_SLIDES_SKILL` / `~/.agents/skills/claude-slides`。
 - 发布：push 到 `main` 触发 `.github/workflows/deploy.yml` → `npm ci` + `npm run site` → GitHub Pages。

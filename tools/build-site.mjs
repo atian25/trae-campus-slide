@@ -113,7 +113,9 @@ function slideHtml(id) {
     if (!f) throw new Error(`第 ${id} 页引用了不存在的图片 ${blob}`);
     return `assets/${f}`;
   });
-  return `<div class="page" data-id="${id}">${html}</div>`;
+  const tr = (html.match(/<section[^>]*\sdata-transition="([a-z]+)"/) || [])[1];
+  const trAttr = tr ? ` data-transition="${tr}"` : "";
+  return `<div class="slide" data-id="${id}"${trAttr}><div class="fit">${html}</div></div>`;
 }
 
 const { font: iconFont, map: iconMap } = iconFontAndMap();
@@ -138,343 +140,258 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#EBECEA">
+<meta name="theme-color" content="#000000">
 <title>${title}</title>
 <link rel="icon" type="image/svg+xml" href="${ICON}">
 <style>
 @font-face{font-family:'AnthropiconsFZ';src:url(${iconFont}) format('woff2');font-weight:400 700;font-display:block}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#EBECEA;
-  font-family:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Source Han Sans SC',system-ui,sans-serif;
-  -webkit-text-size-adjust:100%}
-/* ---------- 顶栏：只留页码 + 两个动作，任何宽度都不换行 ---------- */
-#bar{position:fixed;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:10px;
-  padding:0 14px;background:#F4F5F3;border-bottom:1px solid #DDE2DE;z-index:5;
-  font-size:13px;color:#3B463F;white-space:nowrap;overflow:hidden}
-#pos{color:#5C6B63;letter-spacing:.06em;font-variant-numeric:tabular-nums}
-#ro{color:#93A097;letter-spacing:.02em}
-#bar .spacer{flex:1;min-width:8px}
-#bar a,#bar button{appearance:none;border:1px solid #CFD7D2;background:#fff;color:#26302B;font:inherit;
-  padding:6px 13px;border-radius:999px;cursor:pointer;text-decoration:none;flex:none;white-space:nowrap}
-#bar a:hover,#bar button:hover{background:#EDF3EF;border-color:#B9C7BF}
-#present{background:#0B3A29;color:#EAF3ED;border-color:#0B3A29}
-#present:hover{background:#123B29}
-/* ---------- 画布区 ---------- */
-#stage{position:fixed;left:0;right:0;top:52px;bottom:150px;display:flex;align-items:center;justify-content:center;
-  background:#EBECEA;transition:background .2s}
-#canvas{width:1920px;height:1080px;transform-origin:center center;flex:none;position:relative;
-  box-shadow:0 4px 28px rgba(20,40,30,.13);background:#F7F8F5}
-/* ---------- 缩略图滑轨 ---------- */
-#rail{position:fixed;left:0;right:0;bottom:0;height:150px;display:flex;align-items:center;gap:8px;
-  padding:0 12px 0 6px;background:#F4F5F3;border-top:1px solid #DDE2DE;z-index:5}
-#rail-track{display:flex;gap:10px;overflow-x:auto;scrollbar-width:thin;padding:12px 4px;flex:1;align-items:center}
-#rail-track::-webkit-scrollbar{height:8px}
-#rail-track::-webkit-scrollbar-thumb{background:#C9D3CC;border-radius:4px}
-.thumb{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;flex:none;display:block;text-align:left}
-.thumb-frame{width:184px;aspect-ratio:16/9;overflow:hidden;background:#fff;border-radius:6px;
-  box-shadow:0 1px 4px rgba(20,40,30,.14);outline:2px solid transparent;outline-offset:2px}
-.thumb-inner{width:1920px;height:1080px;transform-origin:top left;pointer-events:none}
-.thumb-cap{display:block;margin-top:5px;font-size:11px;color:#8A968F;letter-spacing:.04em}
-.thumb.active .thumb-frame{outline-color:#2FAE72}
-.thumb.active .thumb-cap{color:#17754A}
-#rail-actions{display:flex;flex-direction:row;gap:6px;flex:none;padding:0 2px}
-#rail-actions button,#rail-toggle{appearance:none;border:1px solid #CFD7D2;background:#fff;color:#3B463F;
-  font:inherit;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
-#rail-actions button:hover,#rail-toggle:hover{background:#EDF3EF}
-#rail-toggle{flex:none;align-self:center}
-/* 收起滑轨 */
-body.no-rail #rail{height:0;padding:0;overflow:hidden;border-top:0}
-body.no-rail #rail-track,body.no-rail #rail-actions{display:none}
-body.no-rail #stage{bottom:0}
-body.no-rail #rail-toggle{position:fixed;left:12px;bottom:12px;z-index:6;box-shadow:0 2px 8px rgba(20,40,30,.16)}
-/* ---------- 首屏提示（浮在画布下方，自动淡出） ---------- */
-#coach{position:fixed;left:50%;transform:translateX(-50%);bottom:166px;z-index:6;
-  padding:8px 16px;border-radius:999px;background:rgba(11,58,41,.86);color:#EAF3ED;font-size:12px;
-  letter-spacing:.03em;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
-#coach.show{opacity:1}
-body.no-rail #coach{bottom:16px}
-/* ---------- 演示态 ---------- */
-body.mode-present #bar,body.mode-present #rail,body.mode-present #rail-toggle,body.mode-present #coach{display:none}
-body.mode-present #stage{top:0;bottom:0;background:#000}
-body.mode-present #canvas{box-shadow:none}
-/* 演示态的退出入口（触屏没有 Esc） */
-#exit-present{position:fixed;top:14px;right:14px;z-index:8;display:none}
-body.mode-present #exit-present{display:block}
-#exit-present button{appearance:none;border:1px solid rgba(255,255,255,.28);background:rgba(20,20,20,.72);
-  color:#F2F5F3;font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;
-  opacity:0;transition:opacity .25s;backdrop-filter:blur(6px)}
-body.present-ui #exit-present button{opacity:1}
-/* ---------- 总览网格 ---------- */
-#overview{position:fixed;inset:0;z-index:9;background:#0B0B0B;padding:26px 26px 40px;overflow:auto;display:none}
-body.mode-overview #overview{display:block}
-#ov-hint{margin:0 0 16px;color:rgba(255,255,255,.5);font-size:13px;letter-spacing:.06em}
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-#grid .thumb-frame{width:100%;aspect-ratio:16/9;box-shadow:0 2px 12px rgba(0,0,0,.6)}
-#grid .thumb-cap{color:rgba(255,255,255,.45);font-size:12px}
-#grid .thumb.active .thumb-frame{outline-color:#7FE3AE}
-#grid .thumb.active .thumb-cap{color:#7FE3AE}
-.page{display:none;position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;background:#F7F8F5}
-.page.on{display:block}
-.page>section{width:1920px;height:1080px}
-.page.fade{animation:fade .28s ease both}
-.page.push{animation:push .32s cubic-bezier(.2,.7,.2,1) both}
-@keyframes fade{from{opacity:0}to{opacity:1}}
-@keyframes push{from{opacity:.2;transform:translateX(4%)}to{opacity:1;transform:translateX(0)}}
+html{background:#000;color-scheme:dark}
+body{margin:0;background:#000;overflow:visible}
+/* ===== 幻灯片 ===== */
+.slide{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
+.fit > section{width:1920px;height:1080px}
+/* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
+html.stage #deck{position:fixed;inset:0}
+html.stage .slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
+html.stage .slide.on{opacity:1;pointer-events:auto;z-index:1}
+html.stage .slide.t-fade.on{animation:d-fade .3s ease both}
+html.stage .slide.t-push.on{animation:d-push .34s cubic-bezier(.2,.7,.2,1) both}
+html.stage .slide.t-magic.on{animation:d-magic .42s ease both}
+@keyframes d-fade{from{opacity:0}to{opacity:1}}
+@keyframes d-push{from{opacity:.2;transform:translateX(4%)}to{opacity:1;transform:translateX(0)}}
+@keyframes d-magic{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+/* build-in 入场动画 */
+@keyframes bi-fade{from{opacity:0}to{opacity:1}}
+@keyframes bi-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bi-pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+/* ===== 文档模式（竖屏 / 手机）：纵向滚动，一页一屏 ===== */
+html.doc{overflow:hidden auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+html.doc::-webkit-scrollbar{display:none}
+html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
+/* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
+.pager{position:fixed;z-index:3;right:16px;bottom:16px;padding:4px 10px;border-radius:999px;
+  background:rgba(0,0,0,.7);color:#fff;font:12px/1.5 system-ui,-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s;pointer-events:none}
+.pager[data-on]{opacity:1}
 x-icon{display:inline-flex;align-items:center;justify-content:center;font-family:'AnthropiconsFZ',sans-serif;
   font-style:normal;font-weight:400;line-height:1;font-variant-ligatures:none;overflow:hidden}
-/* ---------- 窄屏（手机） ---------- */
-@media (max-width: 900px){
-  #bar{height:44px;padding:0 10px;gap:8px;font-size:12px}
-  #bar a,#bar button{padding:5px 11px;font-size:12px}
-  #ro{display:none}
-  #stage{top:44px;bottom:132px}
-  #rail{height:132px;padding:0 8px 0 4px}
-  .thumb-frame{width:150px}
-  #coach{bottom:148px;font-size:11px;padding:7px 12px}
-  body.no-rail #stage{bottom:0}
-  body.no-rail #coach{bottom:14px}
-}
 @media print{
   @page{size:1920px 1080px;margin:0}
   html,body{background:#fff;overflow:visible;height:auto}
-  #bar,#rail,#rail-toggle,#overview,#coach,#exit-present{display:none!important}
-  #stage{position:static;display:block;background:#fff;top:auto;bottom:auto}
-  #canvas{transform:none!important;width:1920px;height:auto;box-shadow:none;position:static}
-  .page{display:block!important;position:relative;break-after:page;page-break-after:always;animation:none!important}
+  html.stage #deck,html.doc{position:static;overflow:visible}
+  .slide{position:static!important;opacity:1!important;display:block!important;height:auto!important;
+    pointer-events:auto!important;break-after:page;page-break-after:always;animation:none!important}
+  .fit{transform:none!important}
+  .pager{display:none!important}
 }
 </style>
 </head>
 <body>
-<div id="bar">
-  <span id="pos">1 / ${pageCount}</span>
-  <span id="ro">只读视图</span>
-  <span class="spacer"></span>
-  <a id="pdf" href="${encodeURIComponent(title + ".pdf")}" download>下载 PDF</a>
-  <button id="present" type="button">▶ 演示</button>
-</div>
-
-<div id="stage"><div id="canvas">
+<main id="deck">
 ${pages}
-</div></div>
-
-<p id="coach">← → / 滚轮翻页 · 点缩略图跳页</p>
-
-<div id="rail">
-  <button id="rail-toggle" type="button">收起</button>
-  <div id="rail-track"></div>
-  <div id="rail-actions"><button id="grid-btn" type="button">总览</button></div>
-</div>
-
-<div id="exit-present"><button id="exit-btn" type="button">✕ 退出演示</button></div>
-<div id="overview"><p id="ov-hint"></p><div id="grid"></div></div>
-
+</main>
+<div class="pager" aria-hidden="true"></div>
 <script>
 const CP = ${JSON.stringify(iconMap)};
 for (const el of document.querySelectorAll('x-icon')) {
   const name = el.getAttribute('name') || '';
   el.textContent = String.fromCodePoint(CP[name] || 0xE000);
   const h = el.style.height || '24px';
-  el.style.fontSize = h;               // 字形按 em 框缩放，和编辑器一致
+  el.style.fontSize = h;               // 字形按 em 框缩放，与编辑器一致
   if (!el.style.width) el.style.width = h;
 }
 
-const pages = [...document.querySelectorAll('.page')];
-const canvas = document.getElementById('canvas');
-const stage = document.getElementById('stage');
-const pos = document.getElementById('pos');
-const track = document.getElementById('rail-track');
-const grid = document.getElementById('grid');
-const overview = document.getElementById('overview');
-const coach = document.getElementById('coach');
-const railToggle = document.getElementById('rail-toggle');
-let cur = 0;
-let mode = 'view';            // view | present | overview
-const clamp = (n) => Math.max(0, Math.min(pages.length - 1, n));
-const isNarrow = () => matchMedia('(max-width: 900px)').matches;
-const isTouch = () => matchMedia('(pointer: coarse)').matches;
+const deck = document.getElementById('deck');
+const slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+const pager = document.querySelector('.pager');
+const mqPortrait = matchMedia('(max-aspect-ratio: 1/1)');
+let cur = 0, mode = '', pagerTimer = 0;
+
+function clamp(n) { return Math.max(0, Math.min(slides.length - 1, n)); }
 
 function fit() {
-  const s = Math.min(stage.clientWidth / 1920, stage.clientHeight / 1080);
-  canvas.style.transform = 'scale(' + s + ')';
-  scaleThumbs();
-}
-function scaleThumbs() {
-  for (const t of track.querySelectorAll('.thumb-inner')) t.style.transform = 'scale(0.0958)';
-  const first = grid.firstElementChild;
-  if (first) {
-    const w = first.getBoundingClientRect().width || 280;
-    for (const t of grid.querySelectorAll('.thumb-inner')) t.style.transform = 'scale(' + (w / 1920) + ')';
+  const ref = slides[0];
+  if (!ref) return;
+  const w = ref.clientWidth, h = ref.clientHeight;
+  const s = Math.min(w / 1920, h / 1080);
+  for (const sl of slides) {
+    const f = sl.querySelector('.fit');
+    if (f) f.style.transform = 'scale(' + s + ')';
   }
 }
 
-/* 收起/展开滑轨 */
-function setRail(collapsed) {
-  document.body.classList.toggle('no-rail', collapsed);
-  railToggle.textContent = collapsed ? '缩略图' : '收起';
-  requestAnimationFrame(fit);
+function setPager() {
+  if (!pager) return;
+  pager.textContent = (cur + 1) + ' / ' + slides.length;
+  pager.setAttribute('data-on', '');
+  clearTimeout(pagerTimer);
+  pagerTimer = setTimeout(function () { pager.removeAttribute('data-on'); }, 1600);
 }
-railToggle.addEventListener('click', () => setRail(!document.body.classList.contains('no-rail')));
 
-/* 翻页 */
-function show(n, opts) {
-  const o = opts || {};
-  cur = clamp(n);
-  pages.forEach((p, i) => {
-    const on = i === cur;
-    p.classList.toggle('on', on);
-    p.classList.remove('fade', 'push');
-    if (on) {
-      const tr = p.dataset.transition || '';
-      if (tr === 'fade') p.classList.add('fade');
-      else if (tr === 'push') p.classList.add('push');
+function writeHash(i) {
+  try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+}
+
+function runBuildIn(slide) {
+  const els = slide.querySelectorAll('[data-build-in]');
+  for (let k = 0; k < els.length; k++) {
+    const el = els[k];
+    const kind = el.getAttribute('data-build-in') || 'fade';
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = (kind === 'rise' ? 'bi-rise' : kind === 'pop' ? 'bi-pop' : 'bi-fade') +
+      ' .45s cubic-bezier(.2,.7,.2,1) both';
+    el.style.animationDelay = (k * 0.06) + 's';
+  }
+}
+
+/* 舞台模式下切页 */
+function show(i, animate) {
+  cur = clamp(i);
+  for (let k = 0; k < slides.length; k++) {
+    const sl = slides[k], on = k === cur;
+    sl.classList.toggle('on', on);
+    sl.classList.remove('t-fade', 't-push', 't-magic');
+    sl.setAttribute('aria-hidden', on ? 'false' : 'true');
+    if (on && animate) {
+      const tr = sl.getAttribute('data-transition');
+      if (tr) sl.classList.add('t-' + tr);
+    }
+  }
+  setPager();
+  writeHash(cur);
+  if (animate) runBuildIn(slides[cur]);
+}
+
+/* 文档模式下按滚动位置算当前页 */
+function syncFromScroll() {
+  const h = slides[0] ? slides[0].clientHeight : 0;
+  if (!h) return;
+  const i = clamp(Math.round(window.scrollY / h));
+  if (i !== cur) {
+    cur = i;
+    setPager();
+    writeHash(i);
+    runBuildIn(slides[i]);
+  }
+}
+
+function setMode() {
+  const m = mqPortrait.matches ? 'doc' : 'stage';
+  const changed = m !== mode;
+  mode = m;
+  document.documentElement.classList.toggle('doc', m === 'doc');
+  document.documentElement.classList.toggle('stage', m === 'stage');
+  requestAnimationFrame(function () {
+    fit();
+    if (mode === 'stage') {
+      for (let k = 0; k < slides.length; k++) slides[k].classList.toggle('on', k === cur);
+      setPager();
+    } else if (changed && slides[cur]) {
+      slides[cur].scrollIntoView({ block: 'start' });
     }
   });
-  pos.textContent = (cur + 1) + ' / ' + pages.length;
-  for (const el of document.querySelectorAll('.thumb')) el.classList.toggle('active', (+el.dataset.i) === cur);
-  const active = track.querySelector('.thumb.active');
-  if (active && !o.noScroll && !document.body.classList.contains('no-rail')) {
-    active.scrollIntoView({ inline: 'center', block: 'nearest' });
+}
+
+function toggleFullscreen() {
+  const el = document.documentElement;
+  if (document.fullscreenElement) { (document.exitFullscreen || function(){}).call(document); }
+  else if (el.requestFullscreen) { el.requestFullscreen().catch(function(){}); }
+}
+
+function step(d) {
+  const n = clamp(cur + d);
+  if (mode === 'doc') {
+    if (slides[n]) slides[n].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    cur = n; setPager(); writeHash(n);
+  } else {
+    show(n, true);
   }
-  const g = grid.querySelector('.thumb.active');
-  if (g) g.scrollIntoView({ block: 'nearest' });
-  if (o.push !== false) history.replaceState(null, '', '#slide-' + (cur + 1));
 }
 
-/* 缩略图 */
-function makeThumb(i, page) {
-  const btn = document.createElement('button');
-  btn.type = 'button'; btn.className = 'thumb'; btn.dataset.i = String(i);
-  const frame = document.createElement('div'); frame.className = 'thumb-frame';
-  const inner = document.createElement('div'); inner.className = 'thumb-inner';
-  const clone = page.querySelector('section').cloneNode(true);
-  clone.removeAttribute('id');
-  inner.appendChild(clone); frame.appendChild(inner);
-  const cap = document.createElement('span'); cap.className = 'thumb-cap';
-  cap.textContent = (i + 1) + ' / ' + pages.length;
-  btn.appendChild(frame); btn.appendChild(cap);
-  btn.addEventListener('click', () => { setMode('view'); show(i); });
-  return btn;
-}
-pages.forEach((p, i) => track.appendChild(makeThumb(i, p)));
-let gridBuilt = false;
-function buildGrid() {
-  if (gridBuilt) return;
-  gridBuilt = true;
-  pages.forEach((p, i) => grid.appendChild(makeThumb(i, p)));
-  document.getElementById('ov-hint').textContent =
-    '共 ' + pages.length + ' 页 · 点击缩略图跳转 · Esc 或点空白处关闭';
-  scaleThumbs();
-}
-
-/* 首屏提示：出现 4s 后淡出，任何交互也淡出 */
-let coachTimer = 0;
-function flashCoach() {
-  coach.classList.add('show');
-  clearTimeout(coachTimer);
-  coachTimer = setTimeout(() => coach.classList.remove('show'), 4000);
-}
-function hideCoach() { clearTimeout(coachTimer); coach.classList.remove('show'); }
-
-/* 模式 */
-function setMode(m) {
-  mode = m;
-  document.body.classList.toggle('mode-present', m === 'present');
-  document.body.classList.toggle('mode-overview', m === 'overview');
-  document.body.classList.remove('present-ui');
-  if (m === 'overview') buildGrid();
-  if (m !== 'view') hideCoach();
-  requestAnimationFrame(() => { fit(); show(cur, { noScroll: true, push: false }); });
-}
-function enterPresent() {
-  setMode('present');
-  if (isNarrow()) setRail(true);
-  if (!isTouch() && document.documentElement.requestFullscreen) {
-    document.documentElement.requestFullscreen().catch(() => {});
-  }
-  flashPresentUi();
-}
-function exitPresent() {
-  setMode('view');
-  document.body.classList.remove('present-ui');
-  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
-}
-/* 演示态里点一下画面：短暂显示退出按钮（触屏唯一出路） */
-let uiTimer = 0;
-function flashPresentUi() {
-  if (mode !== 'present') return;
-  document.body.classList.add('present-ui');
-  clearTimeout(uiTimer);
-  uiTimer = setTimeout(() => document.body.classList.remove('present-ui'), 3000);
-}
-document.getElementById('exit-btn').addEventListener('click', (e) => { e.stopPropagation(); exitPresent(); });
-
-document.getElementById('present').addEventListener('click', (e) => { e.stopPropagation(); enterPresent(); });
-document.getElementById('grid-btn').addEventListener('click', () => setMode('overview'));
-addEventListener('resize', () => { if (!document.body.classList.contains('no-rail') && isNarrow()) setRail(true); fit(); });
-document.addEventListener('fullscreenchange', () => requestAnimationFrame(fit));
-
-addEventListener('keydown', (e) => {
+/* ---- 键盘 ---- */
+window.addEventListener('keydown', function (e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
-  if (k === 'Escape') {
-    e.preventDefault();
-    if (mode === 'overview') setMode('view');
-    else if (mode === 'present') exitPresent();
-    else setMode('overview');
-    return;
-  }
-  if (mode === 'overview') return;
-  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown') { e.preventDefault(); show(cur + 1); hideCoach(); }
-  else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(cur - 1); hideCoach(); }
-  else if (k === 'Home') { show(0); hideCoach(); }
-  else if (k === 'End') { show(pages.length - 1); hideCoach(); }
-  else if (/^[1-9]$/.test(k)) { show(+k - 1); hideCoach(); }
+  if ((k === ' ' && e.shiftKey) || k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') {
+    e.preventDefault(); step(-1);
+  } else if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') {
+    e.preventDefault(); step(1);
+  } else if (k === 'Home') { e.preventDefault(); show(0, true); }
+  else if (k === 'End') { e.preventDefault(); show(slides.length - 1, true); }
+  else if (/^[1-9]$/.test(k) && Number(k) <= slides.length) { show(Number(k) - 1, true); }
+  else if (k === 'f' || k === 'F') { toggleFullscreen(); }
 });
 
-let wheelAt = 0;
-addEventListener('wheel', (e) => {
-  if (mode !== 'view') return;
-  if (e.target.closest('#rail')) return;
-  const now = Date.now();
-  if (now - wheelAt < 450 || Math.abs(e.deltaY) < 8) return;
-  wheelAt = now;
-  hideCoach();
-  show(cur + (e.deltaY > 0 ? 1 : -1));
+/* ---- 滚轮（仅舞台模式）---- */
+let wheelAcc = 0, wheelReset = 0, wheelDone = false;
+window.addEventListener('wheel', function (e) {
+  if (e.ctrlKey || mode !== 'stage') return;
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+  e.preventDefault();
+  clearTimeout(wheelReset);
+  wheelReset = setTimeout(function () { wheelDone = false; wheelAcc = 0; }, 250);
+  if (wheelDone) return;
+  wheelAcc += e.deltaMode ? (e.deltaY > 0 ? 60 : e.deltaY < 0 ? -60 : 0) : e.deltaY;
+  if (Math.abs(wheelAcc) >= 60) {
+    wheelDone = true;
+    step(wheelAcc > 0 ? 1 : -1);
+    wheelAcc = 0;
+  }
+}, { passive: false });
+
+/* ---- 点击左右各半屏 ---- */
+window.addEventListener('click', function (e) {
+  if (mode !== 'stage') return;
+  const sel = window.getSelection();
+  if (e.button !== 0) return;
+  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell]')) return;
+  if (sel && String(sel) !== '') return;
+  step(e.clientX < window.innerWidth / 2 ? -1 : 1);
+});
+
+/* ---- 触摸滑动 ---- */
+let tX = 0, tY = 0, tT = 0;
+window.addEventListener('touchstart', function (e) {
+  if (e.touches.length !== 1) { tT = 0; return; }
+  tX = e.touches[0].clientX; tY = e.touches[0].clientY; tT = Date.now();
+}, { passive: true });
+window.addEventListener('touchend', function (e) {
+  if (e.changedTouches.length !== 1 || !tT) return;
+  const dx = e.changedTouches[0].clientX - tX;
+  const dy = e.changedTouches[0].clientY - tY;
+  if (Date.now() - tT > 700) return;
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  if (mode === 'stage') step(dx < 0 ? 1 : -1);
 }, { passive: true });
 
-addEventListener('click', (e) => {
-  if (mode === 'overview') { if (e.target === overview) setMode('view'); return; }
-  if (e.target.closest('#bar') || e.target.closest('#rail') || e.target.closest('#exit-present') || e.target.closest('a')) return;
-  if (mode === 'present') flashPresentUi();   // 演示态：点一下先亮出退出入口，同时照常翻页
-  hideCoach();
-  if (e.clientX > innerWidth * 0.62) show(cur + 1);
-  else if (e.clientX < innerWidth * 0.38) show(cur - 1);
-});
-
-let sx = 0, sy = 0;
-addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-addEventListener('touchend', (e) => {
-  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-  if (mode === 'present') {
-    if (dy > 90 && Math.abs(dy) > Math.abs(dx)) { exitPresent(); return; }   // 下拉退出演示
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
-    flashPresentUi();
-    return;
-  }
-  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { hideCoach(); show(cur + (dx < 0 ? 1 : -1)); }
+/* ---- 滚动（文档模式的页码/深链）---- */
+window.addEventListener('scroll', function () {
+  if (mode === 'doc') syncFromScroll();
 }, { passive: true });
-document.addEventListener('touchmove', () => flashPresentUi(), { passive: true });
 
-/* 启动：窄屏默认收起滑轨；首屏给一次翻页提示 */
-if (isNarrow()) setRail(true);
-fit();
-const fromHash = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
-show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
-setTimeout(flashCoach, 400);
-addEventListener('hashchange', () => {
-  const n = parseInt((location.hash.match(/(\\d+)$/) || [])[1], 10);
-  if (Number.isFinite(n)) show(n - 1, { noScroll: true });
+window.addEventListener('resize', function () { setMode(); });
+if (mqPortrait.addEventListener) mqPortrait.addEventListener('change', function () { setMode(); });
+
+/* ---- 深链 #N ---- */
+function fromHash() {
+  const m = /^#(\\d+)$/.exec(window.location.hash);
+  return m ? clamp(Number(m[1]) - 1) : 0;
+}
+window.addEventListener('hashchange', function () {
+  const i = fromHash();
+  if (i === cur) return;
+  if (mode === 'stage') show(i, true);
+  else { cur = i; if (slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); setPager(); }
 });
+
+/* ---- 启动 ---- */
+cur = fromHash();
+if (pager) pager.textContent = (cur + 1) + ' / ' + slides.length;
+setMode();
+window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
 </body>
 </html>`;
