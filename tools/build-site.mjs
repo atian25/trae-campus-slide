@@ -151,7 +151,7 @@ body{margin:0;background:#000;overflow:visible}
 /* ===== 幻灯片 ===== */
 .slide{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
-.fit > section{width:1920px;height:1080px}
+.fit > section,.th-inner > section{width:1920px;height:1080px;display:block}
 /* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
 html.stage #deck{position:fixed;inset:0}
 html.stage .slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
@@ -293,7 +293,7 @@ function syncFromScroll() {
 }
 
 function setMode() {
-  const m = mqPortrait.matches ? 'doc' : 'stage';
+  const m = 'stage';   /* 统一左右翻页；竖屏也走 stage（swipe/点边缘/键盘）*/
   const changed = m !== mode;
   mode = m;
   document.documentElement.classList.toggle('doc', m === 'doc');
