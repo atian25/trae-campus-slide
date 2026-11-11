@@ -171,12 +171,11 @@ html.doc{overflow:hidden auto;scroll-snap-type:y mandatory;scrollbar-width:none}
 html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
-.pager{position:fixed;z-index:4;right:18px;bottom:14px;padding:0;background:none;
-  color:#fff;mix-blend-mode:difference;
-  font:12px/1.5 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.08em;
-  opacity:0;transition:opacity .3s;pointer-events:auto;cursor:pointer}
-.pager[data-on]{opacity:.5}
-.pager:hover{opacity:.9}
+.pager{position:fixed;z-index:4;right:16px;bottom:16px;padding:4px 10px;border-radius:999px;
+  background:rgba(0,0,0,.7);color:#fff;font:12px/1.5 system-ui,-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s;pointer-events:auto;cursor:pointer}
+.pager[data-on]{opacity:1}
+.pager:hover{background:rgba(11,58,41,.9)}
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
