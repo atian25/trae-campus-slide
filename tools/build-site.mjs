@@ -171,10 +171,23 @@ html.doc{overflow:hidden auto;scroll-snap-type:y mandatory;scrollbar-width:none}
 html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
-.pager{position:fixed;z-index:3;right:16px;bottom:16px;padding:4px 10px;border-radius:999px;
+.pager{position:fixed;z-index:4;right:16px;bottom:16px;padding:4px 10px;border-radius:999px;
   background:rgba(0,0,0,.7);color:#fff;font:12px/1.5 system-ui,-apple-system,sans-serif;
-  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s;pointer-events:none}
+  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s;pointer-events:auto;cursor:pointer}
 .pager[data-on]{opacity:1}
+.pager:hover{background:rgba(11,58,41,.9)}
+/* ===== 概览（o 键 / 点右下角页码）===== */
+.ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
+.ovl.on{display:block}
+.ovl-hint{margin:0 0 16px;color:rgba(255,255,255,.5);font:13px/1.4 system-ui,sans-serif;letter-spacing:.04em}
+.ovl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.th{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block}
+.th-frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#111;
+  box-shadow:0 2px 10px rgba(0,0,0,.6);outline:2px solid transparent;outline-offset:2px}
+.th-inner{width:1920px;height:1080px;transform-origin:top left;pointer-events:none}
+.th-cap{display:block;margin-top:6px;font:11px/1.4 system-ui,sans-serif;color:rgba(255,255,255,.5)}
+.th.active .th-frame{outline-color:#2fae72}
+.th:hover .th-frame{outline-color:rgba(127,227,174,.8)}
 x-icon{display:inline-flex;align-items:center;justify-content:center;font-family:'AnthropiconsFZ',sans-serif;
   font-style:normal;font-weight:400;line-height:1;font-variant-ligatures:none;overflow:hidden}
 @media print{
@@ -193,6 +206,7 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 ${pages}
 </main>
 <div class="pager" aria-hidden="true"></div>
+<div class="ovl"><p class="ovl-hint"></p><div class="ovl-grid"></div></div>
 <script>
 const CP = ${JSON.stringify(iconMap)};
 for (const el of document.querySelectorAll('x-icon')) {
@@ -301,6 +315,63 @@ function toggleFullscreen() {
   else if (el.requestFullscreen) { el.requestFullscreen().catch(function(){}); }
 }
 
+/* ===== 概览 ===== */
+const ovl = document.querySelector('.ovl');
+const ovlGrid = document.querySelector('.ovl-grid');
+const ovlHint = document.querySelector('.ovl-hint');
+let ovlBuilt = false;
+function scaleThumbs() {
+  const first = ovlGrid.firstElementChild;
+  const w = first ? first.getBoundingClientRect().width : 240;
+  const els = ovlGrid.querySelectorAll('.th-inner');
+  for (let i = 0; i < els.length; i++) els[i].style.transform = 'scale(' + (w / 1920) + ')';
+}
+function buildOverview() {
+  if (ovlBuilt) return;
+  ovlBuilt = true;
+  ovlHint.textContent = '共 ' + slides.length + ' 页 · 点击缩略图跳转 · Esc 或点空白处关闭';
+  for (let i = 0; i < slides.length; i++) {
+    const src = slides[i].querySelector('.fit > section');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'th'; b.setAttribute('data-i', String(i));
+    const f = document.createElement('div'); f.className = 'th-frame';
+    const inner = document.createElement('div'); inner.className = 'th-inner';
+    if (src) { const c = src.cloneNode(true); c.removeAttribute('id'); inner.appendChild(c); }
+    f.appendChild(inner);
+    const cap = document.createElement('span'); cap.className = 'th-cap';
+    cap.textContent = (i + 1) + ' / ' + slides.length;
+    b.appendChild(f); b.appendChild(cap);
+    b.addEventListener('click', function (e) { e.stopPropagation(); closeOverview(); jump(i); });
+    ovlGrid.appendChild(b);
+  }
+  scaleThumbs();
+}
+function jump(i) {
+  i = clamp(i);
+  if (mode === 'doc') { cur = i; if (slides[i]) slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); setPager(); writeHash(i); }
+  else { show(i, true); }
+}
+function openOverview() {
+  buildOverview();
+  ovl.classList.add('on');
+  requestAnimationFrame(function () {
+    scaleThumbs();
+    const active = ovlGrid.querySelector('.th[data-i="' + cur + '"]');
+    if (active) active.classList.add('active');
+    if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+  });
+  document.body.style.overflow = 'hidden';
+}
+function closeOverview() {
+  ovl.classList.remove('on');
+  document.body.style.overflow = '';
+  const a = ovlGrid.querySelector('.th.active');
+  if (a) a.classList.remove('active');
+}
+function toggleOverview() {
+  if (ovl.classList.contains('on')) closeOverview(); else openOverview();
+}
+
 function step(d) {
   const n = clamp(cur + d);
   if (mode === 'doc') {
@@ -323,6 +394,8 @@ window.addEventListener('keydown', function (e) {
   else if (k === 'End') { e.preventDefault(); show(slides.length - 1, true); }
   else if (/^[1-9]$/.test(k) && Number(k) <= slides.length) { show(Number(k) - 1, true); }
   else if (k === 'f' || k === 'F') { toggleFullscreen(); }
+  else if (k === 'o' || k === 'O') { toggleOverview(); }
+  else if (k === 'Escape' && ovl.classList.contains('on')) { closeOverview(); }
 });
 
 /* ---- 滚轮（仅舞台模式）---- */
@@ -342,14 +415,17 @@ window.addEventListener('wheel', function (e) {
   }
 }, { passive: false });
 
-/* ---- 点击左右各半屏 ---- */
+/* ---- 点击：只响应左右边缘 15%，中间不翻页 ---- */
+const EDGE = 0.15;
 window.addEventListener('click', function (e) {
+  if (ovl.classList.contains('on')) return;
   if (mode !== 'stage') return;
-  const sel = window.getSelection();
   if (e.button !== 0) return;
-  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell]')) return;
+  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell],.pager,.ovl')) return;
+  const sel = window.getSelection();
   if (sel && String(sel) !== '') return;
-  step(e.clientX < window.innerWidth / 2 ? -1 : 1);
+  if (e.clientX < window.innerWidth * EDGE) step(-1);
+  else if (e.clientX > window.innerWidth * (1 - EDGE)) step(1);
 });
 
 /* ---- 触摸滑动 ---- */
@@ -386,6 +462,12 @@ window.addEventListener('hashchange', function () {
   if (mode === 'stage') show(i, true);
   else { cur = i; if (slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); setPager(); }
 });
+
+/* ---- 概览交互 ---- */
+if (pager) pager.addEventListener('click', function (e) { e.stopPropagation(); toggleOverview(); });
+ovl.addEventListener('click', function (e) { if (e.target === ovl || e.target === ovlGrid) closeOverview(); });
+window.addEventListener('mousemove', function () { if (mode === 'stage') setPager(); }, { passive: true });
+window.addEventListener('resize', function () { if (ovl.classList.contains('on')) scaleThumbs(); });
 
 /* ---- 启动 ---- */
 cur = fromHash();
