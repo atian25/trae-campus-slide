@@ -38,3 +38,6 @@ env/
 
 # ---- Agent 工作树 ----
 .agents/
+
+# 待处理素材（视频等大文件不提交）
+slide/project/inbox/*
