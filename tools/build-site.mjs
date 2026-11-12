@@ -177,22 +177,22 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 /* ===== 底部控制条（参考 skill 演示态）===== */
 .bar{position:fixed;z-index:6;left:50%;bottom:12px;transform:translateX(-50%);
   display:flex;flex-direction:row;align-items:center;gap:2px;height:40px;padding:0 7px;
-  border-radius:999px;background:rgba(11,58,41,.9);backdrop-filter:blur(10px);
-  box-shadow:0 6px 20px rgba(11,58,41,.18);transition:opacity .3s,transform .3s}
+  border-radius:999px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+  border:1px solid #d9e1dc;box-shadow:0 6px 20px rgba(20,28,24,.10);transition:opacity .3s,transform .3s}
 .bar[data-quiet]{opacity:0;transform:translateX(-50%) translateY(6px);pointer-events:none}
-.bar button{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.82);
+.bar button{appearance:none;border:0;background:transparent;color:#17754a;
   width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;transition:background .18s,color .18s}
-.bar button:hover{background:rgba(255,255,255,.16);color:#fff}
+.bar button:hover{background:#dff1e6;color:#0b4a32}
 .bar button svg{width:16px;height:16px;display:block}
-.bar .num{min-width:52px;text-align:center;color:rgba(255,255,255,.9);
+.bar .num{min-width:52px;text-align:center;color:#17754a;
   font:12px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
-.bar .sep{width:1px;height:16px;background:rgba(255,255,255,.22);margin:0 5px}
+.bar .sep{width:1px;height:16px;background:#d9e1dc;margin:0 5px}
 .tips{position:fixed;z-index:6;left:50%;bottom:60px;transform:translateX(-50%);
-  padding:10px 14px;border-radius:10px;background:rgba(11,58,41,.94);color:rgba(255,255,255,.82);
+  padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.96);border:1px solid #d9e1dc;color:#3b463f;box-shadow:0 6px 20px rgba(20,28,24,.10);
   font:12px/1.9 system-ui,-apple-system,sans-serif;white-space:nowrap;display:none}
 .tips[data-on]{display:block}
-.tips b{color:#fff;font-weight:600;margin-right:6px}
+.tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
@@ -214,7 +214,8 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
   .slide{position:static!important;opacity:1!important;display:block!important;height:auto!important;
     pointer-events:auto!important;break-after:page;page-break-after:always;animation:none!important}
   .fit{transform:none!important}
-  .pager{display:none!important}
+  .bar,.tips,.ovl{display:none!important}
+  html,body{background:#f7f8f5}
 }
 </style>
 </head>
