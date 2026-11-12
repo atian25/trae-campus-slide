@@ -519,18 +519,7 @@ window.addEventListener('wheel', function (e) {
   }
 }, { passive: false });
 
-/* ---- 点击：只响应左右边缘 15%，中间不翻页 ---- */
-const EDGE = 0.15;
-window.addEventListener('click', function (e) {
-  if (ovl.classList.contains('on')) return;
-  if (mode !== 'stage') return;
-  if (e.button !== 0) return;
-  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell],.bar,.tips,.ovl')) return;
-  const sel = window.getSelection();
-  if (sel && String(sel) !== '') return;
-  if (e.clientX < window.innerWidth * EDGE) step(-1);
-  else if (e.clientX > window.innerWidth * (1 - EDGE)) step(1);
-});
+/* ---- 点击不再翻页（桌面用键盘/滚轮，移动端滑动）---- */
 
 /* ---- 触摸滑动 ---- */
 let tX = 0, tY = 0, tT = 0;
@@ -588,8 +577,14 @@ function closeLightbox() {
   lb.setAttribute('aria-hidden', 'true');
 }
 document.addEventListener('click', function (e) {
-  const img = e.target.closest && e.target.closest('.slide img');
-  if (img) { e.stopPropagation(); e.preventDefault(); openLightbox(img.currentSrc || img.src, img.getAttribute('alt')); }
+  const t = e.target;
+  if (!t || !t.closest) return;
+  const img = t.closest('.slide img') || (t.tagName === 'IMG' ? t : null);
+  if (!img) return;
+  if (ovl && ovl.classList.contains('on')) return;   // 概览里的缩略图不放大
+  e.stopPropagation();
+  e.preventDefault();
+  openLightbox(img.currentSrc || img.src, img.getAttribute('alt'));
 }, true);
 if (lb) lb.addEventListener('click', closeLightbox);
 
