@@ -209,6 +209,7 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .lightbox[data-on]{display:flex}
 .lightbox img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;
   border-radius:12px;box-shadow:0 16px 50px rgba(0,0,0,.4)}
+.lightbox .lb-video{display:none;max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 16px 50px rgba(0,0,0,.45)}
 
 /* ===== 视频 ===== */
 .slide video{display:block}
@@ -270,7 +271,7 @@ ${pages}
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
 <div class="lb-mask" data-mask></div>
-<div class="lightbox" data-lb aria-hidden="true"><img alt=""></div>
+<div class="lightbox" data-lb aria-hidden="true"><img alt=""><video class="lb-video" playsinline></video></div>
 <div class="tips" data-tips>
   <div><b>← →</b>上一页 / 下一页</div>
   <div><b>空格</b>下一页 · <b>Home / End</b> 首尾页</div>
@@ -650,8 +651,30 @@ function toggleVideo() {
 /* ---- 点击图片放大 ---- */
 const lb = document.querySelector('.lightbox');
 const lbImg = lb ? lb.querySelector('img') : null;
+let lbResumeVideo = false;
+function openLightboxVideo(src) {
+  if (!lb) return;
+  if (activeVideo && !activeVideo.paused) { activeVideo.pause(); lbResumeVideo = true; } else { lbResumeVideo = false; }
+  const v = lb.querySelector('.lb-video');
+  if (!v) return;
+  lbImg.style.display = 'none';
+  v.style.display = 'block';
+  v.src = src;
+  v.controls = true;
+  v.loop = false;
+  v.muted = false;
+  const pr = v.play();
+  if (pr && pr.catch) pr.catch(function () {});
+  lb.setAttribute('data-on', '');
+  lb.setAttribute('aria-hidden', 'false');
+  const mask = document.querySelector('.lb-mask');
+  if (mask) mask.setAttribute('data-on', '');
+}
 function openLightbox(src, alt) {
   if (!lb || !lbImg) return;
+  const v0 = lb.querySelector('.lb-video');
+  if (v0) { try { v0.pause(); } catch (e) {} v0.removeAttribute('src'); v0.style.display = 'none'; }
+  lbImg.style.display = '';
   lbImg.setAttribute('src', src);
   lbImg.setAttribute('alt', alt || '');
   lb.setAttribute('data-on', '');
@@ -661,6 +684,10 @@ function openLightbox(src, alt) {
 }
 function closeLightbox() {
   if (!lb) return;
+  if (lbResumeVideo && activeVideo) { const pr = activeVideo.play(); if (pr && pr.catch) pr.catch(function(){}); lbResumeVideo = false; }
+  const v0 = lb.querySelector('.lb-video');
+  if (v0) { try { v0.pause(); } catch (e) {} v0.removeAttribute('src'); v0.style.display = 'none'; }
+  if (lbImg) lbImg.style.display = '';
   lb.removeAttribute('data-on');
   lb.setAttribute('aria-hidden', 'true');
   const mask = document.querySelector('.lb-mask');
@@ -669,6 +696,12 @@ function closeLightbox() {
 document.addEventListener('click', function (e) {
   const t = e.target;
   if (!t || !t.closest) return;
+  const vid = t.closest('.slide video');
+  if (vid) {
+    e.stopPropagation(); e.preventDefault();
+    openLightboxVideo(vid.currentSrc || vid.src);
+    return;
+  }
   const img = t.closest('.slide img[data-zoom]') || (t.tagName === 'IMG' && t.hasAttribute('data-zoom') ? t : null);
   if (!img) return;
   if (ovl && ovl.classList.contains('on')) return;   // 概览里的缩略图不放大
