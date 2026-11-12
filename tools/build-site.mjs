@@ -226,12 +226,11 @@ ${pages}
 <div class="bar" role="toolbar" aria-label="演示控制">
   <button type="button" data-act="prev" title="上一页（← / PgUp）" aria-label="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"></path></svg></button>
   <span class="num" data-num></span>
-  <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
-  <button type="button" data-act="next" title="下一页（→ / PgDn / 空格）" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+    <button type="button" data-act="next" title="下一页（→ / PgDn / 空格）" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
   <span class="sep"></span>
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
+  <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
-  <button type="button" data-act="close" title="退出全屏 / 收起控制条（Esc）" aria-label="收起"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
 </div>
 <div class="tips" data-tips>
   <div><b>← →</b>上一页 / 下一页</div>
@@ -308,6 +307,7 @@ function show(i, animate) {
   setPager();
   writeHash(cur);
   if (animate) runBuildIn(slides[cur]);
+  if (typeof showBarNow === 'function') showBarNow();
 }
 
 /* 文档模式下按滚动位置算当前页 */
@@ -523,10 +523,7 @@ if (bar) {
     else if (act === 'overview') toggleOverview();
     else if (act === 'full') toggleFullscreen();
     else if (act === 'tips') { tips.toggleAttribute('data-on'); }
-    else if (act === 'close') {
-      if (document.fullscreenElement) (document.exitFullscreen || function(){}).call(document);
-      bar.setAttribute('hidden', '');
-    }
+    else if (act === 'close') { /* 已移除 ✕ 按钮 */ }
   });
   // 自动隐藏：鼠标动一下就出现，停 1.8s 或移出窗口就淡出
   let barTimer = 0;
@@ -536,6 +533,7 @@ if (bar) {
     clearTimeout(barTimer);
     barTimer = setTimeout(function () { bar.setAttribute('data-quiet', ''); }, 1800);
   }
+  window.showBarNow = showBar;
   window.addEventListener('mousemove', showBar, { passive: true });
   window.addEventListener('keydown', showBar);
   document.addEventListener('mouseleave', function () {
