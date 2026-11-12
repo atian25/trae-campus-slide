@@ -116,6 +116,8 @@ function slideHtml(id, eager) {
   // 图片懒加载：首屏页保持即时加载，其余页 loading=lazy（不会阻塞首屏）
   html = html.replace(/<img\b(?![^>]*\bloading=)/g,
     eager ? '<img decoding="async"' : '<img loading="lazy" decoding="async"');
+  const ZOOM_PAGES = ['ai-digital', 'ai-physical', 'learn-1', 'learn-2'];
+  if (ZOOM_PAGES.includes(id)) html = html.replace(/<img\b/g, '<img data-zoom');
   const tr = (html.match(/<section[^>]*\sdata-transition="([a-z]+)"/) || [])[1];
   const trAttr = tr ? ` data-transition="${tr}"` : "";
   return `<div class="slide" data-id="${id}"${trAttr}><div class="fit">${html}</div></div>`;
@@ -196,11 +198,12 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 图片放大 ===== */
-.lightbox{position:fixed;inset:0;z-index:30;background:rgba(8,12,10,.92);display:none;
-  align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lightbox{position:fixed;z-index:30;background:rgba(255,255,255,.97);display:none;
+  align-items:center;justify-content:center;padding:16px;cursor:zoom-out;
+  border:1px solid #d9e1dc;border-radius:16px;box-shadow:0 18px 50px rgba(20,28,24,.16)}
 .lightbox[data-on]{display:flex}
-.lightbox img{max-width:94vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.lightbox .lb-close{position:absolute;top:14px;right:18px;color:rgba(255,255,255,.7);
+.lightbox img{max-width:100%;max-height:100%;border-radius:10px}
+.lightbox .lb-close{position:absolute;top:8px;right:14px;color:#8a968f;
   font:13px/1 system-ui,sans-serif;letter-spacing:.06em}
 
 /* ===== 概览（o 键 / 点右下角页码）===== */
@@ -566,6 +569,17 @@ const lb = document.querySelector('.lightbox');
 const lbImg = lb ? lb.querySelector('img') : null;
 function openLightbox(src, alt) {
   if (!lb || !lbImg) return;
+  const fit = slides[cur] && slides[cur].querySelector('.fit');
+  if (fit) {
+    const r = fit.getBoundingClientRect();
+    const k = r.width / 1920;
+    const padTop = 272 * k;          // 页头高度：放大区从标题下方开始
+    const side = 60 * k;
+    lb.style.left = Math.round(r.left + side) + 'px';
+    lb.style.top = Math.round(r.top + padTop) + 'px';
+    lb.style.width = Math.round(r.width - side * 2) + 'px';
+    lb.style.height = Math.round(r.height - padTop - 30 * k) + 'px';
+  }
   lbImg.setAttribute('src', src);
   lbImg.setAttribute('alt', alt || '');
   lb.setAttribute('data-on', '');
@@ -579,7 +593,7 @@ function closeLightbox() {
 document.addEventListener('click', function (e) {
   const t = e.target;
   if (!t || !t.closest) return;
-  const img = t.closest('.slide img') || (t.tagName === 'IMG' ? t : null);
+  const img = t.closest('.slide img[data-zoom]') || (t.tagName === 'IMG' && t.hasAttribute('data-zoom') ? t : null);
   if (!img) return;
   if (ovl && ovl.classList.contains('on')) return;   // 概览里的缩略图不放大
   e.stopPropagation();
