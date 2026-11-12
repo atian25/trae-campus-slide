@@ -335,7 +335,7 @@ function show(i, animate) {
   setPager();
   writeHash(cur);
   if (animate) runBuildIn(slides[cur]);
-  if (typeof showBarNow === 'function' && !document.fullscreenElement) showBarNow();
+  if (typeof showBarNow === 'function') showBarNow();
 }
 
 /* 文档模式下按滚动位置算当前页 */
@@ -555,26 +555,13 @@ if (bar) {
     else if (act === 'tips') { tips.toggleAttribute('data-on'); }
     else if (act === 'close') { /* 已移除 ✕ 按钮 */ }
   });
-  // 常驻：窗口模式下一直显示；全屏时鼠标动才出现、静止后淡出
-  let barTimer = 0;
+  // 常驻：任何模式（含全屏）都一直显示，不再自动隐藏
   function showBar() {
     bar.removeAttribute('data-quiet');
-    clearTimeout(barTimer);
-    if (document.fullscreenElement) {
-      barTimer = setTimeout(function () { bar.setAttribute('data-quiet', ''); }, 1800);
-    }
   }
   window.showBarNow = showBar;
   window.addEventListener('click', function (e) {
     if (!e.target.closest('.bar')) tips.removeAttribute('data-on');
-  });
-  window.addEventListener('mousemove', showBar, { passive: true });
-  window.addEventListener('keydown', showBar);
-  document.addEventListener('mouseleave', function () {
-    if (document.fullscreenElement) { clearTimeout(barTimer); bar.setAttribute('data-quiet', ''); }
-  });
-  document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement) { clearTimeout(barTimer); bar.removeAttribute('data-quiet'); alignBar(); }
   });
   showBar();
 }
