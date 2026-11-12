@@ -684,8 +684,14 @@ function openLightbox(src, alt) {
 }
 function closeLightbox() {
   if (!lb) return;
-  if (lbResumeVideo && activeVideo) { const pr = activeVideo.play(); if (pr && pr.catch) pr.catch(function(){}); lbResumeVideo = false; }
   const v0 = lb.querySelector('.lb-video');
+  // 放大视图里视频是暂停状态 → 关掉后卡片视频也保持暂停，不自动恢复
+  const lbWasPlaying = !!(v0 && v0.style.display !== 'none' && !v0.paused);
+  if (lbResumeVideo && lbWasPlaying && activeVideo) {
+    const pr = activeVideo.play();
+    if (pr && pr.catch) pr.catch(function () {});
+  }
+  lbResumeVideo = false;
   if (v0) { try { v0.pause(); } catch (e) {} v0.removeAttribute('src'); v0.style.display = 'none'; }
   if (lbImg) lbImg.style.display = '';
   lb.removeAttribute('data-on');
@@ -710,11 +716,23 @@ document.addEventListener('click', function (e) {
   openLightbox(img.currentSrc || img.src, img.getAttribute('alt'));
 }, true);
 if (lb) {
-  lb.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('.lb-video')) return;   // 视频区域自己处理
+    closeLightbox();
+  });
   const mask = document.querySelector('.lb-mask');
   if (mask) mask.addEventListener('click', closeLightbox);
   document.addEventListener('click', function (e) {
-    if (lb.hasAttribute('data-on') && !e.target.closest('.slide img[data-zoom]')) closeLightbox();
+    if (!lb.hasAttribute('data-on')) return;
+    const lv = e.target.closest && e.target.closest('.lb-video');
+    if (lv) {                                   // 放大视图里点视频 = 播放/暂停
+      e.stopPropagation();
+      e.preventDefault();
+      if (lv.paused) { const pr = lv.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      else lv.pause();
+      return;
+    }
+    if (!e.target.closest('.slide img[data-zoom]')) closeLightbox();
   }, false);
 }
 
