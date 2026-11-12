@@ -226,11 +226,7 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 ${pages}
 </main>
 <div class="bar" role="toolbar" aria-label="演示控制">
-  <button type="button" data-act="prev" title="上一页（← / PgUp）" aria-label="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"></path></svg></button>
-  <span class="num" data-num></span>
-  <button type="button" data-act="next" title="下一页（→ / PgDn / 空格）" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
-  <span class="sep"></span>
-<button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
+  <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
@@ -254,7 +250,6 @@ for (const el of document.querySelectorAll('x-icon')) {
 const deck = document.getElementById('deck');
 const slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
 const bar = document.querySelector('.bar');
-const barNum = document.querySelector('.bar .num');
 const tips = document.querySelector('.tips');
 const mqPortrait = matchMedia('(max-aspect-ratio: 1/1)');
 let cur = 0, mode = '', pagerTimer = 0;
@@ -283,9 +278,8 @@ function fit() {
   // 先按满高算：如果底部本来就有一块 ≥ 控制条高度的留白，就不用压缩幻灯片
   const sFull = Math.min(vw / 1920, vh0 / 1080);
   const letterGap = (vh0 - 1080 * sFull) / 2;
-  const needBar = cur > 0;   // 封面不显示控制条，也就不占空间
-  const reserve = mode === 'stage' && needBar && letterGap < BAR_SPACE ? BAR_SPACE : 0;
-  deck.style.bottom = reserve ? reserve + 'px' : '0px';
+  const reserve = 0;   // 控制条只有 3 个图标，直接压在页面底部留白上，不再压缩幻灯片
+  deck.style.bottom = '0px';
 
   const vh = vh0 - reserve;
   const s = Math.min(vw / 1920, vh / 1080);
@@ -297,7 +291,6 @@ function fit() {
 }
 
 function setPager() {
-  if (barNum) barNum.textContent = (cur + 1) + ' / ' + slides.length;
   if (bar) bar.style.display = cur === 0 ? 'none' : 'flex';   // 封面不显示控制条
   if (mode === 'stage') fit();
 }
@@ -573,7 +566,6 @@ window.addEventListener('resize', function () { if (ovl.classList.contains('on')
 
 /* ---- 启动 ---- */
 cur = fromHash();
-if (barNum) barNum.textContent = (cur + 1) + ' / ' + slides.length;
 setMode();
 window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
