@@ -149,11 +149,11 @@ const html = `<!doctype html>
 <style>
 @font-face{font-family:'AnthropiconsFZ';src:url(${iconFont}) format('woff2');font-weight:400 700;font-display:block}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{background:#000;color-scheme:dark}
+html{background:#e9ede8;color-scheme:light}
 body{margin:0;background:#000;overflow:visible}
 /* ===== 幻灯片 ===== */
 .slide{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
+.fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;box-shadow:0 10px 44px rgba(20,28,24,.10)}
 .fit > section,.th-inner > section{width:1920px;height:1080px;display:block}
 /* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
 html.stage #deck{position:fixed;inset:0}
@@ -174,15 +174,25 @@ html.doc{overflow:hidden auto;scroll-snap-type:y mandatory;scrollbar-width:none}
 html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
-/* ===== 底部提示条：页码 + 快捷键提示（常驻、淡）===== */
-.hud{position:fixed;z-index:4;left:0;right:0;bottom:10px;height:24px;
-  display:flex;flex-direction:row;align-items:center;justify-content:space-between;
-  padding:0 18px;pointer-events:none;
-  font:12px/1.5 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;
-  color:rgba(255,255,255,.45);mix-blend-mode:difference;transition:opacity .3s}
-.hud .keys{letter-spacing:.06em}
-.hud .num{letter-spacing:.1em}
-@media (hover:hover){ .hud{opacity:.55} body:hover .hud{opacity:.9} }
+/* ===== 底部控制条（参考 skill 演示态）===== */
+.bar{position:fixed;z-index:6;left:50%;bottom:12px;transform:translateX(-50%);
+  display:flex;flex-direction:row;align-items:center;gap:2px;height:40px;padding:0 7px;
+  border-radius:999px;background:rgba(18,22,20,.78);backdrop-filter:blur(10px);
+  box-shadow:0 4px 18px rgba(0,0,0,.22);transition:opacity .25s}
+.bar[hidden]{display:none}
+.bar button{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.82);
+  width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;transition:background .18s,color .18s}
+.bar button:hover{background:rgba(255,255,255,.16);color:#fff}
+.bar button svg{width:16px;height:16px;display:block}
+.bar .num{min-width:52px;text-align:center;color:rgba(255,255,255,.9);
+  font:12px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.bar .sep{width:1px;height:16px;background:rgba(255,255,255,.22);margin:0 5px}
+.tips{position:fixed;z-index:6;left:50%;bottom:60px;transform:translateX(-50%);
+  padding:10px 14px;border-radius:10px;background:rgba(18,22,20,.9);color:rgba(255,255,255,.82);
+  font:12px/1.9 system-ui,-apple-system,sans-serif;white-space:nowrap;display:none}
+.tips[data-on]{display:block}
+.tips b{color:#fff;font-weight:600;margin-right:6px}
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
@@ -212,9 +222,21 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 <main id="deck">
 ${pages}
 </main>
-<div class="hud" aria-hidden="true">
-  <span class="keys">← → 翻页 · Esc 概览 · F 全屏 · 1-9 跳页</span>
-  <span class="num"></span>
+<div class="bar" role="toolbar" aria-label="演示控制">
+  <button type="button" data-act="prev" title="上一页（← / PgUp）" aria-label="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"></path></svg></button>
+  <span class="num" data-num></span>
+  <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
+  <button type="button" data-act="next" title="下一页（→ / PgDn / 空格）" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"></path></svg></button>
+  <span class="sep"></span>
+  <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
+  <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
+  <button type="button" data-act="close" title="退出全屏 / 收起控制条（Esc）" aria-label="收起"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<div class="tips" data-tips>
+  <div><b>← →</b>上一页 / 下一页</div>
+  <div><b>空格</b>下一页 · <b>Home / End</b> 首尾页</div>
+  <div><b>1-9</b>跳页 · <b>O</b> 概览 · <b>F</b> 全屏</div>
+  <div><b>Esc</b>概览 / 收起控制条</div>
 </div>
 <div class="ovl"><p class="ovl-hint"></p><div class="ovl-grid"></div></div>
 <script>
@@ -229,9 +251,9 @@ for (const el of document.querySelectorAll('x-icon')) {
 
 const deck = document.getElementById('deck');
 const slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
-const hud = document.querySelector('.hud');
-const hudKeys = document.querySelector('.hud .keys');
-const hudNum = document.querySelector('.hud .num');
+const bar = document.querySelector('.bar');
+const barNum = document.querySelector('.bar .num');
+const tips = document.querySelector('.tips');
 const mqPortrait = matchMedia('(max-aspect-ratio: 1/1)');
 let cur = 0, mode = '', pagerTimer = 0;
 
@@ -249,8 +271,7 @@ function fit() {
 }
 
 function setPager() {
-  if (!hudNum) return;
-  hudNum.textContent = (cur + 1) + ' / ' + slides.length;
+  if (barNum) barNum.textContent = (cur + 1) + ' / ' + slides.length;
 }
 
 function writeHash(i) {
@@ -430,7 +451,7 @@ window.addEventListener('click', function (e) {
   if (ovl.classList.contains('on')) return;
   if (mode !== 'stage') return;
   if (e.button !== 0) return;
-  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell],.pager,.ovl')) return;
+  if (e.target && e.target.closest && e.target.closest('a,[data-text-path],[data-cell],.bar,.tips,.ovl')) return;
   const sel = window.getSelection();
   if (sel && String(sel) !== '') return;
   if (e.clientX < window.innerWidth * EDGE) step(-1);
@@ -472,6 +493,29 @@ window.addEventListener('hashchange', function () {
   else { cur = i; if (slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); setPager(); }
 });
 
+/* ---- 底部控制条 ---- */
+if (bar) {
+  bar.addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    e.stopPropagation();
+    const act = b.getAttribute('data-act');
+    if (act === 'prev') step(-1);
+    else if (act === 'next') step(1);
+    else if (act === 'overview') toggleOverview();
+    else if (act === 'full') toggleFullscreen();
+    else if (act === 'tips') { tips.toggleAttribute('data-on'); }
+    else if (act === 'close') {
+      if (document.fullscreenElement) (document.exitFullscreen || function(){}).call(document);
+      bar.setAttribute('hidden', '');
+    }
+  });
+  // 鼠标移到窗口底部时把控制条叫回来
+  window.addEventListener('mousemove', function (e) {
+    if (e.clientY > window.innerHeight - 48) bar.removeAttribute('hidden');
+  }, { passive: true });
+}
+
 /* ---- 概览交互 ---- */
 ovl.addEventListener('click', function (e) { if (e.target === ovl || e.target === ovlGrid) closeOverview(); });
 window.addEventListener('mousemove', function () { setPager(); }, { passive: true });
@@ -479,7 +523,7 @@ window.addEventListener('resize', function () { if (ovl.classList.contains('on')
 
 /* ---- 启动 ---- */
 cur = fromHash();
-if (hudNum) hudNum.textContent = (cur + 1) + ' / ' + slides.length;
+if (barNum) barNum.textContent = (cur + 1) + ' / ' + slides.length;
 setMode();
 window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
