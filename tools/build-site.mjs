@@ -633,12 +633,17 @@ function startVideo() {
   img.style.display = 'none';
   activeVideo = v;
   const play = v.play();
-  if (play && play.catch) play.catch(function () {});
+  if (play && play.catch) play.catch(function () {
+    v.muted = true;                      // 浏览器拦自动播放时降级静音，画面照常
+    const again = v.play();
+    if (again && again.catch) again.catch(function () {});
+  });
 }
 function toggleVideo() {
+  // 播放中 → 暂停（不翻页）；已暂停 → 让位给翻页
   if (!activeVideo) return false;
-  if (activeVideo.paused) { const p = activeVideo.play(); if (p && p.catch) p.catch(function(){}); }
-  else activeVideo.pause();
+  if (activeVideo.paused) { stopVideo(); return false; }
+  activeVideo.pause();
   return true;
 }
 
@@ -766,6 +771,7 @@ function presenterMode() {
 cur = fromHash();
 setMode();
 if (location.search.indexOf('presenter') >= 0) { presenterMode(); }
+else { try { startVideo(); } catch (e) {} }   // 首屏直接深链到有视频的页也要播
 window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
 </body>
