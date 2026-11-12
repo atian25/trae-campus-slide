@@ -198,15 +198,13 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 图片放大 ===== */
-.lb-mask{position:fixed;inset:0;z-index:29;background:rgba(20,28,24,.30);display:none}
+.lb-mask{position:fixed;inset:0;z-index:29;background:rgba(16,22,19,.72);backdrop-filter:blur(3px);display:none}
 .lb-mask[data-on]{display:block}
-.lightbox{position:fixed;z-index:30;background:rgba(18,24,21,.82);backdrop-filter:blur(8px);display:none;
-  align-items:center;justify-content:center;padding:0;cursor:zoom-out;
-  border-radius:16px;box-shadow:0 18px 50px rgba(10,14,12,.35)}
+.lightbox{position:fixed;inset:0;z-index:30;background:transparent;display:none;
+  align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
 .lightbox[data-on]{display:flex}
-.lightbox img{width:100%;height:100%;object-fit:contain;border-radius:14px}
-.lightbox .lb-close{position:absolute;top:8px;right:14px;color:#8a968f;
-  font:13px/1 system-ui,sans-serif;letter-spacing:.06em}
+.lightbox img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;
+  border-radius:12px;box-shadow:0 16px 50px rgba(0,0,0,.4)}
 
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
@@ -572,17 +570,6 @@ const lb = document.querySelector('.lightbox');
 const lbImg = lb ? lb.querySelector('img') : null;
 function openLightbox(src, alt) {
   if (!lb || !lbImg) return;
-  const fit = slides[cur] && slides[cur].querySelector('.fit');
-  if (fit) {
-    const r = fit.getBoundingClientRect();
-    const k = r.width / 1920;
-    const padTop = 205 * k;          // 从副标题区域开始，标题仍露在外面
-    const side = 70 * k;
-    lb.style.left = Math.round(r.left + side) + 'px';
-    lb.style.top = Math.round(r.top + padTop) + 'px';
-    lb.style.width = Math.round(r.width - side * 2) + 'px';
-    lb.style.height = Math.round(r.height - padTop - 30 * k) + 'px';
-  }
   lbImg.setAttribute('src', src);
   lbImg.setAttribute('alt', alt || '');
   lb.setAttribute('data-on', '');
