@@ -116,8 +116,12 @@ function slideHtml(id, eager) {
   // 图片懒加载：首屏页保持即时加载，其余页 loading=lazy（不会阻塞首屏）
   html = html.replace(/<img\b(?![^>]*\bloading=)/g,
     eager ? '<img decoding="async"' : '<img loading="lazy" decoding="async"');
+  // 外链一律新窗口打开，避免把演示页面顶掉
+  html = html.replace(/<a href="(https?:[^"]+)"/g, '<a target="_blank" rel="noopener noreferrer" href="$1"');
   const ZOOM_PAGES = ['ai-digital', 'ai-physical', 'learn-1', 'learn-2'];
   if (ZOOM_PAGES.includes(id)) html = html.replace(/<img\b/g, '<img data-zoom');
+  // 所有链接在新窗口打开
+  html = html.replace(/<a\s+(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
   const tr = (html.match(/<section[^>]*\sdata-transition="([a-z]+)"/) || [])[1];
   const trAttr = tr ? ` data-transition="${tr}"` : "";
   return `<div class="slide" data-id="${id}"${trAttr}><div class="fit">${html}</div></div>`;
