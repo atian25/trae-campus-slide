@@ -482,6 +482,12 @@ window.addEventListener('load', function () { fit(); if (mode === 'doc' && slide
 </html>`;
 
 fs.writeFileSync(path.join(SITE, "index.html"), html);
+// 卡片样式指南（docs/style-guide.html → 站点 style-guide.html）
+const guide = path.join(REPO, "docs/style-guide.html");
+if (fs.existsSync(guide)) {
+  fs.copyFileSync(guide, path.join(SITE, "style-guide.html"));
+  console.log("guide -> release/site/style-guide.html");
+}
 const mb = (Buffer.byteLength(html) / 1024).toFixed(0);
 console.log(`site -> release/site/index.html  ${mb} KB，${pageCount} 页，图片 ${blobFiles.size} 张`);
 
