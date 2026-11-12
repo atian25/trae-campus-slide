@@ -175,7 +175,7 @@ html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
 /* ===== 底部控制条（参考 skill 演示态）===== */
-.bar{position:fixed;z-index:6;right:14px;bottom:9px;
+.bar{position:fixed;z-index:6;right:14px;bottom:4px;
   display:flex;flex-direction:row;align-items:center;gap:1px;height:28px;padding:0 2px;
   background:transparent;transition:opacity .3s}
 .bar[data-quiet]{opacity:0;pointer-events:none}
@@ -272,11 +272,23 @@ function alignBar() {
   bar.style.right = Math.round(inset) + 'px';
 }
 
+const BAR_SPACE = 36;   // 控制条 + 边距（尽量少占幻灯片空间）
+
 function fit() {
   const ref = slides[0];
   if (!ref) return;
-  const w = ref.clientWidth, h = ref.clientHeight;
-  const s = Math.min(w / 1920, h / 1080);
+  const deck = document.getElementById('deck');
+  const vw = deck.clientWidth, vh0 = window.innerHeight;
+
+  // 先按满高算：如果底部本来就有一块 ≥ 控制条高度的留白，就不用压缩幻灯片
+  const sFull = Math.min(vw / 1920, vh0 / 1080);
+  const letterGap = (vh0 - 1080 * sFull) / 2;
+  const needBar = cur > 0;   // 封面不显示控制条，也就不占空间
+  const reserve = mode === 'stage' && needBar && letterGap < BAR_SPACE ? BAR_SPACE : 0;
+  deck.style.bottom = reserve ? reserve + 'px' : '0px';
+
+  const vh = vh0 - reserve;
+  const s = Math.min(vw / 1920, vh / 1080);
   for (const sl of slides) {
     const f = sl.querySelector('.fit');
     if (f) f.style.transform = 'scale(' + s + ')';
@@ -286,6 +298,8 @@ function fit() {
 
 function setPager() {
   if (barNum) barNum.textContent = (cur + 1) + ' / ' + slides.length;
+  if (bar) bar.style.display = cur === 0 ? 'none' : 'flex';   // 封面不显示控制条
+  if (mode === 'stage') fit();
 }
 
 function writeHash(i) {
