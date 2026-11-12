@@ -1,11 +1,11 @@
 # 原文资料（飞书同步）
 
-本目录是飞书原稿的本地快照，由 lark-cli docs +fetch 拉取，最近一次同步：2026-11-07。
+本目录是飞书原稿的本地快照，由 lark-cli docs +fetch 拉取，最近一次同步：2026-11-07（2026-11-12 复核：token 已修正为 `KUvWwd…`，文档 revision 2961）。
 
 - 原文.md：正文（图片引用已替换为本地 images/ 路径）
 - images/01.png ~ images/17.png：文中全部 17 张图片，按出现顺序编号
 
-源文档：https://my.feishu.cn/wiki/KUvWwDzfiBI2Vkzjzwc7S6SnTe
+源文档：https://my.feishu.cn/wiki/KUvWwdDzfiBI2Vkzjzwc7S6SnTe
 
 ## 同步方式
 
