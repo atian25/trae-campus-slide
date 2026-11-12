@@ -156,7 +156,7 @@ body{margin:0;background:#000;overflow:visible}
 .fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
 .fit > section,.th-inner > section{width:1920px;height:1080px;display:block}
 /* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
-html.stage #deck{position:fixed;inset:0}
+html.stage #deck{position:fixed;left:0;right:0;top:0;bottom:46px}
 html.stage .slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
 html.stage .slide.on{opacity:1;pointer-events:auto;z-index:1}
 html.stage .slide.t-fade.on{animation:d-fade .3s ease both}
