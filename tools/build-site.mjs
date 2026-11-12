@@ -238,7 +238,9 @@ body.pv .pv-hint b{color:#cfe0d5;font-weight:600;margin-right:4px}
 .ovl-tools{display:flex;flex-direction:row;align-items:center;gap:14px;margin:0 0 16px;color:rgba(255,255,255,.55);font:13px/1.4 system-ui,sans-serif}
 .ovl-tools input[type=range]{width:180px;accent-color:#2fae72}
 .ovl-tools b{color:rgba(255,255,255,.8);font-weight:600}
-.ovl-hint{margin:0 0 16px;color:rgba(255,255,255,.5);font:13px/1.4 system-ui,sans-serif;letter-spacing:.04em}
+.ovl-hint{margin:0;color:rgba(255,255,255,.55);font:13px/1.4 system-ui,sans-serif;letter-spacing:.04em;line-height:1}
+.ovl-tools>span{line-height:1}
+.ovl-tools input[type=range]{margin:0;vertical-align:middle}
 .ovl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 .th{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block}
 .th-frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#111;
@@ -764,7 +766,11 @@ if (bar) {
 }
 
 /* ---- 概览交互 ---- */
-ovl.addEventListener('click', function (e) { if (e.target === ovl || e.target === ovlGrid) closeOverview(); });
+ovl.addEventListener('click', function (e) {
+  if (e.target.closest('.th')) return;                       // 点缩略图：跳转
+  if (e.target.closest('input,label,button')) return;        // 控件不关闭
+  closeOverview();
+});
 window.addEventListener('mousemove', function () { setPager(); }, { passive: true });
 window.addEventListener('resize', function () { if (ovl.classList.contains('on')) scaleThumbs(); });
 
