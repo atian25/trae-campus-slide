@@ -1,4 +1,6 @@
 {
+  "0577d30d0105d73debf88d73a5ce75b1": "ai-img-creation",
+  "20f1c8fc21ba7ca34cc3287350832709": "ai-video",
   "2ac66ef611684e9c463c04a524260f35": "farewell-history",
   "511273b215ea60b173041d9b3f5f4ec4": "preface-survey",
   "516499f24269db53fb6c55b1314ee0b2": "cases1-wusheng-youshi",
@@ -7,8 +9,10 @@
   "67521fc38e05959b8c6e814283ffe355": "cover-trae-logo",
   "679b8edb1c9b4a572060a1579335f483": "campus-tokens-poster",
   "699e7a5dbf35877f833e5f4a62ba6f35": "threshold-tree-planting",
+  "7c518052ba75b41867a16fe57cf7e998": "ai-spatial",
   "7f556057226c248879776db7c1d2c287": "learn2-open-source",
   "97fca7a13e6d72a7d10335de78e939ef": "learn1-paper-reading",
+  "9c9e618185c5002aa45b6515f11b8df7": "ai-3d",
   "bad54e2f0c5e075dc080621a94e25b25": "cases2-motion-frames",
   "bc0672d5b18063fea2a3321a00b0591e": "about-me-portrait",
   "bd23c9bfd0e3ed7e131bb67dd6d909f5": "mindset-vs-brush",
@@ -20,5 +24,6 @@
   "ed62510c4fa3ef8b52785eb114f88c12": "cover-robot-hero",
   "f07b9112bb96f85cfbb5e690911881cd": "campus-live-session",
   "f09f78094514d4b82ef6b77f2d4353ed": "cover-mascot",
-  "f9b880ce3cc6c113a548b32d2e4bdfce": "eras-progress"
+  "f9b880ce3cc6c113a548b32d2e4bdfce": "eras-progress",
+  "fc6a7024d937e87179017f8c0ecc59d1": "ai-office"
 }
