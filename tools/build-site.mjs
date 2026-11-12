@@ -343,6 +343,7 @@ function runBuildIn(slide) {
 
 /* 舞台模式下切页 */
 function show(i, animate) {
+  if (typeof closeLightbox === 'function') closeLightbox();   // 切页时收起放大图
   cur = clamp(i);
   for (let k = 0; k < slides.length; k++) {
     const sl = slides[k], on = k === cur;
@@ -443,6 +444,7 @@ function jump(i) {
   else { show(i, true); }
 }
 function openOverview() {
+  if (typeof closeLightbox === 'function') closeLightbox();
   buildOverview();
   ovl.classList.add('on');
   requestAnimationFrame(function () {
