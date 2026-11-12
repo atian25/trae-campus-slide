@@ -175,24 +175,24 @@ html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
 /* ===== 底部控制条（参考 skill 演示态）===== */
-.bar{position:fixed;z-index:6;left:50%;bottom:12px;transform:translateX(-50%);
-  display:flex;flex-direction:row;align-items:center;gap:2px;height:40px;padding:0 7px;
-  border-radius:999px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
-  border:1px solid #d9e1dc;box-shadow:0 6px 20px rgba(20,28,24,.10);transition:opacity .3s,transform .3s}
-.bar[data-quiet]{opacity:0;transform:translateX(-50%) translateY(6px);pointer-events:none}
-.bar button{appearance:none;border:0;background:transparent;color:#17754a;
-  width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+.bar{position:fixed;z-index:6;right:14px;bottom:9px;
+  display:flex;flex-direction:row;align-items:center;gap:1px;height:28px;padding:0 2px;
+  background:transparent;transition:opacity .3s}
+.bar[data-quiet]{opacity:0;pointer-events:none}
+.bar button{appearance:none;border:0;background:transparent;color:rgba(23,117,74,.5);
+  width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;transition:background .18s,color .18s}
-.bar button:hover{background:#dff1e6;color:#0b4a32}
-.bar button svg{width:16px;height:16px;display:block}
+.bar button:hover{background:rgba(11,74,50,.08);color:#17754a}
+.bar button svg{width:15px;height:15px;display:block}
 .bar button:focus{outline:none}
 .bar button:focus-visible{outline:2px solid #2fae72;outline-offset:2px}
-.bar .num{min-width:52px;text-align:center;color:#17754a;
-  font:12px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
-.bar .sep{width:1px;height:16px;background:#d9e1dc;margin:0 5px}
-.tips{position:fixed;z-index:6;left:50%;bottom:60px;transform:translateX(-50%);
-  padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.96);border:1px solid #d9e1dc;color:#3b463f;box-shadow:0 6px 20px rgba(20,28,24,.10);
-  font:12px/1.9 system-ui,-apple-system,sans-serif;white-space:nowrap;display:none}
+.bar .num{min-width:46px;text-align:center;color:rgba(23,117,74,.5);
+  font:11px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.bar .sep{width:1px;height:12px;background:rgba(23,117,74,.16);margin:0 4px}
+.tips{position:fixed;z-index:6;right:14px;bottom:44px;
+  padding:9px 13px;border-radius:10px;background:rgba(255,255,255,.97);border:1px solid #e2e6e1;
+  color:#3b463f;font:12px/1.85 system-ui,-apple-system,sans-serif;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(20,28,24,.08);display:none}
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 概览（o 键 / 点右下角页码）===== */
