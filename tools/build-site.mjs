@@ -174,11 +174,15 @@ html.doc{overflow:hidden auto;scroll-snap-type:y mandatory;scrollbar-width:none}
 html.doc::-webkit-scrollbar{display:none}
 html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always}
 /* ===== 页码胶囊（右下角，翻页淡入 1.6s）===== */
-.pager{position:fixed;z-index:4;right:16px;bottom:16px;padding:4px 10px;border-radius:999px;
-  background:rgba(0,0,0,.7);color:#fff;font:12px/1.5 system-ui,-apple-system,sans-serif;
-  font-variant-numeric:tabular-nums;opacity:0;transition:opacity .3s;pointer-events:auto;cursor:pointer}
-.pager[data-on]{opacity:1}
-.pager:hover{background:rgba(11,58,41,.9)}
+/* ===== 底部提示条：页码 + 快捷键提示（常驻、淡）===== */
+.hud{position:fixed;z-index:4;left:0;right:0;bottom:10px;height:24px;
+  display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+  padding:0 18px;pointer-events:none;
+  font:12px/1.5 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;
+  color:rgba(255,255,255,.45);mix-blend-mode:difference;transition:opacity .3s}
+.hud .keys{letter-spacing:.06em}
+.hud .num{letter-spacing:.1em}
+@media (hover:hover){ .hud{opacity:.55} body:hover .hud{opacity:.9} }
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
@@ -208,7 +212,10 @@ x-icon{display:inline-flex;align-items:center;justify-content:center;font-family
 <main id="deck">
 ${pages}
 </main>
-<div class="pager" aria-hidden="true"></div>
+<div class="hud" aria-hidden="true">
+  <span class="keys">← → 翻页 · Esc 概览 · F 全屏 · 1-9 跳页</span>
+  <span class="num"></span>
+</div>
 <div class="ovl"><p class="ovl-hint"></p><div class="ovl-grid"></div></div>
 <script>
 const CP = ${JSON.stringify(iconMap)};
@@ -222,7 +229,9 @@ for (const el of document.querySelectorAll('x-icon')) {
 
 const deck = document.getElementById('deck');
 const slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
-const pager = document.querySelector('.pager');
+const hud = document.querySelector('.hud');
+const hudKeys = document.querySelector('.hud .keys');
+const hudNum = document.querySelector('.hud .num');
 const mqPortrait = matchMedia('(max-aspect-ratio: 1/1)');
 let cur = 0, mode = '', pagerTimer = 0;
 
@@ -240,11 +249,8 @@ function fit() {
 }
 
 function setPager() {
-  if (!pager) return;
-  pager.textContent = (cur + 1) + ' / ' + slides.length;
-  pager.setAttribute('data-on', '');
-  clearTimeout(pagerTimer);
-  pagerTimer = setTimeout(function () { pager.removeAttribute('data-on'); }, 1600);
+  if (!hudNum) return;
+  hudNum.textContent = (cur + 1) + ' / ' + slides.length;
 }
 
 function writeHash(i) {
@@ -398,7 +404,7 @@ window.addEventListener('keydown', function (e) {
   else if (/^[1-9]$/.test(k) && Number(k) <= slides.length) { show(Number(k) - 1, true); }
   else if (k === 'f' || k === 'F') { toggleFullscreen(); }
   else if (k === 'o' || k === 'O') { toggleOverview(); }
-  else if (k === 'Escape' && ovl.classList.contains('on')) { closeOverview(); }
+  else if (k === 'Escape') { toggleOverview(); }
 });
 
 /* ---- 滚轮（仅舞台模式）---- */
@@ -467,14 +473,13 @@ window.addEventListener('hashchange', function () {
 });
 
 /* ---- 概览交互 ---- */
-if (pager) pager.addEventListener('click', function (e) { e.stopPropagation(); toggleOverview(); });
 ovl.addEventListener('click', function (e) { if (e.target === ovl || e.target === ovlGrid) closeOverview(); });
-window.addEventListener('mousemove', function () { if (mode === 'stage') setPager(); }, { passive: true });
+window.addEventListener('mousemove', function () { setPager(); }, { passive: true });
 window.addEventListener('resize', function () { if (ovl.classList.contains('on')) scaleThumbs(); });
 
 /* ---- 启动 ---- */
 cur = fromHash();
-if (pager) pager.textContent = (cur + 1) + ' / ' + slides.length;
+if (hudNum) hudNum.textContent = (cur + 1) + ' / ' + slides.length;
 setMode();
 window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
