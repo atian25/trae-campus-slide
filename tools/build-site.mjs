@@ -156,7 +156,7 @@ body{margin:0;background:#000;overflow:visible}
 .fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
 .fit > section,.th-inner > section{width:1920px;height:1080px;display:block}
 /* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
-html.stage #deck{position:fixed;left:0;right:0;top:0;bottom:46px}
+html.stage #deck{position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh}
 html.stage .slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .32s ease}
 html.stage .slide.on{opacity:1;pointer-events:auto;z-index:1}
 html.stage .slide.t-fade.on{animation:d-fade .3s ease both}
@@ -273,7 +273,7 @@ function fit() {
   const ref = slides[0];
   if (!ref) return;
   const deck = document.getElementById('deck');
-  const vw = deck.clientWidth, vh0 = window.innerHeight;
+  const vw = deck.clientWidth, vh0 = deck.clientHeight || window.innerHeight;
 
   // 先按满高算：如果底部本来就有一块 ≥ 控制条高度的留白，就不用压缩幻灯片
   const sFull = Math.min(vw / 1920, vh0 / 1080);
@@ -518,6 +518,11 @@ window.addEventListener('scroll', function () {
 }, { passive: true });
 
 window.addEventListener('resize', function () { setMode(); });
+window.addEventListener('orientationchange', function () { setTimeout(setMode, 120); });
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', function () { setMode(); });
+  window.visualViewport.addEventListener('scroll', function () { setMode(); });
+}
 if (mqPortrait.addEventListener) mqPortrait.addEventListener('change', function () { setMode(); });
 
 /* ---- 深链 #N ---- */
