@@ -212,6 +212,8 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 
 /* ===== 视频 ===== */
 .slide video{display:block}
+.slide a{text-decoration:none!important}
+.slide a:hover{text-decoration:underline!important}
 .slide aside{display:none!important}   /* skill 的演讲者备注，不画在幻灯片上 */
 
 /* ===== 演讲者窗口 ===== */
