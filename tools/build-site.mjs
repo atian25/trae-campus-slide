@@ -149,11 +149,11 @@ const html = `<!doctype html>
 <style>
 @font-face{font-family:'AnthropiconsFZ';src:url(${iconFont}) format('woff2');font-weight:400 700;font-display:block}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{background:#e9ede8;color-scheme:light}
+html{background:#f7f8f5;color-scheme:light}
 body{margin:0;background:#000;overflow:visible}
 /* ===== 幻灯片 ===== */
 .slide{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;box-shadow:0 10px 44px rgba(20,28,24,.10)}
+.fit{width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative}
 .fit > section,.th-inner > section{width:1920px;height:1080px;display:block}
 /* ===== 舞台模式（横屏 / 桌面，默认）：一屏一页 ===== */
 html.stage #deck{position:fixed;inset:0}
@@ -177,9 +177,9 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 /* ===== 底部控制条（参考 skill 演示态）===== */
 .bar{position:fixed;z-index:6;left:50%;bottom:12px;transform:translateX(-50%);
   display:flex;flex-direction:row;align-items:center;gap:2px;height:40px;padding:0 7px;
-  border-radius:999px;background:rgba(18,22,20,.78);backdrop-filter:blur(10px);
-  box-shadow:0 4px 18px rgba(0,0,0,.22);transition:opacity .25s}
-.bar[hidden]{display:none}
+  border-radius:999px;background:rgba(11,58,41,.9);backdrop-filter:blur(10px);
+  box-shadow:0 6px 20px rgba(11,58,41,.18);transition:opacity .3s,transform .3s}
+.bar[data-quiet]{opacity:0;transform:translateX(-50%) translateY(6px);pointer-events:none}
 .bar button{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.82);
   width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;transition:background .18s,color .18s}
@@ -189,7 +189,7 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
   font:12px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .bar .sep{width:1px;height:16px;background:rgba(255,255,255,.22);margin:0 5px}
 .tips{position:fixed;z-index:6;left:50%;bottom:60px;transform:translateX(-50%);
-  padding:10px 14px;border-radius:10px;background:rgba(18,22,20,.9);color:rgba(255,255,255,.82);
+  padding:10px 14px;border-radius:10px;background:rgba(11,58,41,.94);color:rgba(255,255,255,.82);
   font:12px/1.9 system-ui,-apple-system,sans-serif;white-space:nowrap;display:none}
 .tips[data-on]{display:block}
 .tips b{color:#fff;font-weight:600;margin-right:6px}
@@ -402,6 +402,23 @@ function toggleOverview() {
   if (ovl.classList.contains('on')) closeOverview(); else openOverview();
 }
 
+/* 数字键跳页：支持多位数（1 → 2 = 第 12 页），无法再拼接时立即跳 */
+let digitBuf = '', digitTimer = 0;
+function typeDigit(k) {
+  clearTimeout(digitTimer);
+  digitBuf += k;
+  const n = Number(digitBuf);
+  if (n < 1) { digitBuf = ''; return; }
+  if (n <= slides.length && n * 10 <= slides.length) {
+    // 还可以再拼一位（例如 1 → 10..19 中的某页）
+    digitTimer = setTimeout(function () { show(n - 1, true); digitBuf = ''; }, 420);
+    show(n - 1, true);
+    return;
+  }
+  digitBuf = '';
+  if (n <= slides.length) show(n - 1, true);
+}
+
 function step(d) {
   const n = clamp(cur + d);
   if (mode === 'doc') {
@@ -422,7 +439,7 @@ window.addEventListener('keydown', function (e) {
     e.preventDefault(); step(1);
   } else if (k === 'Home') { e.preventDefault(); show(0, true); }
   else if (k === 'End') { e.preventDefault(); show(slides.length - 1, true); }
-  else if (/^[1-9]$/.test(k) && Number(k) <= slides.length) { show(Number(k) - 1, true); }
+  else if (/^[0-9]$/.test(k)) { typeDigit(k); }
   else if (k === 'f' || k === 'F') { toggleFullscreen(); }
   else if (k === 'o' || k === 'O') { toggleOverview(); }
   else if (k === 'Escape') { toggleOverview(); }
@@ -510,10 +527,21 @@ if (bar) {
       bar.setAttribute('hidden', '');
     }
   });
-  // 鼠标移到窗口底部时把控制条叫回来
-  window.addEventListener('mousemove', function (e) {
-    if (e.clientY > window.innerHeight - 48) bar.removeAttribute('hidden');
-  }, { passive: true });
+  // 自动隐藏：鼠标动一下就出现，停 1.8s 或移出窗口就淡出
+  let barTimer = 0;
+  function showBar() {
+    bar.removeAttribute('hidden');
+    bar.removeAttribute('data-quiet');
+    clearTimeout(barTimer);
+    barTimer = setTimeout(function () { bar.setAttribute('data-quiet', ''); }, 1800);
+  }
+  window.addEventListener('mousemove', showBar, { passive: true });
+  window.addEventListener('keydown', showBar);
+  document.addEventListener('mouseleave', function () {
+    clearTimeout(barTimer);
+    bar.setAttribute('data-quiet', '');
+  });
+  showBar();
 }
 
 /* ---- 概览交互 ---- */
