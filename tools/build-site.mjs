@@ -195,6 +195,14 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
   box-shadow:0 4px 14px rgba(20,28,24,.08);display:none}
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
+/* ===== 图片放大 ===== */
+.lightbox{position:fixed;inset:0;z-index:30;background:rgba(8,12,10,.92);display:none;
+  align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lightbox[data-on]{display:flex}
+.lightbox img{max-width:94vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lightbox .lb-close{position:absolute;top:14px;right:18px;color:rgba(255,255,255,.7);
+  font:13px/1 system-ui,sans-serif;letter-spacing:.06em}
+
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
@@ -233,6 +241,7 @@ ${pages}
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
+<div class="lightbox" data-lb aria-hidden="true"><span class="lb-close">点击任意处 / Esc 关闭</span><img alt=""></div>
 <div class="tips" data-tips>
   <div><b>← →</b>上一页 / 下一页</div>
   <div><b>空格</b>下一页 · <b>Home / End</b> 首尾页</div>
@@ -490,7 +499,7 @@ window.addEventListener('keydown', function (e) {
   else if (/^[0-9]$/.test(k)) { typeDigit(k); }
   else if (k === 'f' || k === 'F') { toggleFullscreen(); }
   else if (k === 'o' || k === 'O') { toggleOverview(); }
-  else if (k === 'Escape') { toggleOverview(); }
+  else if (k === 'Escape') { if (lb && lb.hasAttribute('data-on')) closeLightbox(); else toggleOverview(); }
 });
 
 /* ---- 滚轮（仅舞台模式）---- */
@@ -562,6 +571,27 @@ window.addEventListener('hashchange', function () {
   if (mode === 'stage') show(i, true);
   else { cur = i; if (slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); setPager(); }
 });
+
+/* ---- 点击图片放大 ---- */
+const lb = document.querySelector('.lightbox');
+const lbImg = lb ? lb.querySelector('img') : null;
+function openLightbox(src, alt) {
+  if (!lb || !lbImg) return;
+  lbImg.setAttribute('src', src);
+  lbImg.setAttribute('alt', alt || '');
+  lb.setAttribute('data-on', '');
+  lb.setAttribute('aria-hidden', 'false');
+}
+function closeLightbox() {
+  if (!lb) return;
+  lb.removeAttribute('data-on');
+  lb.setAttribute('aria-hidden', 'true');
+}
+document.addEventListener('click', function (e) {
+  const img = e.target.closest && e.target.closest('.slide img');
+  if (img) { e.stopPropagation(); e.preventDefault(); openLightbox(img.currentSrc || img.src, img.getAttribute('alt')); }
+}, true);
+if (lb) lb.addEventListener('click', closeLightbox);
 
 /* ---- 底部控制条 ---- */
 if (bar) {
