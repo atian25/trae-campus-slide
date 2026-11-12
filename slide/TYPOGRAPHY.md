@@ -49,6 +49,8 @@
 
 **字号是封闭集合**：全篇只允许 `24 / 25 / 30 / 41 / 56 / 104` 六个值。出现 27、33、48 之类的第七个值就是错的。
 
+**唯一例外：`tip 22px`**（卡片里的「来自：/💡 出处」这类附注一行小字，第 7 页视频卡在用）。它比 `caption` 小一档、比正文明显弱，`deck:check` 通过；除此之外不要再引入 20/21/23 之类的新值。
+
 原版 1600 基准 → 新档位的归并规则（照表走，不要自己发明）：
 
 ```
@@ -224,6 +226,58 @@ P2 = min(100, ((L − 1.41) / 2 + 1.41) / L × 100)
 - **不要**用 `<u>` 包链接：`<u>` 的下划线会和 `<a>` 自带的那条叠成双线。
 - 胶囊（`查看作品` / `了解详情`）里的链接同样按这个写法，不要另做一套。
 - 备选下划线色：`#A6ECC0` 更淡（远看几乎无线）、`#BFF2D2` 在米白底上基本看不见——只在确定投影环境很好时用。
+
+**站点层（`release/site` 与 PDF）的额外约定**（`tools/build-site.mjs` 统一处理，deck 源文件不用管）：
+
+- 所有 `http(s)` 外链自动补 `target="_blank" rel="noopener noreferrer"` → **新标签页打开**，不顶掉演示页。
+- 全局 `.slide a{text-decoration:none}`，只在 hover 时出现下划线 → 页面上那条 underline 会消失，视觉更干净。
+- 「后缀箭头」统一用 `了解详情 ↗` 结构：`<p><a href><span>了解详情</span></a></p>` + **22px 内联 ↗ SVG**（`aria-label="打开链接"`，`stroke` 同色）。
+  不要用图标字体的 `Link`（观感太重，已从全篇移除）。
+- 胶囊 CTA（第 3 页知乎链接）：`#DFF1E6` 底 + `1px solid #BFE4CD` + `border-radius:999px` + `padding:18px 30px`，
+  与副标题放在**同一 flex 行**、`align-items:center` 垂直居中，并与内容区右边留 110px（不要贴边）。
+
+### 5.11 三卡图文（第 7、8 页「AI 之变」）
+
+```html
+<div style="display:grid; gap:24px; grid-template-columns:1fr 1fr 1fr; align-items:center; flex:1">
+  <div style="display:flex; flex-direction:column; gap:30px; padding:18px 18px 24px;
+              background:#ffffff; border:1px solid #d9e1dc; border-radius:20px">
+    <div style="height:360px; display:flex; flex-direction:column; flex:0 0 auto;
+                border-radius:14px; overflow:hidden">
+      <img src="/_blob/<id>" alt="…" style="width:536px; height:360px; object-fit:contain">
+    </div>
+    <div style="height:200px; display:flex; flex-direction:column; gap:10px; flex:0 0 auto;
+                padding:16px 0 0; border-top:1px solid #d9e1dc">
+      <div style="display:flex; flex-direction:row; gap:12px; align-items:baseline">
+        <p style="…24px; font-weight:800; letter-spacing:2.4px; color:#17754a">01</p>
+        <h3 style="…30px; font-weight:800; color:#141c18">图片创作</h3>
+      </div>
+      <p style="padding:0 0 0 46px; …24px; line-height:1.65; color:#5a645e">描述…</p>
+    </div>
+  </div>
+  …
+</div>
+```
+
+- `align-items:center`：三卡整体**垂直居中**，不要拉满整页（拉满会在卡底留一大片空）。
+- 图区固定 `536×360`，图片一律 **`object-fit:contain`**：截图类素材用 `cover` 会切掉边上内容（地址栏、二维码、边栏），宁可留白。
+- 需要和白色卡面区分开的图（第 7 页 01 图片创作）：图容器再加 `background:#E7EFE8; border:1px solid #d9e1dc`。
+- 图与文案之间：卡片 `gap:30px` + 文案块 `border-top:1px solid #d9e1dc; padding:16px 0 0`。
+- 描述不再另行缩进之外的样式；`01/02/03` 编号与标题同一基线，描述缩进 `46px` 对齐标题文字。
+- 附注小字（tip）：`22px`，图标 22px 灰 `#8a968f` + 前缀 + 绿色链接 `22px #17754a` + 20px 灰 ↗，**不缩进**。
+
+### 5.12 视频卡（`data-video`）
+
+```html
+<img data-video-sound="on" src="/_blob/<静帧>" data-video="/_blob/<mp4>"
+     alt="…" style="width:536px; height:360px; object-fit:contain">
+```
+
+- 静帧必须是**视频里的干净帧**（`ffmpeg -ss 2 -frames:v 1`），不要用自带播放按钮的截图 —— 会和播放器叠成「两个播放按钮」。
+- `data-video-sound="on"` 才有声音；不写默认静音（浏览器自动播放策略下、被拦时会降级静音，画面照常）。
+- 站点播放层行为：进入该页自动循环播放；`→` 播放中 = 暂停，已暂停 = 翻页；点视频 = 进放大视图（放大里点视频 = 播放/暂停，点其他处 = 关闭）。
+- 素材规格：`mp4(H.264)` 或 `webm`，**≤ 20MB**。4K 源压法：`ffmpeg -i src.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart out.mp4`（77s 4K → 720p 约 14MB）。
+- `artifact.mjs upload` **不收视频**（只收图片/字体）：mp4 手动放进 `project/assets/<32hex>.mp4`，并在 `project/assets/index.json` 里登记 `video/mp4`，`tools/asset-names.json` 里补语义名。
 
 ### 另：封面（01）
 

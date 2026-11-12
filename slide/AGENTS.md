@@ -74,10 +74,41 @@ npm run deck:render              # 全部
 - 运行时 sidecar：`comments.json`、`.sharing.json`、`.artifact-server.json`、`.artifact-server.log`、`history/`、`exports/` —— 已在 `slide/.gitignore` 里。
 - 增删页只改两处：`project/slides/<id>.html` 文件 + `project/deck.json` 的 `order`（`cover` / `sections.start` 指向的 id 也要跟着改）。
 
-## 7. 现状（2026-11-10）
+## 7. 站点播放层（`release/site`，线上给观众的版本）
 
-- `slide/`：**19 页**（1600×900 单文件版是 18 页，这里把第 7、8 页换成了改版，
-  另新增 1 页 `mindset`）。页面顺序见 `project/deck.json` 的 `order`。
+`npm run site` 构建 `release/site/`（页面 + PDF），`npm run preview` 在 `127.0.0.1:8765` 预览 —— **和线上同一份产物**，验收看这个，不是编辑器的 Present。
+
+播放层约定（`tools/build-site.mjs` 的模板，改行为只改这里）：
+
+| 能力 | 规则 |
+| --- | --- |
+| 翻页 | 键盘 `←/→/PgUp/PgDn/空格`、滚轮、触摸滑动；**点了左右边缘不再翻页**（曾经有，和点图放大冲突，已移除） |
+| 图片放大 | 只对白名单页面生效：`ZOOM_PAGES = ['ai-digital','ai-physical','learn-1','learn-2']`；放大层是全屏半透明蒙层 + 图片居中（无盒子），点任意处 / `Esc` 关闭 |
+| 放大时的键盘 | 方向键/空格 = **只关闭放大**，不翻页；数字键 = 关闭放大后跳页 |
+| 视频 | `img[data-video]` 进入页面自动播放；`→` 播放中=暂停、已暂停=翻页；点视频进放大视图（放大里点视频=播放/暂停）；放大时卡片视频暂停，关闭后只有「放大仍在播」才恢复 |
+| 外链 | 自动 `target="_blank" rel="noopener noreferrer"`，全局去下划线（hover 才出现） |
+| 演讲者窗口 | 按 `P` 打开 `?presenter=1`：当前页 + **`<aside>` 演讲备注** + 下一页预览 + 计时器 + 键位提示，`BroadcastChannel` 同步 |
+| 概览 | 按 `O` / `Esc`：缩略图网格 + 尺寸滑轨（顶部工具行垂直居中），点缩略图跳页，**点任意空白关闭** |
+| 备注 | deck 里的 `<aside>` 不画在页面上（`.slide aside{display:none}`），只喂给演讲者窗口 |
+
+验收与发布：
+
+1. 改完：`npm run deck:check`（problems 必须 0）→ `npm run site` → 浏览器看 `http://127.0.0.1:8765/#<页号>`。
+2. 小改动**改完直接 commit + push**；CI 用 `gh run list --limit 1` 查一眼即可，**不要阻塞等待**（用户明确要求过）。
+3. 发布失败重跑时要小心：`gh run rerun` 会造成 `Multiple artifacts named "github-pages"`，**要重跑就提交一个空 commit**。
+4. 上线后自检：`curl -s https://atian25.github.io/trae-campus-slide/ | grep <关键词>`。
+
+## 8. 素材规范（图片 / 视频）
+
+- 图片按卡片图区比例出图，**默认 `object-fit:contain` 不裁切**（`cover` 会切掉截图边缘）。
+- 截图先削掉约 0.6–0.8% 的边，去掉自带的 1px 黑框/白框。
+- 需要补边时按卡片底色补（白卡补白、淡绿卡 `#E7EFE8` 补同色），补完看不出接缝。
+- 视频：≤20MB、mp4/webm；静帧截自视频本身（不要带播放按钮）。大文件放 `slide/project/inbox/`（已 gitignore），处理完删掉。
+- `artifact.mjs upload` 只收图片/字体，视频要手动登记进 `project/assets/`（见 `TYPOGRAPHY.md` §5.12）。
+
+## 9. 现状（2026-11-12）
+
+- `slide/`：**22 页**（新增第 7、8 页「AI 之变」两页；第 17、18 页改版）。页面顺序见 `project/deck.json` 的 `order`。
 - `design-system/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
 - 验证/渲染脚本在 `tools/`，npm 脚本见 §3；`tools/render-slide.mjs` 会从本机 claude-slides 安装里读
   图标字体（Anthropicons-Variable）和字形表，不往仓库里拷字体。

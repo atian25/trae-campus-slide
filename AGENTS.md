@@ -12,11 +12,11 @@
 ## slide/（幻灯片）与 design-system/
 
 - `slide/`：幻灯片本体，claude-slides 的 Slides artifact 格式（`project/deck.json` + 一页一个 HTML，
-  1920×1080 固定画布、全内联样式）。19 页，顺序见 `project/deck.json` 的 `order`。
+  1920×1080 固定画布、全内联样式）。**22 页**，顺序见 `project/deck.json` 的 `order`。
 - `design-system/`：TRAE Campus 设计系统（token + 组件预览），deck 里装了一份拷贝在 `slide/project/ds/traecampus/`。
 - **协作约定**（文案在编辑器里改、结构/样式交给 AI、编辑器会整页重写文件）见 [`slide/AGENTS.md`](slide/AGENTS.md)，
   在 `slide/` 下工作时先读它。
-- 排版规范见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md)：字号只用 24 / 25 / 30 / 41 / 56 / 104，
+- 排版规范见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md)：字号只用 24 / 25 / 30 / 41 / 56 / 104（tip 小字可 22），
   间距用 `gap`/`padding`（`margin` 无效），页面预算 = 页头约 205 + 正文 746 + 页脚 62。
 
 ## 常用命令
@@ -27,7 +27,7 @@
 | `npm run deck:check` | 校验草稿，`problems` 必须为 0 才提交 |
 | `npm run deck:render` | 每页渲染成 1920×1080 PNG（`.tmp-test/render/`；`-- <id>` 渲染单页） |
 | `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
-| `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765） |
+| `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
   `build-site.mjs`（站点 + PDF；播放层对齐 claude-slides 导出的 Web page：黑底一屏一页 / 竖屏纵向滚动 / 右下角页码 / f 全屏）、`serve.mjs`（本地预览）。
@@ -40,3 +40,9 @@
 - `npm run deck:check` 的 `problems` 为 0，且没有任何 `排版` / 警告 note。
 - 改了版式就 `npm run deck:render`，检查页面内容不溢出（内容下沿 ≤ 1018px，安全线）。
 - 改完文案至少看一眼渲染图；不要在编辑器开着的同一页上做批量结构改动。
+
+## 部署与验收（重要）
+
+- **小改动改完直接 commit + push**；push 后 CI 用 `gh run list --limit 1` 查一眼即可，**不要阻塞等待**。
+- 发布失败要重跑时：**提交一个空 commit**，不要 `gh run rerun`（会产生重复 artifact 报错）。
+- 播放层能力 / 素材规范见 [`slide/AGENTS.md`](slide/AGENTS.md) §7–§8；版式配方见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md) §5.10–§5.12。
