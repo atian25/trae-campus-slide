@@ -517,6 +517,15 @@ function step(d) {
 window.addEventListener('keydown', function (e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key;
+  // 灯箱打开时：方向键/空格只关灯箱不翻页；数字键关灯箱后照常跳页；Esc 关闭
+  if (lb && lb.hasAttribute('data-on')) {
+    if (k === 'Escape') { e.preventDefault(); closeLightbox(); return; }
+    if (/^[0-9]$/.test(k)) { closeLightbox(); }
+    else if (k === 'ArrowLeft' || k === 'ArrowRight' || k === 'ArrowUp' || k === 'ArrowDown'
+          || k === 'PageUp' || k === 'PageDown' || k === ' ' || k === 'Home' || k === 'End') {
+      e.preventDefault(); closeLightbox(); return;
+    } else { return; }
+  }
   if ((k === ' ' && e.shiftKey) || k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') {
     e.preventDefault(); step(-1);
   } else if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') {
