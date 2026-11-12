@@ -198,8 +198,10 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 图片放大 ===== */
-.lightbox{position:fixed;z-index:30;background:rgba(255,255,255,.97);display:none;
-  align-items:center;justify-content:center;padding:16px;cursor:zoom-out;
+.lb-mask{position:fixed;inset:0;z-index:29;background:rgba(247,248,245,.86);backdrop-filter:blur(2px);display:none}
+.lb-mask[data-on]{display:block}
+.lightbox{position:fixed;z-index:30;background:#ffffff;display:none;
+  align-items:center;justify-content:center;padding:14px;cursor:zoom-out;
   border:1px solid #d9e1dc;border-radius:16px;box-shadow:0 18px 50px rgba(20,28,24,.16)}
 .lightbox[data-on]{display:flex}
 .lightbox img{max-width:100%;max-height:100%;border-radius:10px}
@@ -244,6 +246,7 @@ ${pages}
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
+<div class="lb-mask" data-mask></div>
 <div class="lightbox" data-lb aria-hidden="true"><span class="lb-close">点击任意处 / Esc 关闭</span><img alt=""></div>
 <div class="tips" data-tips>
   <div><b>← →</b>上一页 / 下一页</div>
@@ -573,8 +576,8 @@ function openLightbox(src, alt) {
   if (fit) {
     const r = fit.getBoundingClientRect();
     const k = r.width / 1920;
-    const padTop = 272 * k;          // 页头高度：放大区从标题下方开始
-    const side = 60 * k;
+    const padTop = 205 * k;          // 从副标题区域开始，标题仍露在外面
+    const side = 70 * k;
     lb.style.left = Math.round(r.left + side) + 'px';
     lb.style.top = Math.round(r.top + padTop) + 'px';
     lb.style.width = Math.round(r.width - side * 2) + 'px';
@@ -584,11 +587,15 @@ function openLightbox(src, alt) {
   lbImg.setAttribute('alt', alt || '');
   lb.setAttribute('data-on', '');
   lb.setAttribute('aria-hidden', 'false');
+  const mask = document.querySelector('.lb-mask');
+  if (mask) mask.setAttribute('data-on', '');
 }
 function closeLightbox() {
   if (!lb) return;
   lb.removeAttribute('data-on');
   lb.setAttribute('aria-hidden', 'true');
+  const mask = document.querySelector('.lb-mask');
+  if (mask) mask.removeAttribute('data-on');
 }
 document.addEventListener('click', function (e) {
   const t = e.target;
@@ -600,7 +607,14 @@ document.addEventListener('click', function (e) {
   e.preventDefault();
   openLightbox(img.currentSrc || img.src, img.getAttribute('alt'));
 }, true);
-if (lb) lb.addEventListener('click', closeLightbox);
+if (lb) {
+  lb.addEventListener('click', closeLightbox);
+  const mask = document.querySelector('.lb-mask');
+  if (mask) mask.addEventListener('click', closeLightbox);
+  document.addEventListener('click', function (e) {
+    if (lb.hasAttribute('data-on') && !e.target.closest('.slide img[data-zoom]')) closeLightbox();
+  }, false);
+}
 
 /* ---- 底部控制条 ---- */
 if (bar) {
