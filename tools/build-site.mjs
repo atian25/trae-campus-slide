@@ -185,6 +185,8 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
   cursor:pointer;padding:0;transition:background .18s,color .18s}
 .bar button:hover{background:#dff1e6;color:#0b4a32}
 .bar button svg{width:16px;height:16px;display:block}
+.bar button:focus{outline:none}
+.bar button:focus-visible{outline:2px solid #2fae72;outline-offset:2px}
 .bar .num{min-width:52px;text-align:center;color:#17754a;
   font:12px/1 system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.06em}
 .bar .sep{width:1px;height:16px;background:#d9e1dc;margin:0 5px}
@@ -513,6 +515,7 @@ window.addEventListener('hashchange', function () {
 
 /* ---- 底部控制条 ---- */
 if (bar) {
+  bar.addEventListener('mousedown', function (e) { e.preventDefault(); });
   bar.addEventListener('click', function (e) {
     const b = e.target.closest('button[data-act]');
     if (!b) return;
