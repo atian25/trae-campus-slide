@@ -105,7 +105,7 @@ if (fs.existsSync(blobDir)) {
   }
 }
 
-function slideHtml(id) {
+function slideHtml(id, eager) {
   const file = path.join(DECK, "project/slides", `${id}.html`);
   let html = fs.readFileSync(file, "utf8").trim();
   html = html.replace(/\/_blob\/([0-9a-f]{32})/g, (all, blob) => {
@@ -113,6 +113,9 @@ function slideHtml(id) {
     if (!f) throw new Error(`第 ${id} 页引用了不存在的图片 ${blob}`);
     return `assets/${f}`;
   });
+  // 图片懒加载：首屏页保持即时加载，其余页 loading=lazy（不会阻塞首屏）
+  html = html.replace(/<img\b(?![^>]*\bloading=)/g,
+    eager ? '<img decoding="async"' : '<img loading="lazy" decoding="async"');
   const tr = (html.match(/<section[^>]*\sdata-transition="([a-z]+)"/) || [])[1];
   const trAttr = tr ? ` data-transition="${tr}"` : "";
   return `<div class="slide" data-id="${id}"${trAttr}><div class="fit">${html}</div></div>`;
@@ -130,7 +133,7 @@ function isHidden(id) {
   return /(^|\s)hidden(\s|=|$)/.test(attrs);
 }
 const visibleOrder = order.filter((id) => !isHidden(id));
-const pages = visibleOrder.map(slideHtml).join("\n");
+const pages = visibleOrder.map((id, i) => slideHtml(id, i === 0)).join("\n");
 const pageCount = visibleOrder.length;
 if (!pageCount) throw new Error("所有页都被隐藏了");
 
