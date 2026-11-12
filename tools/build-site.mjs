@@ -198,13 +198,13 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .tips[data-on]{display:block}
 .tips b{color:#0b4a32;font-weight:700;margin-right:6px}
 /* ===== 图片放大 ===== */
-.lb-mask{position:fixed;inset:0;z-index:29;background:rgba(247,248,245,.86);backdrop-filter:blur(2px);display:none}
+.lb-mask{position:fixed;inset:0;z-index:29;background:rgba(20,28,24,.30);display:none}
 .lb-mask[data-on]{display:block}
-.lightbox{position:fixed;z-index:30;background:#ffffff;display:none;
-  align-items:center;justify-content:center;padding:14px;cursor:zoom-out;
-  border:1px solid #d9e1dc;border-radius:16px;box-shadow:0 18px 50px rgba(20,28,24,.16)}
+.lightbox{position:fixed;z-index:30;background:rgba(18,24,21,.82);backdrop-filter:blur(8px);display:none;
+  align-items:center;justify-content:center;padding:0;cursor:zoom-out;
+  border-radius:16px;box-shadow:0 18px 50px rgba(10,14,12,.35)}
 .lightbox[data-on]{display:flex}
-.lightbox img{max-width:100%;max-height:100%;border-radius:10px}
+.lightbox img{width:100%;height:100%;object-fit:contain;border-radius:14px}
 .lightbox .lb-close{position:absolute;top:8px;right:14px;color:#8a968f;
   font:13px/1 system-ui,sans-serif;letter-spacing:.06em}
 
@@ -247,7 +247,7 @@ ${pages}
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
 <div class="lb-mask" data-mask></div>
-<div class="lightbox" data-lb aria-hidden="true"><span class="lb-close">点击任意处 / Esc 关闭</span><img alt=""></div>
+<div class="lightbox" data-lb aria-hidden="true"><img alt=""></div>
 <div class="tips" data-tips>
   <div><b>← →</b>上一页 / 下一页</div>
   <div><b>空格</b>下一页 · <b>Home / End</b> 首尾页</div>
