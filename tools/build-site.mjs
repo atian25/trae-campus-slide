@@ -180,10 +180,10 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
   background:transparent;transition:opacity .3s}
 .bar[data-quiet]{opacity:0;pointer-events:none}
 .bar button{appearance:none;border:0;background:transparent;color:rgba(23,117,74,.5);
-  width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+  width:calc(26px * var(--bs, 1));height:calc(26px * var(--bs, 1));border-radius:999px;display:flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;transition:background .18s,color .18s}
 .bar button:hover{background:rgba(11,74,50,.08);color:#17754a}
-.bar button svg{width:15px;height:15px;display:block}
+.bar button svg{width:calc(15px * var(--bs, 1));height:calc(15px * var(--bs, 1));display:block}
 .bar button:focus{outline:none}
 .bar button:focus-visible{outline:2px solid #2fae72;outline-offset:2px}
 .bar .num{min-width:46px;text-align:center;color:rgba(23,117,74,.5);
@@ -198,6 +198,9 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
+.ovl-tools{display:flex;flex-direction:row;align-items:center;gap:14px;margin:0 0 16px;color:rgba(255,255,255,.55);font:13px/1.4 system-ui,sans-serif}
+.ovl-tools input[type=range]{width:180px;accent-color:#2fae72}
+.ovl-tools b{color:rgba(255,255,255,.8);font-weight:600}
 .ovl-hint{margin:0 0 16px;color:rgba(255,255,255,.5);font:13px/1.4 system-ui,sans-serif;letter-spacing:.04em}
 .ovl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 .th{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block}
@@ -236,7 +239,14 @@ ${pages}
   <div><b>1-9</b>跳页 · <b>O</b> 概览 · <b>F</b> 全屏</div>
   <div><b>Esc</b>概览 / 收起控制条</div>
 </div>
-<div class="ovl"><p class="ovl-hint"></p><div class="ovl-grid"></div></div>
+<div class="ovl">
+  <div class="ovl-tools"><b class="ovl-hint"></b>
+    <span>缩略图</span>
+    <input type="range" class="ovl-size" min="160" max="440" step="20" value="240" aria-label="缩略图尺寸">
+    <span class="ovl-size-label">240px</span>
+  </div>
+  <div class="ovl-grid"></div>
+</div>
 <script>
 const CP = ${JSON.stringify(iconMap)};
 for (const el of document.querySelectorAll('x-icon')) {
@@ -265,6 +275,12 @@ function alignBar() {
   const safeRight = r.right - 77 * scale;          // 正文安全区右边
   const inset = Math.max(10, (window.innerWidth - safeRight) + 10);
   bar.style.right = Math.round(inset) + 'px';
+
+  // 页面底部留白 = 1080 - 正文安全下沿(1018) = 62px，控制条必须塞进这条空带里
+  const freeBand = 62 * scale;
+  const bs = Math.max(0.62, Math.min(1, (freeBand - 8) / 26));
+  bar.style.setProperty('--bs', bs.toFixed(2));
+  bar.style.bottom = Math.max(2, Math.round(freeBand - 26 * bs - 3)) + 'px';
 }
 
 const BAR_SPACE = 36;   // 控制条 + 边距（尽量少占幻灯片空间）
@@ -397,6 +413,16 @@ function buildOverview() {
     ovlGrid.appendChild(b);
   }
   scaleThumbs();
+  const sizeInput = document.querySelector('.ovl-size');
+  const sizeLabel = document.querySelector('.ovl-size-label');
+  if (sizeInput) {
+    sizeInput.addEventListener('input', function () {
+      const px = Number(sizeInput.value) || 240;
+      sizeLabel.textContent = px + 'px';
+      ovlGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + px + 'px, 1fr))';
+      scaleThumbs();
+    });
+  }
 }
 function jump(i) {
   i = clamp(i);
