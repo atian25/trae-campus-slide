@@ -208,6 +208,7 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 
 /* ===== 视频 ===== */
 .slide video{display:block}
+.slide aside{display:none!important}   /* skill 的演讲者备注，不画在幻灯片上 */
 
 /* ===== 演讲者窗口 ===== */
 body.pv{background:#0d1210;color:#e8eee9;display:flex;height:100vh;overflow:hidden}
@@ -220,6 +221,7 @@ body.pv .pv-side h2{font:600 12px/1.6 system-ui,sans-serif;letter-spacing:.12em;
 body.pv .pv-next{width:100%;aspect-ratio:16/9;border:0;border-radius:8px;background:#0a0e0c;display:block}
 body.embed .bar,body.embed .lb-mask,body.embed .lightbox{display:none!important}
 body.pv .pv-timer{font:700 34px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#7fe3ae}
+body.pv .pv-notes{font:13px/1.85 system-ui,sans-serif;color:#cfe0d5;max-height:180px;overflow:auto;white-space:pre-wrap}
 body.pv .pv-hint{font:12px/1.9 system-ui,sans-serif;color:#7f8f86;margin:0}
 body.pv .pv-hint b{color:#cfe0d5;font-weight:600;margin-right:4px}
 
@@ -712,7 +714,8 @@ function presenterMode() {
   const base = location.origin + location.pathname;
   const main = document.createElement('div'); main.className = 'pv-main';
   const side = document.createElement('aside'); side.className = 'pv-side';
-  side.innerHTML = '<div><h2>下一页</h2><iframe class="pv-next" src="' + base + '?embed=1#2"></iframe></div>'
+  side.innerHTML = '<div><h2>备注（本页）</h2><div class="pv-notes"></div></div>'
+    + '<div><h2>下一页</h2><iframe class="pv-next" src="' + base + '?embed=1#2"></iframe></div>'
     + '<div><h2>已用时间</h2><div class="pv-timer">00:00</div></div>'
     + '<p class="pv-hint"><b>→</b>下一页（有视频时先播放/暂停）</p>'
     + '<p class="pv-hint"><b>←</b>上一页 · <b>O</b>概览 · <b>F</b>全屏</p>'
@@ -731,6 +734,12 @@ function presenterMode() {
   }, 500);
   function goto(i) {
     const n = Math.max(1, Math.min(slides.length, i + 1));
+    const sec = slides[n - 1] && slides[n - 1].querySelector('section');
+    const noteEl = document.querySelector('.pv-notes');
+    if (noteEl) {
+      const note = sec && sec.querySelector('aside');
+      noteEl.textContent = note ? note.textContent.trim() : '（本页没有备注）';
+    }
     if (frame.contentWindow) frame.contentWindow.location.hash = '#' + n;
     if (nextFrame.contentWindow) nextFrame.contentWindow.location.hash = '#' + Math.min(slides.length, n + 1);
   }
