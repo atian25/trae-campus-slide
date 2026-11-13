@@ -133,17 +133,23 @@ for (const rel of files) {
     CSS: [...prev.css].filter((x) => !cur.css.has(x)),
   };
   const lostSvg = Math.max(0, prev.svgCount - cur.svgCount);
-  const total = Object.values(lost).reduce((a, b) => a + b.length, 0) + lostSvg;
+  // 文案是正常编辑对象：改句子必然「删旧加新」，只提示、不拦截
+  const lostHard = lost.图片.length + lost.图标.length + lost.链接.length + lost.CSS.length + lostSvg;
+  const total = lostHard;
 
   if (VERBOSE) {
     console.log(`  · ${path.basename(rel)} 文案${cur.texts.size} 图${cur.imgs.size} 图标${cur.icons.size} svg${cur.svgCount} css${cur.css.size}（HEAD 同类 ${prev.texts.size}/${prev.imgs.size}/${prev.icons.size}/${prev.svgCount}/${prev.css.size}）`);
+  }
+
+  if (lost.文案.length && VERBOSE) {
+    console.log(`  · ${path.basename(rel)} 文案有 ${lost.文案.length} 处改动（正常编辑，不拦截）`);
   }
 
   if (total) {
     failures++;
     console.log(`\n  ✗ ${path.basename(rel)} 相比 HEAD 丢了 ${total} 项语义：`);
     for (const [k, v] of Object.entries(lost)) {
-      if (v.length) {
+      if (v.length && k !== "文案") {
         console.log(`      ${k}（${v.length}）:`);
         for (const x of v.slice(0, 6)) console.log(`        - ${x.slice(0, 110)}`);
         if (v.length > 6) console.log(`        … 还有 ${v.length - 6} 项`);
