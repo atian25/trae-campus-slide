@@ -39,6 +39,18 @@
   本地若想用安装里的新版可删掉这两个文件，脚本会回落到 `CLAUDE_SLIDES_SKILL` / `~/.agents/skills/claude-slides`。
 - 发布：push 到 `main` 触发 `.github/workflows/deploy.yml` → `npm ci` + `npm run site` → GitHub Pages。
 
+## 验证策略（按复杂度分级，别过度）
+
+| 改动类型 | 只做这些 | 不要做 |
+| --- | --- | --- |
+| 文案 / 数字 / 链接 | `npm run deck:check`（2s）→ 直接 commit+push | 渲染、截图、本地构建 |
+| 间距 / 字号 / 颜色等局部样式 | `deck:check` + 单页 `node tools/render-slide.mjs <id>` 看一眼 | 全量渲染、CDP 脚本 |
+| 版式重排 / 加页 / 换图文 | 渲染 + 看截图 | — |
+| 播放层交互（键盘/点击/滚动/视频） | 才用 CDP 脚本实测行为 | — |
+| `npm run site`（本地构建含 PDF，60–120s） | **只在需要在 8765 验收时**跑，且放后台 | 每次改完都跑 |
+
+原则：**push 触发 CI 构建就够了**，本地构建只是给「本地预览」用的；验证手段要和风险匹配，别为了保险每步都做全套。
+
 ## 验收
 
 - `npm run deck:check` 的 `problems` 为 0，且没有任何 `排版` / 警告 note。
