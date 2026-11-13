@@ -188,6 +188,17 @@ try {
   bad("资产检查", e.message);
 }
 
+// ---------- 4b. 语义守卫：编辑器重写有没有吃掉东西 ----------
+try {
+  const out = execFileSync("node", [path.join(REPO, "tools/guard-slides.mjs")], { encoding: "utf8" });
+  if (/没有改动过的 slide/.test(out)) ok("语义守卫", "无改动页，跳过");
+  else ok("语义守卫", (out.match(/通过：(.*)/) || [, "通过"])[1].trim());
+} catch (e) {
+  const msg = ((e.stdout || "") + (e.stderr || "")).trim();
+  const first = msg.split("\n").find((l) => l.includes("✗")) || "有语义丢失";
+  bad("语义守卫", first.trim() + "（跑 npm run guard 看清单）");
+}
+
 // ---------- 5. artifact check（真正的格式校验）----------
 if (!skipCheck && skill) {
   try {
