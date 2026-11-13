@@ -202,6 +202,15 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
   cursor:pointer;padding:0;transition:background .18s,color .18s}
 .bar button:hover{background:rgba(11,74,50,.08);color:#17754a}
 .bar button svg{width:calc(15px * var(--bs, 1));height:calc(15px * var(--bs, 1));display:block}
+.bar a.ic{appearance:none;border:0;background:transparent;color:rgba(23,117,74,.5);
+  width:calc(26px * var(--bs, 1));height:calc(26px * var(--bs, 1));border-radius:999px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;transition:background .18s,color .18s;text-decoration:none}
+.bar a.ic:hover{background:rgba(11,74,50,.08);color:#17754a}
+.bar a.ic svg{width:calc(15px * var(--bs, 1));height:calc(15px * var(--bs, 1));display:block}
+.bar a.ic:focus-visible{outline:2px solid #2fae72;outline-offset:2px}
+.ovl-links{margin-left:auto;display:flex;flex-direction:row;gap:18px;align-items:center}
+.ovl-links a{color:rgba(255,255,255,.62);text-decoration:none;font:13px/1 system-ui,sans-serif;letter-spacing:.02em}
+.ovl-links a:hover{color:#7fe3ae}
 .bar button:focus{outline:none}
 .bar button:focus-visible{outline:2px solid #2fae72;outline-offset:2px}
 .bar .num{min-width:46px;text-align:center;color:rgba(23,117,74,.5);
@@ -282,6 +291,8 @@ ${pages}
 <div class="bar" role="toolbar" aria-label="演示控制">
   <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
+  <a class="ic" href="https://github.com/atian25/trae-campus-slide" target="_blank" rel="noopener" title="GitHub 仓库" aria-label="GitHub 仓库"><svg viewBox="0 0 16 16" fill="currentColor" stroke="none"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path></svg></a>
+  <a class="ic" href="deck.pdf" download title="下载 PDF" aria-label="下载 PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"></path><path d="m7.5 9.5 4.5 4.5 4.5-4.5"></path><path d="M5 20h14"></path></svg></a>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
 <div class="lb-mask" data-mask></div>
@@ -297,6 +308,10 @@ ${pages}
     <span>缩略图</span>
     <input type="range" class="ovl-size" min="160" max="440" step="20" value="240" aria-label="缩略图尺寸">
     <span class="ovl-size-label">240px</span>
+    <span class="ovl-links">
+      <a href="https://github.com/atian25/trae-campus-slide" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
+      <a href="deck.pdf" download>下载 PDF ↗</a>
+    </span>
   </div>
   <div class="ovl-grid"></div>
 </div>
@@ -935,4 +950,6 @@ if (!fs.existsSync(PDF)) {
   process.exit(1);
 }
 const pdfMb = (fs.statSync(PDF).size / 1048576).toFixed(2);
-console.log(`pdf  -> release/site/${path.basename(PDF)}  ${pdfMb} MB`);
+// 另存一份 ASCII 文件名，给控制条/概览的「下载 PDF」用（中文名做链接容易出错）
+fs.copyFileSync(PDF, path.join(SITE, "deck.pdf"));
+console.log(`pdf  -> release/site/${path.basename(PDF)}  ${pdfMb} MB  (+ deck.pdf)`);
