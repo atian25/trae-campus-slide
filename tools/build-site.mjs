@@ -248,8 +248,16 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .ovl-hint{margin:0;color:rgba(255,255,255,.55);font:13px/1.4 system-ui,sans-serif;letter-spacing:.04em;line-height:1}
 .ovl-tools>span{line-height:1}
 .ovl-tools input[type=range]{margin:0;vertical-align:middle}
-.ovl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
-.th{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block}
+.ovl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media (max-width:900px){
+  .ovl-grid{gap:10px}
+  .ovl{padding:16px 14px 28px}
+  .ovl-tools{flex-wrap:wrap;gap:10px 12px;align-items:center}
+  .ovl-hint{flex:0 0 100%;white-space:normal;line-height:1.5}
+  .ovl-tools input[type=range]{flex:1 1 auto;width:auto;min-width:110px}
+  .ovl-links{margin-left:0;flex:0 0 100%;justify-content:flex-start;gap:14px}
+}
+.th{appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-align:left;display:block;min-width:0;width:100%}
 .th-frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#111;
   box-shadow:0 2px 10px rgba(0,0,0,.6);outline:2px solid transparent;outline-offset:2px}
 .th-inner{width:1920px;height:1080px;transform-origin:top left;pointer-events:none}
@@ -291,9 +299,9 @@ ${pages}
 </div>
 <div class="ovl">
   <div class="ovl-tools"><b class="ovl-hint"></b>
-    <span>缩略图</span>
-    <input type="range" class="ovl-size" min="160" max="440" step="20" value="240" aria-label="缩略图尺寸">
-    <span class="ovl-size-label">240px</span>
+    <span>每行</span>
+    <input type="range" class="ovl-size" min="2" max="8" step="1" value="5" aria-label="每行缩略图数量">
+    <span class="ovl-size-label">5 张</span>
     <span class="ovl-links">
       <a href="https://github.com/atian25/trae-campus-slide" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
       <a href="${PDF_URL}" target="_blank" rel="noopener">查看 PDF ↗</a>
@@ -502,14 +510,25 @@ function buildOverview() {
   window.addEventListener('resize', loadVisibleThumbs);
   const sizeInput = document.querySelector('.ovl-size');
   const sizeLabel = document.querySelector('.ovl-size-label');
+  const limits = function () {
+    const mobile = window.innerWidth < 900;
+    return mobile ? { min: 1, max: 4, def: 2 } : { min: 2, max: 8, def: 5 };
+  };
+  function applyCols(n) {
+    const L = limits();
+    const cols = Math.max(L.min, Math.min(L.max, n));
+    ovlGrid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+    if (sizeLabel) sizeLabel.textContent = cols + ' 张';
+    if (sizeInput) sizeInput.value = String(cols);
+    scaleThumbs();
+    requestAnimationFrame(loadVisibleThumbs);
+  }
   if (sizeInput) {
-    sizeInput.addEventListener('input', function () {
-      const px = Number(sizeInput.value) || 240;
-      sizeLabel.textContent = px + 'px';
-      ovlGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + px + 'px, 1fr))';
-      scaleThumbs();
-      requestAnimationFrame(loadVisibleThumbs);
-    });
+    const L = limits();
+    sizeInput.min = String(L.min); sizeInput.max = String(L.max);
+    applyCols(L.def);
+    sizeInput.addEventListener('input', function () { applyCols(Number(sizeInput.value) || L.def); });
+    window.addEventListener('resize', function () { applyCols(Number(sizeInput.value) || L.def); });
   }
 }
 function jump(i) {
