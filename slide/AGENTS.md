@@ -141,10 +141,9 @@ npm run deck:render              # 全部
 | 放大时的键盘 | 方向键/空格 = **只关闭放大**，不翻页；数字键 = 关闭放大后跳页 |
 | 视频 | `img[data-video]` 进入页面自动播放；`→` 播放中=暂停、已暂停=翻页；点视频进放大视图（放大里点视频=播放/暂停）；放大时卡片视频暂停，关闭后只有「放大仍在播」才恢复 |
 | 外链 | 自动 `target="_blank" rel="noopener noreferrer"`，全局去下划线（hover 才出现） |
-| 演讲者窗口 | 按 `P` 打开 `?presenter=1`：当前页 + **`<aside>` 演讲备注** + 下一页预览 + 计时器 + 键位提示，`BroadcastChannel` 同步 |
 | 控制条 | 右下 5 个图标：`ⓘ` 快捷键 / `⊞` 概览 / GitHub 仓库 / 下载 PDF（`deck.pdf`）/ `⤢` 全屏；随幻灯片缩放塞进 62px 底边带，封面页隐藏 |
 | 概览 | 按 `O` / `Esc`：缩略图网格 + 尺寸滑轨（顶部工具行垂直居中）+ 右上「GitHub 仓库 ↗ / 下载 PDF ↗」文字入口；缩略图滚到才加载；点缩略图跳页，**点任意空白关闭** |
-| 备注 | deck 里的 `<aside>` 不画在页面上（`.slide aside{display:none}`），只喂给演讲者窗口 |
+| 备注 | deck 里的 `<aside>`（skill 的演讲者备注）不画在页面上（`.slide aside{display:none}`）；站点不做自建演讲者窗口，备注交给 claude-slides 编辑器自己展示 |
 
 验收与发布：
 

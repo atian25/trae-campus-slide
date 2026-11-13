@@ -239,21 +239,6 @@ html.doc .slide{height:100vh;height:100dvh;scroll-snap-align:start;scroll-snap-s
 .slide a:hover{text-decoration:underline!important}
 .slide aside{display:none!important}   /* skill 的演讲者备注，不画在幻灯片上 */
 
-/* ===== 演讲者窗口 ===== */
-body.pv{background:#0d1210;color:#e8eee9;display:flex;height:100vh;overflow:hidden}
-body.pv > #deck,body.pv > .bar,body.pv > .tips,body.pv > .lb-mask,body.pv > .lightbox{display:none!important}
-body.pv .pv-main{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:14px;overflow:hidden}
-body.pv .pv-frame{width:100%;height:100%;border:0;background:#fff;border-radius:10px}
-body.pv .pv-main .fit{box-shadow:0 10px 40px rgba(0,0,0,.5)}
-body.pv .pv-side{width:300px;flex:0 0 auto;box-sizing:border-box;padding:18px;display:flex;flex-direction:column;gap:16px;background:#131a16}
-body.pv .pv-side h2{font:600 12px/1.6 system-ui,sans-serif;letter-spacing:.12em;color:#7f8f86;margin:0}
-body.pv .pv-next{width:100%;aspect-ratio:16/9;border:0;border-radius:8px;background:#0a0e0c;display:block}
-body.embed .bar,body.embed .lb-mask,body.embed .lightbox{display:none!important}
-body.pv .pv-timer{font:700 34px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#7fe3ae}
-body.pv .pv-notes{font:13px/1.85 system-ui,sans-serif;color:#cfe0d5;max-height:180px;overflow:auto;white-space:pre-wrap}
-body.pv .pv-hint{font:12px/1.9 system-ui,sans-serif;color:#7f8f86;margin:0}
-body.pv .pv-hint b{color:#cfe0d5;font-weight:600;margin-right:4px}
-
 /* ===== 概览（o 键 / 点右下角页码）===== */
 .ovl{position:fixed;inset:0;z-index:20;background:#000;padding:24px 24px 40px;overflow:auto;display:none}
 .ovl.on{display:block}
@@ -415,7 +400,6 @@ function show(i, animate) {
   writeHash(cur);
   try { startVideo(); } catch (e) {}
   if (animate) runBuildIn(slides[cur]);
-  postState();
   if (typeof showBarNow === 'function') showBarNow();
 }
 
@@ -613,7 +597,6 @@ window.addEventListener('keydown', function (e) {
   else if (/^[0-9]$/.test(k)) { typeDigit(k); }
   else if (k === 'f' || k === 'F') { toggleFullscreen(); }
   else if (k === 'o' || k === 'O') { toggleOverview(); }
-  else if (k === 'p' || k === 'P') { openPresenter(); }
   else if (k === 'Escape') { if (lb && lb.hasAttribute('data-on')) closeLightbox(); else toggleOverview(); }
 });
 
@@ -844,61 +827,10 @@ ovl.addEventListener('click', function (e) {
 window.addEventListener('mousemove', function () { setPager(); }, { passive: true });
 window.addEventListener('resize', function () { if (ovl.classList.contains('on')) scaleThumbs(); });
 
-/* ---- 演讲者窗口（P）：同源第二窗口，BroadcastChannel 同步 ---- */
-const chan = ('BroadcastChannel' in window) ? new BroadcastChannel('dsh-deck') : null;
-function postState() {
-  if (chan) chan.postMessage({ cur: cur, total: slides.length, t: Date.now() });
-}
-function openPresenter() {
-  const url = location.origin + location.pathname + '?presenter=1';
-  window.open(url, 'dsh-presenter', 'width=1280,height=760');
-}
-
-/* ---- 演讲者窗口渲染（?presenter=1）---- */
-function presenterMode() {
-  document.documentElement.classList.add('pv');
-  document.body.classList.add('pv');
-  const base = location.origin + location.pathname;
-  const main = document.createElement('div'); main.className = 'pv-main';
-  const side = document.createElement('aside'); side.className = 'pv-side';
-  side.innerHTML = '<div><h2>备注（本页）</h2><div class="pv-notes"></div></div>'
-    + '<div><h2>下一页</h2><iframe class="pv-next" src="' + base + '?embed=1#2"></iframe></div>'
-    + '<div><h2>已用时间</h2><div class="pv-timer">00:00</div></div>'
-    + '<p class="pv-hint"><b>→</b>下一页（有视频时先播放/暂停）</p>'
-    + '<p class="pv-hint"><b>←</b>上一页 · <b>O</b>概览 · <b>F</b>全屏</p>'
-    + '<p class="pv-hint"><b>1-9</b>跳页，可连按两位数</p>';
-  const frame = document.createElement('iframe');
-  frame.className = 'pv-frame';
-  frame.src = base + '?embed=1#1';
-  main.appendChild(frame);
-  document.body.appendChild(main); document.body.appendChild(side);
-  const nextFrame = side.querySelector('.pv-next');
-  const timerEl = side.querySelector('.pv-timer');
-  const start = Date.now();
-  setInterval(function () {
-    const s2 = Math.floor((Date.now() - start) / 1000);
-    timerEl.textContent = String(Math.floor(s2 / 60)).padStart(2, '0') + ':' + String(s2 % 60).padStart(2, '0');
-  }, 500);
-  function goto(i) {
-    const n = Math.max(1, Math.min(slides.length, i + 1));
-    const sec = slides[n - 1] && slides[n - 1].querySelector('section');
-    const noteEl = document.querySelector('.pv-notes');
-    if (noteEl) {
-      const note = sec && sec.querySelector('aside');
-      noteEl.textContent = note ? note.textContent.trim() : '（本页没有备注）';
-    }
-    if (frame.contentWindow) frame.contentWindow.location.hash = '#' + n;
-    if (nextFrame.contentWindow) nextFrame.contentWindow.location.hash = '#' + Math.min(slides.length, n + 1);
-  }
-  window.gotoPresenter = goto;
-  goto(0);
-}
-
 /* ---- 启动 ---- */
 cur = fromHash();
 setMode();
-if (location.search.indexOf('presenter') >= 0) { presenterMode(); }
-else { try { startVideo(); } catch (e) {} }   // 首屏直接深链到有视频的页也要播
+try { startVideo(); } catch (e) {}   // 首屏直接深链到有视频的页也要播
 window.addEventListener('load', function () { fit(); if (mode === 'doc' && slides[cur]) slides[cur].scrollIntoView({ block: 'start' }); });
 </script>
 </body>
