@@ -719,8 +719,9 @@ function startVideo() {
   const img = slide.querySelector('img[data-video]');
   if (!img) return;
   const vsrc = img.getAttribute('data-video') || '';
-  // 只有构建进站点的本地片段才内嵌播放；外链（如 YouTube/Vimeo）留给 <a> 打开，不插 <video>
-  const isLocalClip = vsrc.indexOf('assets/') === 0 || vsrc.indexOf('/_blob/') === 0;
+  // 以 .mp4 结尾的片段都内嵌播放（相对路径或跨域绝对地址，如 CDN/GitHub Pages）；
+  // 外链页面（如 YouTube/Vimeo）留给 <a> 打开，不插 <video>
+  const isLocalClip = vsrc.split(/[?#]/)[0].toLowerCase().endsWith('.mp4');
   if (!isLocalClip) return;
   const v = document.createElement('video');
   v.setAttribute('src', img.getAttribute('data-video'));
