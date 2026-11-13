@@ -731,9 +731,13 @@ function openLightboxVideo(src) {
   v.src = src;
   v.controls = true;
   v.loop = false;
-  v.muted = true;
+  v.muted = false;                       // 点开放大 = 显式操作，默认出声
   const pr = v.play();
-  if (pr && pr.catch) pr.catch(function () {});
+  if (pr && pr.catch) pr.catch(function () {
+    v.muted = true;                      // 浏览器拦自动播放时先静音播，用户可点控制条开声
+    const again = v.play();
+    if (again && again.catch) again.catch(function () {});
+  });
   lb.setAttribute('data-on', '');
   lb.setAttribute('aria-hidden', 'false');
   const mask = document.querySelector('.lb-mask');

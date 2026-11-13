@@ -2,7 +2,7 @@
 
 天猪 · TRAE Campus 高校分享
 
-一套 19 页的 16:9 幻灯片，用 [claude-slides](https://claude.ai) 的 Slides artifact 格式维护（`project/deck.json` + 一页一个 HTML，全内联样式、1920×1080 固定画布），本地用自带的编辑器改，构建成站点 + PDF 后部署到 GitHub Pages。
+一套 22 页的 16:9 幻灯片，用 [claude-slides](https://github.com/JimLiu/baoyu-design) 的 Slides artifact 格式维护（`project/deck.json` + 一页一个 HTML，全内联样式、1920×1080 固定画布），本地用自带的编辑器改，构建成站点 + PDF 后部署到 GitHub Pages。
 
 ## 相关链接
 
