@@ -286,6 +286,7 @@ ${pages}
 <div class="tips" data-tips>
   <div><b>← → / 空格</b>上一页 / 下一页</div>
   <div><b>↑ ↓ / PgUp PgDn</b>同上一页 / 下一页</div>
+  <div><b>点击左右边缘</b>上一页 / 下一页（移动端热区更窄）</div>
   <div><b>1-9</b>跳页 · <b>Home / End</b> 首尾页 · <b>O</b> 概览 · <b>F</b> 全屏</div>
 </div>
 <div class="ovl">
@@ -613,6 +614,35 @@ window.addEventListener('wheel', function (e) {
 }, { passive: false });
 
 /* ---- 点击不再翻页（桌面用键盘/滚轮，移动端滑动）---- */
+
+/* ---- 点左右两侧翻页（桌面点边缘也能翻，移动端窄一点防误触）---- */
+let tapX = 0, tapY = 0, tapT = 0, tapMoved = false, tapType = 'mouse';
+document.addEventListener('pointerdown', function (e) {
+  tapX = e.clientX; tapY = e.clientY; tapT = Date.now(); tapMoved = false;
+  tapType = e.pointerType || 'mouse';
+}, true);
+document.addEventListener('pointermove', function (e) {
+  if (tapMoved) return;
+  if (Math.abs(e.clientX - tapX) > 10 || Math.abs(e.clientY - tapY) > 10) tapMoved = true;
+}, true);
+document.addEventListener('click', function (e) {
+  if (tapMoved) return;                                  // 滑动/拖拽，不算点击
+  if (Date.now() - tapT > 700) return;                    // 长按
+  if (mode !== 'stage') return;
+  if (lb && lb.hasAttribute('data-on')) return;           // 放大视图自己处理点击
+  if (ovl && ovl.classList.contains('on')) return;
+  const t = e.target;
+  if (t.closest && t.closest('a,button,video,img,svg,x-icon,input,label,.bar,.tips,.lightbox,.ovl')) return;
+  const slideEl = slides[cur]; const fit = slideEl && slideEl.querySelector('.fit');
+  if (!fit) return;
+  const r = fit.getBoundingClientRect();
+  if (e.clientY < r.top || e.clientY > r.bottom) return;
+  const ratio = tapType === 'touch' ? 0.05 : 0.07;   // 触屏热区更窄，防误触
+  const edge = r.width * ratio;
+  const x = e.clientX - r.left;
+  if (x < edge) step(-1);
+  else if (x > r.width - edge) step(1);
+}, false);
 
 /* ---- 触摸滑动 ---- */
 let tX = 0, tY = 0, tT = 0;
