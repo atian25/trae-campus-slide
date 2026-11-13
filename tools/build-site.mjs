@@ -722,7 +722,9 @@ function startVideo() {
   const vsrc = img.getAttribute('data-video') || '';
   // 以 .mp4 结尾的片段都内嵌播放（相对路径或跨域绝对地址，如 CDN/GitHub Pages）；
   // 外链页面（如 YouTube/Vimeo）留给 <a> 打开，不插 <video>
-  const isLocalClip = vsrc.split(/[?#]/)[0].toLowerCase().endsWith('.mp4');
+  const vsrcClean = vsrc.split(/[?#]/)[0].toLowerCase();
+  // .mp4 / .webm 都当作可内嵌片段（相对路径或跨域绝对地址都可以）；其余（YouTube 等页面链接）走 <a>
+  const isLocalClip = vsrcClean.endsWith('.mp4') || vsrcClean.endsWith('.webm');
   if (!isLocalClip) return;
   const v = document.createElement('video');
   v.setAttribute('src', img.getAttribute('data-video'));

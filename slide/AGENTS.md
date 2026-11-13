@@ -152,6 +152,17 @@ npm run deck:render              # 全部
 3. 发布失败重跑时要小心：`gh run rerun` 会造成 `Multiple artifacts named "github-pages"`，**要重跑就提交一个空 commit**。
 4. 上线后自检：`curl -s https://atian25.github.io/trae-campus-slide/ | grep <关键词>`。
 
+## 7.5 AI Works 发布包（另一个会话维护）与站点的共用点
+
+仓库里可能同时有「GitHub Pages 站点」和「AI Works 静态包」（`aiworks-site/`，已 gitignore）两条发布线，
+它们共用 `tools/build-site.mjs`，改动时注意这几处耦合：
+
+| 共用点 | 规则 |
+| --- | --- |
+| 视频判定 | 只看 `data-video` 是否以 `.mp4` / `.webm` 结尾（去 query/hash、忽略大小写），相对路径和跨域绝对地址都内嵌；其它链接不内嵌 |
+| PDF 链接 | 带构建版本号 `?v=<stamp>` 破缓存；AI Works 包若要把 PDF 指到 Pages，重写链接时**必须保留 query** |
+| 站点产物 | `release/site/` 是唯一产物来源；AI Works 包是它的**裁剪快照**（去掉 PDF 和 mp4），不会自动同步 |
+
 ## 8. 素材规范（图片 / 视频）
 
 - 图片按卡片图区比例出图，**默认 `object-fit:contain` 不裁切**（`cover` 会切掉截图边缘）。
