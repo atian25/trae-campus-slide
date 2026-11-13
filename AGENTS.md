@@ -27,6 +27,7 @@
 | `npm run deck:check` | 校验草稿，`problems` 必须为 0 才提交 |
 | `npm run deck:render` | 每页渲染成 1920×1080 PNG（`.tmp-test/render/`；`-- <id>` 渲染单页） |
 | `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
+| `npm run doctor` | 体检：claude-slides 安装 / deck 格式 / 图标 / 资产 / check，**插件升级后先跑它** |
 | `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
@@ -46,3 +47,16 @@
 - **小改动改完直接 commit + push**；push 后 CI 用 `gh run list --limit 1` 查一眼即可，**不要阻塞等待**。
 - 发布失败要重跑时：**提交一个空 commit**，不要 `gh run rerun`（会产生重复 artifact 报错）。
 - 播放层能力 / 素材规范见 [`slide/AGENTS.md`](slide/AGENTS.md) §7–§8；版式配方见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md) §5.10–§5.12。
+
+## claude-slides 升级后要做什么
+
+我们只依赖它 4 个**稳定接口**，其余（播放器、编辑器 UI）都是它自己的事，不用跟：
+
+| 耦合点 | 谁在用 | 升级后怎么验 |
+| --- | --- | --- |
+| `scripts/artifact.mjs` 的 `check` / `render` / `open` / `share` / `upload` | `tools/deck.mjs` | `npm run doctor`（会跑一次 check） |
+| `project/deck.json` 的 `v` 与 `order` 约定 | `tools/build-site.mjs`、`tools/doctor.mjs` | doctor 里 `deck 格式版本`，不是 v4 就会提醒 |
+| `project/assets/index.json` + `/_blob/<id>` | `tools/build-site.mjs` | doctor 里 `资产文件 / 资产引用` |
+| 图标字体与字形表 | `tools/assets/anthropicons.*`（**仓库内置副本**） | doctor 里 `图标覆盖`；新图标名要先导出进 json |
+
+升级后依次：`npm run doctor` → `npm run site` → 浏览器看 `127.0.0.1:8765`。三项都过就不用改我们这边；doctor 报错就是该更新的地方（多半是 artifact 命令名或 deck 格式变了）。

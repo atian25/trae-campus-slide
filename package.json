@@ -8,7 +8,8 @@
     "deck:render": "node tools/deck.mjs render",
     "site": "node tools/build-site.mjs",
     "preview": "node tools/serve.mjs",
-    "guide": "node tools/build-style-guide.mjs"
+    "guide": "node tools/build-style-guide.mjs",
+    "doctor": "node tools/doctor.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

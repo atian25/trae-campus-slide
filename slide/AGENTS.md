@@ -45,6 +45,7 @@ npm run deck:render -- <id>      # 单页
 npm run deck:render              # 全部
 ```
 
+- 体检（claude-slides 升级后先跑）：`npm run doctor` —— 检查安装 / deck 格式 / 图标 / 资产 / check
 - 起编辑器：`npm run deck:open`（= `node tools/deck.mjs open`，本机 127.0.0.1）
 - 局域网分享（按角色出链接）：`node tools/deck.mjs share`
 - 这些脚本是 `tools/deck.mjs` 的薄封装，内部调用本机 claude-slides 的 `artifact.mjs`；
