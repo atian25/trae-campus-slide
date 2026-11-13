@@ -33,18 +33,21 @@
 ## 2.5 编辑器重写 vs AI 改动：怎么共存
 
 编辑器保存时会把整页交给它的规范化器重写，**只改格式**（换行重排、属性顺序、圆角/颜色归一），
-内容不变 —— 所以每次「AI 改完 + 你在编辑器保存」后，`git diff` 会出现一堆纯排版差异，这是正常的。
+内容不变 —— 所以「AI 改完 + 你在编辑器保存」之后，`git diff` 会出现一堆纯排版差异，这属正常，不用管。
 
-**风险**：规范化器也可能**静默丢弃**它不认识的声明（`object-fit`、`mix-blend-mode`、`data-video`…），
-那会悄悄坏版式。所以：
+**真风险**：规范化器可能**静默丢弃**它不认识的声明（`object-fit`、`mix-blend-mode`、`position`、`data-video`…），
+版式会悄悄坏掉，`deck:check` 查不出来。这件事已经**全自动**兜底，你不需要跑任何命令：
 
-| 场景 | 做法 |
+| 自动在哪 | 行为 |
 | --- | --- |
-| 小改（文案/间距） | AI 改完直接提交，commit 里注明「含编辑器格式化」即可 |
-| 大改（结构/加页/改版式） | AI 改完 → 你在编辑器打开该页保存一次 → AI 再提交（仓库即编辑器格式） |
-| 任何编辑器保存之后 | 跑 **`npm run guard`**：语义抽取对比 HEAD，丢了什么会逐条列出来 |
+| **git pre-commit**（`.githooks/pre-commit`，`npm i` 时自动装） | 提交前跑语义守卫；有丢失就**拦住提交**并列出清单 |
+| **npm run site**（构建/发布前） | 同上，有丢失就中止构建，不会把坏版式发上线 |
+| **npm run watch**（后台监视 `slide/project/slides/`） | 你在编辑器一保存，1.5 秒内自动检查；有丢失会 **macOS 弹通知** + 写 `.tmp-test/guard-status.json` |
 
-`npm run guard` 的输出示例：
+守卫做的是「语义抽取后对比 HEAD」：只比文案、图片 `src/data-video/*`、图标名、`<a href>`、内联 svg 数、
+关键 CSS（`object-fit`/`position`/`background`/`border-*`/`white-space`/`letter-spacing`…），**忽略格式差异**。
+
+真有丢失时（示例）：
 
 ```
 ✗ ai-physical.html 相比 HEAD 丢了 1 项语义：
@@ -52,8 +55,10 @@
       - object-fit:contain
 ```
 
-按清单把丢掉的那几行补回去（通常 1–3 行），再 `npm run doctor` 确认全绿。
-`npm run guard:all` 可全量体检 22 页；`npm run doctor` 里也带了这一项。
+处理：AI 把那 1–3 行补回去即可（它改完会自己跑 guard 确认）；确认是误报可以 `git commit --no-verify`。
+手动复核用 `npm run guard`（只查改动页）或 `npm run guard:all`（全量 22 页）。
+
+**你的分工没变**：在编辑器里改**文字**随便改（纯文案不会触发守卫）；**样式/结构**交给 AI。
 
 ## 3. AI 每次开工的动作
 

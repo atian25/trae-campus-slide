@@ -11,7 +11,9 @@
     "guide": "node tools/build-style-guide.mjs",
     "doctor": "node tools/doctor.mjs",
     "guard": "node tools/guard-slides.mjs",
-    "guard:all": "node tools/guard-slides.mjs --all --verbose"
+    "guard:all": "node tools/guard-slides.mjs --all --verbose",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "watch": "node tools/watch-slides.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

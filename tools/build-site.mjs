@@ -69,6 +69,18 @@ function iconFontAndMap() {
 }
 
 // ---------- 读 deck ----------
+// ---------- 构建前语义守卫：防止把「编辑器吃掉声明」的版本发上线 ----------
+if (!process.argv.includes("--no-guard")) {
+  const { spawnSync } = await import("node:child_process");
+  const g = spawnSync("node", [path.join(REPO, "tools/guard-slides.mjs")], { cwd: REPO, encoding: "utf8" });
+  if (g.status !== 0) {
+    console.error("\n⛔ 构建中止：slide 有语义丢失（编辑器重写可能吃掉了声明）");
+    console.error((g.stdout || "").split("\n").filter((l) => l.trim()).slice(-14).join("\n"));
+    console.error("\n  修好后再构建；确认是误报可加 --no-guard\n");
+    process.exit(1);
+  }
+}
+
 const deck = JSON.parse(fs.readFileSync(path.join(DECK, "project/deck.json"), "utf8"));
 const order = deck.order;
 if (!Array.isArray(order) || !order.length) throw new Error("deck.json 的 order 是空的");

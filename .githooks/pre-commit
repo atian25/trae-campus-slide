@@ -1,0 +1,12 @@
+#!/bin/sh
+# 提交前自动跑语义守卫：检测编辑器重写有没有吃掉 object-fit / data-video / CSS 等
+cd "$(git rev-parse --show-toplevel)" || exit 0
+
+# 没有改动的 slide 页就跳过（guard 自己会输出"没有改动过的 slide"并 exit 0）
+if ! node tools/guard-slides.mjs; then
+  echo ""
+  echo "⛔ 提交被拦截：slide 有语义丢失（多半是编辑器保存时把不认识的声明吃掉了）"
+  echo "   1) 按上面的清单把那几行补回去"
+  echo "   2) 确认只是误报：git commit --no-verify"
+  exit 1
+fi

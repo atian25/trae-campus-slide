@@ -28,7 +28,8 @@
 | `npm run deck:render` | 每页渲染成 1920×1080 PNG（`.tmp-test/render/`；`-- <id>` 渲染单页） |
 | `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
 | `npm run doctor` | 体检：claude-slides 安装 / deck 格式 / 图标 / 资产 / 语义守卫 / check |
-| `npm run guard` | 语义守卫：编辑器保存后跑，检测它有没有吃掉 `object-fit`/`data-video` 之类的声明 |
+| `npm run guard` | 语义守卫（**已自动**：pre-commit / `npm run site` 都会跑）；手动复核用 |
+| `npm run watch` | 后台监视 slide 页，编辑器一保存就检查语义，有问题弹 macOS 通知 |
 | `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
