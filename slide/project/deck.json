@@ -47,13 +47,19 @@
     "faq"
   ],
   "sections": {
+    "b6db08e8": {
+      "before": null,
+      "description": "与 AI 共存 - 学习",
+      "start": "knowledge"
+    },
     "campus": {
       "before": null,
-      "description": "TRAE Campus 校园计划",
+      "description": "与 AI 共存 - 资源",
       "start": "campus"
     },
     "change": {
-      "description": "时代变革中，AI 重塑了知识的生产与消费方式。",
+      "before": null,
+      "description": "AI 改变了什么",
       "start": "eras"
     },
     "close": {
@@ -63,8 +69,8 @@
     },
     "old-path": {
       "before": null,
-      "description": "传统的打怪升级路线，正在慢慢被挑战",
-      "start": "path"
+      "description": "当代大学生的困境",
+      "start": "preface"
     },
     "opening": {
       "before": null,
@@ -73,8 +79,8 @@
     },
     "practice": {
       "before": null,
-      "description": "工欲善其事，必先利其器，借助 AI 帮助我们学习和实践",
-      "start": "learn-1"
+      "description": "与 AI 共存 - 实践",
+      "start": "practice-2"
     }
   },
   "title": "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"

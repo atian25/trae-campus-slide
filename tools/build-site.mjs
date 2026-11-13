@@ -460,7 +460,16 @@ function buildOverview() {
     b.type = 'button'; b.className = 'th'; b.setAttribute('data-i', String(i));
     const f = document.createElement('div'); f.className = 'th-frame';
     const inner = document.createElement('div'); inner.className = 'th-inner';
-    if (src) { const c = src.cloneNode(true); c.removeAttribute('id'); inner.appendChild(c); }
+    if (src) {
+      const c = src.cloneNode(true); c.removeAttribute('id');
+      // 缩略图必须立即加载：lazy 的图在概览里不会因为滚动而触发，会一直空着
+      c.querySelectorAll('img').forEach(function (im) {
+        im.setAttribute('loading', 'eager');
+        im.removeAttribute('decoding');
+        if (!im.complete) im.setAttribute('src', im.getAttribute('src'));
+      });
+      inner.appendChild(c);
+    }
     f.appendChild(inner);
     const cap = document.createElement('span'); cap.className = 'th-cap';
     cap.textContent = (i + 1) + ' / ' + slides.length;
@@ -566,6 +575,9 @@ window.addEventListener('keydown', function (e) {
 let wheelAcc = 0, wheelReset = 0, wheelDone = false;
 window.addEventListener('wheel', function (e) {
   if (e.ctrlKey || mode !== 'stage') return;
+  // 概览 / 图片放大 打开时，滚轮属于它们自己的滚动，不翻页
+  if (ovl && ovl.classList.contains('on')) return;
+  if (lb && lb.hasAttribute('data-on')) return;
   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
   e.preventDefault();
   clearTimeout(wheelReset);
