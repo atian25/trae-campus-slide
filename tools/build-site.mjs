@@ -720,7 +720,8 @@ function startVideo() {
   if (!img) return;
   const vsrc = img.getAttribute('data-video') || '';
   // 只有构建进站点的本地片段才内嵌播放；外链（如 YouTube/Vimeo）留给 <a> 打开，不插 <video>
-  if (!/^(assets\/|\/_blob\/|\.\.?\/)/.test(vsrc)) return;
+  const isLocalClip = vsrc.indexOf('assets/') === 0 || vsrc.indexOf('/_blob/') === 0;
+  if (!isLocalClip) return;
   const v = document.createElement('video');
   v.setAttribute('src', img.getAttribute('data-video'));
   v.loop = true;
@@ -924,5 +925,18 @@ if (!fs.existsSync(PDF)) {
   console.error((r.stderr || "").slice(-800) || "PDF 打印失败");
   process.exit(1);
 }
+// 产物自检：内联 <script> 必须语法正确（模板里转义踩坑时能立刻发现）
+{
+  const htmlOut = fs.readFileSync(path.join(SITE, "index.html"), "utf8");
+  const m = /<script>([\s\S]*)<\/script>/.exec(htmlOut);
+  if (m) {
+    try { new Function(m[1]); }
+    catch (e) {
+      console.error("内联脚本语法错误：" + e.message);
+      process.exit(1);
+    }
+  }
+}
+
 const pdfMb = (fs.statSync(PDF).size / 1048576).toFixed(2);
 console.log(`pdf  -> release/site/${path.basename(PDF)}  ${pdfMb} MB`);
