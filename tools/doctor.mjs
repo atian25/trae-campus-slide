@@ -175,7 +175,7 @@ try {
   else ok("资产引用", `${refs.size} 处 /_blob 引用全部有效`);
 
   const videos = ids.filter((id) => String(idx[id]).startsWith("video/"));
-  if (videos.length) ok("视频资产", `${videos.length} 个（手工登记，上传 CLI 不收视频）`);
+  if (videos.length) ok("视频资产", `${videos.length} 个（2.16 起可用 artifact.mjs upload 直接传 mp4/webm）`);
 
   const names = path.join(REPO, "tools/asset-names.json");
   if (fs.existsSync(names)) {

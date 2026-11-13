@@ -718,6 +718,9 @@ function startVideo() {
   if (!slide) return;
   const img = slide.querySelector('img[data-video]');
   if (!img) return;
+  const vsrc = img.getAttribute('data-video') || '';
+  // 只有构建进站点的本地片段才内嵌播放；外链（如 YouTube/Vimeo）留给 <a> 打开，不插 <video>
+  if (!/^(assets\/|\/_blob\/|\.\.?\/)/.test(vsrc)) return;
   const v = document.createElement('video');
   v.setAttribute('src', img.getAttribute('data-video'));
   v.loop = true;

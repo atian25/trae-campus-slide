@@ -158,11 +158,11 @@ npm run deck:render              # 全部
 - 截图先削掉约 0.6–0.8% 的边，去掉自带的 1px 黑框/白框。
 - 需要补边时按卡片底色补（白卡补白、淡绿卡 `#E7EFE8` 补同色），补完看不出接缝。
 - 视频：≤20MB、mp4/webm；静帧截自视频本身（不要带播放按钮）。大文件放 `slide/project/inbox/`（已 gitignore），处理完删掉。
-- `artifact.mjs upload` 只收图片/字体，视频要手动登记进 `project/assets/`（见 `TYPOGRAPHY.md` §5.12）。
+- `artifact.mjs upload`（2.16+）**直接支持 mp4/webm（≤20MB）**：`node ~/.agents/skills/claude-slides/scripts/artifact.mjs upload slide <file>` → 返回 `/_blob/<id>`，写进 `data-video` 即可；旧版本才需要手动登记 `project/assets/`。
 
 ## 9. 现状（2026-11-12）
 
-- `slide/`：**23 页**（第 7 页是第 6 页 `eras` 的副本 `eras-2`，待改造；另有「AI 之变」两页）。顺序见 `project/deck.json` 的 `order`。
+- `slide/`：**22 页**（含第 6 页 `eras` 重排后版本、第 7/8 页「AI 之变」两页；`eras-2` 副本已删除）。顺序见 `project/deck.json` 的 `order`。
 - `design-system/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
 - 验证/渲染脚本在 `tools/`，npm 脚本见 §3；`tools/render-slide.mjs` 会从本机 claude-slides 安装里读
   图标字体（Anthropicons-Variable）和字形表，不往仓库里拷字体。
