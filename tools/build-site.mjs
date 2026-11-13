@@ -723,6 +723,8 @@ function startVideo() {
   v.loop = true;
   v.playsInline = true;
   v.muted = true;   // 视频一律静音；需要声音时再显式定义
+  v.setAttribute('poster', img.currentSrc || img.getAttribute('src') || '');  // 首帧出来前先显示静帧，避免空白
+  v.setAttribute('preload', 'auto');
   v.setAttribute('aria-label', img.getAttribute('alt') || '');
   v.setAttribute('style', (img.getAttribute('style') || '') + ';display:block');
   v.style.objectFit = 'cover';
