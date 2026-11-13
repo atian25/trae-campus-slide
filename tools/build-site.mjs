@@ -444,6 +444,20 @@ const ovl = document.querySelector('.ovl');
 const ovlGrid = document.querySelector('.ovl-grid');
 const ovlHint = document.querySelector('.ovl-hint');
 let ovlBuilt = false;
+function loadThumb(th) {
+  th.querySelectorAll('img[data-src]').forEach(function (im) {
+    im.setAttribute('src', im.getAttribute('data-src'));
+    im.removeAttribute('data-src');
+  });
+}
+function loadVisibleThumbs() {
+  const box = ovl.getBoundingClientRect();
+  for (const th of ovlGrid.children) {
+    if (!th.querySelector('img[data-src]')) continue;
+    const r = th.getBoundingClientRect();
+    if (r.top < box.bottom + 400 && r.bottom > box.top - 200) loadThumb(th);
+  }
+}
 function scaleThumbs() {
   const first = ovlGrid.firstElementChild;
   const w = first ? first.getBoundingClientRect().width : 240;
@@ -462,11 +476,16 @@ function buildOverview() {
     const inner = document.createElement('div'); inner.className = 'th-inner';
     if (src) {
       const c = src.cloneNode(true); c.removeAttribute('id');
-      // 缩略图必须立即加载：lazy 的图在概览里不会因为滚动而触发，会一直空着
+      // ① 正在播放的页会把 <img> 换成 <video>：缩略图里去掉 video、恢复静帧
+      c.querySelectorAll('video').forEach(function (v) { v.remove(); });
+      c.querySelectorAll('img[data-video]').forEach(function (im) { im.style.display = ''; });
+      // ② 图片改成滚到才加载（data-src 占位，IntersectionObserver 再赋值）
       c.querySelectorAll('img').forEach(function (im) {
-        im.setAttribute('loading', 'eager');
-        im.removeAttribute('decoding');
-        if (!im.complete) im.setAttribute('src', im.getAttribute('src'));
+        const u = im.getAttribute('src');
+        if (!u) return;
+        im.setAttribute('data-src', u);
+        im.removeAttribute('src');
+        im.setAttribute('loading', 'lazy');
       });
       inner.appendChild(c);
     }
@@ -478,6 +497,9 @@ function buildOverview() {
     ovlGrid.appendChild(b);
   }
   scaleThumbs();
+  // 滚到才加载：用几何位置判断（比 IntersectionObserver 稳，缩放/显示时机都不影响）
+  ovl.addEventListener('scroll', loadVisibleThumbs, { passive: true });
+  window.addEventListener('resize', loadVisibleThumbs);
   const sizeInput = document.querySelector('.ovl-size');
   const sizeLabel = document.querySelector('.ovl-size-label');
   if (sizeInput) {
@@ -486,6 +508,7 @@ function buildOverview() {
       sizeLabel.textContent = px + 'px';
       ovlGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(' + px + 'px, 1fr))';
       scaleThumbs();
+      requestAnimationFrame(loadVisibleThumbs);
     });
   }
 }
@@ -503,6 +526,7 @@ function openOverview() {
     const active = ovlGrid.querySelector('.th[data-i="' + cur + '"]');
     if (active) active.classList.add('active');
     if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+    requestAnimationFrame(loadVisibleThumbs);
   });
   document.body.style.overflow = 'hidden';
 }
