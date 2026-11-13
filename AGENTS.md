@@ -7,19 +7,71 @@
 - **小改动 / 修复**：本地验证通过后（构建、关键尺寸截图或自测），直接 `git commit` 并 **`git push`**（push 会触发 GitHub Pages 发布，这是预期行为）。
 - **大改动 / 需要我拍板或调试的**（改版式、改文案结构、加依赖、改部署流程）：**先不要提交**，把改动留在工作区，并在回复里明确写出「未提交 + 原因 + 需要我确认什么」；等我确认后再提交 / 推送。
 - 提交信息用中文，一行说清「做了什么 / 为什么」，必要时补正文。
-- 提交前跑 `git status`，确认没有把 `.tmp-test/`、临时截图等带进去。
+- 提交前跑 `git status` / `npm run changes`，确认没有把 `.tmp-test/`、临时截图等带进去。
+- **并发保护**：别人可能同时在编辑器里改文案 —— 提交时只 `git add` 自己改的文件，不要 `git add -A`；改 slide 用带版本校验的 `edit`，不要用脚本整页重写。
 
-## 项目速览
+## slide/（幻灯片）与 design-system/
 
-- 单文件 16:9 幻灯片：`slide/deck.html`，一个 `<section class="p">` 一页，共 18 页。
-- 所有尺寸都基于 `--u`（1600×900 画布单位）。**新增样式必须写 `calc(var(--u)*N)`，不要写死 px**，否则手机缩放时字距、边距会错位（2026-11 就踩过：固定 `letter-spacing:-2.5px` 导致手机标题挤在一起）。
-- 概览缩略图缩放用 JS 算好的无单位 `--ovs`（`transform:scale(var(--ovs))`）。**不要写 `calc(长度 / 长度)`**：length/length 除法是 CSS Values 4 才支持的，鸿蒙自带浏览器等旧内核会整条 `transform` 失效，缩略图按 1:1 裁切（2026-11 实测）。
-- 预览：`cd slide && node server.mjs 8765`；手机/局域网访问加 `HOST=0.0.0.0`。
-- 构建：`npm run build`；导出 PDF：`npm run pdf`。
-- 配色：米白 `#F7F8F5`、薄荷 `#BFF2D2` / `#2FAE72`、深绿 `#0B3A29`；一页最多两处高亮。
+- `slide/`：幻灯片本体，claude-slides 的 Slides artifact 格式（`project/deck.json` + 一页一个 HTML，
+  1920×1080 固定画布、全内联样式）。**23 页**，顺序见 `project/deck.json` 的 `order`。
+- `design-system/`：TRAE Campus 设计系统（token + 组件预览），deck 里装了一份拷贝在 `slide/project/ds/traecampus/`。
+- **协作约定**（文案在编辑器里改、结构/样式交给 AI、编辑器会整页重写文件）见 [`slide/AGENTS.md`](slide/AGENTS.md)，
+  在 `slide/` 下工作时先读它。
+- 排版规范见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md)：字号只用 24 / 25 / 30 / 41 / 56 / 104（tip 小字可 22），
+  间距用 `gap`/`padding`（`margin` 无效），页面预算 = 页头约 205 + 正文 746 + 页脚 62。
+
+## 常用命令
+
+| 命令 | 作用 |
+| --- | --- |
+| `npm run deck:open` | 起 claude-slides 编辑器（只有 `127.0.0.1` 能用；局域网需 https） |
+| `npm run deck:check` | 校验草稿，`problems` 必须为 0 才提交 |
+| `npm run deck:render` | 每页渲染成 1920×1080 PNG（`.tmp-test/render/`；`-- <id>` 渲染单页） |
+| `npm run site` | 构建 `release/site/`（站点 + PDF），CI 用它发布 |
+| `npm run doctor` | 体检：claude-slides 安装 / deck 格式 / 图标 / 资产 / 语义守卫 / check |
+| `npm run guard` | 语义守卫（**已自动**：pre-commit / `npm run site` 都会跑）；手动复核用 |
+| `npm run changes` | 提交前看：哪些页变了、是「只改文字（人）」还是「结构/样式（AI）」 |
+| `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
+
+- 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
+  `build-site.mjs`（站点 + PDF；播放层对齐 claude-slides 导出的 Web page：黑底一屏一页 / 竖屏纵向滚动 / 右下角页码 / f 全屏）、`serve.mjs`（本地预览）。
+- 图标字体与字形表内置在 `tools/assets/`（anthropicons.woff2 + json），CI 无需装 claude-slides；
+  本地若想用安装里的新版可删掉这两个文件，脚本会回落到 `CLAUDE_SLIDES_SKILL` / `~/.agents/skills/claude-slides`。
+- 发布：push 到 `main` 触发 `.github/workflows/deploy.yml` → `npm ci` + `npm run site` → GitHub Pages。
+
+## 验证策略（按复杂度分级，别过度）
+
+| 改动类型 | 只做这些 | 不要做 |
+| --- | --- | --- |
+| 文案 / 数字 / 链接 | `npm run deck:check`（2s）→ 直接 commit+push | 渲染、截图、本地构建 |
+| 间距 / 字号 / 颜色等局部样式 | `deck:check` + 单页 `node tools/render-slide.mjs <id>` 看一眼 | 全量渲染、CDP 脚本 |
+| 版式重排 / 加页 / 换图文 | 渲染 + 看截图 | — |
+| 播放层交互（键盘/点击/滚动/视频） | 才用 CDP 脚本实测行为 | — |
+| `npm run site`（本地构建含 PDF，60–120s） | **只在需要在 8765 验收时**跑，且放后台 | 每次改完都跑 |
+
+原则：**push 触发 CI 构建就够了**，本地构建只是给「本地预览」用的；验证手段要和风险匹配，别为了保险每步都做全套。
 
 ## 验收
 
-- 至少验证两个尺寸：桌面 `1600×900` 与手机竖屏 `390×844`，确认 18 页无溢出、文字不重叠。
-- 手机端交互要能完成：翻页（左右滑动 / 点两侧）、打开并关闭总览。
-- 桌面快捷键：`←` `→` / 空格翻页、数字键跳页、`Esc` 总览。
+- `npm run deck:check` 的 `problems` 为 0（**每次必做**，2 秒）。
+- 改了版式才 `npm run deck:render` 看溢出（内容下沿 ≤ 1018px）；纯文案改动不用渲染（见上面的「验证策略」）。
+- 不要在编辑器开着的同一页上做批量结构改动。
+
+## 部署与验收（重要）
+
+- **小改动改完直接 commit + push**；push 后 CI 用 `gh run list --limit 1` 查一眼即可，**不要阻塞等待**。
+- 发布失败要重跑时：**提交一个空 commit**，不要 `gh run rerun`（会产生重复 artifact 报错）。
+- 播放层能力 / 素材规范见 [`slide/AGENTS.md`](slide/AGENTS.md) §7–§8；版式配方见 [`slide/TYPOGRAPHY.md`](slide/TYPOGRAPHY.md) §5.10–§5.12。
+
+## claude-slides 升级后要做什么
+
+我们只依赖它 4 个**稳定接口**，其余（播放器、编辑器 UI）都是它自己的事，不用跟：
+
+| 耦合点 | 谁在用 | 升级后怎么验 |
+| --- | --- | --- |
+| `scripts/artifact.mjs` 的 `check` / `render` / `open` / `share` / `upload` | `tools/deck.mjs` | `npm run doctor`（会跑一次 check） |
+| `project/deck.json` 的 `v` 与 `order` 约定 | `tools/build-site.mjs`、`tools/doctor.mjs` | doctor 里 `deck 格式版本`，不是 v4 就会提醒 |
+| `project/assets/index.json` + `/_blob/<id>` | `tools/build-site.mjs` | doctor 里 `资产文件 / 资产引用` |
+| 图标字体与字形表 | `tools/assets/anthropicons.*`（**仓库内置副本**） | doctor 里 `图标覆盖`；新图标名要先导出进 json |
+
+升级后依次：`npm run doctor` → `npm run site` → 浏览器看 `127.0.0.1:8765`。三项都过就不用改我们这边；doctor 报错就是该更新的地方（多半是 artifact 命令名或 deck 格式变了）。

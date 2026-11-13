@@ -3,9 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node slide/build.ts",
-    "preview": "node slide/server.mjs",
-    "pdf": "node slide/pdf.mjs"
+    "deck:check": "node tools/deck.mjs check",
+    "deck:open": "node tools/deck.mjs open",
+    "deck:render": "node tools/deck.mjs render",
+    "site": "node tools/build-site.mjs",
+    "preview": "node tools/serve.mjs",
+    "guide": "node tools/build-style-guide.mjs",
+    "doctor": "node tools/doctor.mjs",
+    "guard": "node tools/guard-slides.mjs",
+    "guard:all": "node tools/guard-slides.mjs --all --verbose",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "changes": "node tools/changes.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

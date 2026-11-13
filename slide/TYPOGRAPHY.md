@@ -1,0 +1,357 @@
+# TRAE Campus 排版规范（TYPOGRAPHY）
+
+> 这份文档是 [设计系统](../trae-campus-ds/project/README.md) 的**排版操作手册**：设计系统说"有哪些令牌"，
+> 这里说"一页到底怎么摆、写多少 px、什么不能写"。
+> 基准产物：`slide/`（18 页，claude-slides 格式，1920×1080 固定画布，全内联样式）。
+> 原版参照：`slide/deck.html`（1600×900，`calc(var(--u)*N)`）。**所有尺寸都已乘 1.2 并归并成封闭档位，不要再做二次缩放。**
+
+---
+
+## 1. 画布与版心
+
+```
+┌────────────────────────────────────────────────────────┐ 1920 × 1080
+│ 67px                                                   │
+│      77px ┌──────────────────────────────────┐ 77px    │
+│           │ 页头（eyebrow + h1 + sub + 分类线）│         │
+│           ├──────────────────────────────────┤         │
+│           │ 主体（flex:1，净高 746px）        │         │
+│           └──────────────────────────────────┘         │
+│ 62px                                                   │
+└────────────────────────────────────────────────────────┘
+```
+
+| 量 | 值 | 说明 |
+| --- | --- | --- |
+| 画布 | 1920 × 1080 | `<section>` 就是画布，不写 width/height |
+| 页面内距 | `padding:67px 77px 62px 77px` | 只有封面例外（`0px 115px`） |
+| 版心宽 | 1766 | 1920 − 77×2 |
+| 版心高 | 951 | 1080 − 67 − 62 |
+| 主体净高 | **746** | 版心高 − 页头 205 |
+| 分类线 | `border-bottom:1px solid #D9E1DC` | 页头块的下边框，不是 `<hr>` |
+
+页面预算恒等式：**1080 = 67（上内距）+ 205（页头）+ 746（主体）+ 62（下内距）**。
+所有内容页都满足它；无眉标的页（17 结束页、18 FAQ）页头是 164，主体多出 41。
+
+---
+
+## 2. 字号档位
+
+| 档 | font-size | font-weight | line-height | letter-spacing | 用在哪 |
+| --- | --- | --- | --- | --- | --- |
+| `display` | **104px** | 800 | 1.2 | −3px | 只有封面 h1，一页至多一处 |
+| `title` | **56px** | 800 | 1.35 | −1.2px | 每页页面标题（h1） |
+| `card` | **41px** | 800 | 1.4 | −0.6px | 卡片/栏目标题、封面副标题、封面胶囊名字 |
+| `lead` | **30px** | 800 | 1.5 | −0.4px | 步骤标题、操作句、流程节点标题 |
+| `body` | **25px** | 400（强调 700） | 1.75 | 0 | 正文段落、列表项、图文说明 |
+| `caption` | **24px** | 400 | 1.7 | 0 | 副标题 sub、图注、卡片描述、表格单元格 |
+| `label` | **24px** | 600–800 | 1 | 2.4px（数字编号 1.2px） | 眉标、编号 01/02、胶囊按钮文字、小标签 |
+
+**字号是封闭集合**：全篇只允许 `24 / 25 / 30 / 41 / 56 / 104` 六个值。出现 27、33、48 之类的第七个值就是错的。
+
+**唯一例外：`tip 22px`**（卡片里的「来自：/💡 出处」这类附注一行小字，第 7 页视频卡在用）。它比 `caption` 小一档、比正文明显弱，`deck:check` 通过；除此之外不要再引入 20/21/23 之类的新值。
+
+原版 1600 基准 → 新档位的归并规则（照表走，不要自己发明）：
+
+```
+原 8–18px      → 24  (label / caption)
+原 18.5–22.5px → 25  (body)
+原 23–28px     → 30  (lead)
+原 29–40px     → 41  (card)
+原 41–60px     → 56  (title)
+原 61px 以上   → 104 (display)
+```
+
+同一角色在不同页必须同档：案例标题在 08/09/12/13 四页都是 `lead 30`，卡片标题在 04 页是 `card 41`。
+改字号前先看"同角色其它页用的是哪档"，不要单页调。
+
+---
+
+## 3. 间距梯度与使用规则
+
+可用间距只有：`8 12 16 20 24 32 40 48 56 64 80 96`（另有 5/17/19/22/29/31/41/43/67 这类由 ×1.2 得到的精确值，
+用于页头行距、卡片内距、两栏 gap、网格 gap）。规则只有两条：
+
+1. **就近原则**：同一组元素之间的距离用父级 `gap` 表达；不同组之间的距离用下一组的 `padding-top` 表达。
+   例：眉标/标题/副标题三行是一组 → 父级 `gap:17px`；页头与主体之间是组间 → 主体容器 `padding-top:31px`。
+2. **禁止 `margin`**：格式里 `margin` 是被丢弃的 no-op，写了不仅无效，还会让"我以为有间距"的假象骗到自己。
+   带背景/边框的元素若要外距，外面套一层透明 `div` 用 `padding`。
+
+常用精确值（都已乘 1.2）：
+
+| 场景 | 值 | 场景 | 值 |
+| --- | --- | --- | --- |
+| 页头三行间距 | 17 | 页头下内距 | 31 |
+| 眉标圆点与文字 | 12 | 主体顶部留白 | 31 / 41 |
+| 2×2 网格 gap | 43 | 四行列表列间距 | 29 |
+| 卡片内距 | 48 × 53 | 卡片标题行与正文 | 22 |
+| 两栏图文 gap | 67 | 案例双卡 gap | 29 |
+| 三节点流程箭头格宽 | 67 | 步骤行内距 | 26（上下） |
+| 列表项 gap | 25–38 | 胶囊内距 | 11 × 22 |
+
+---
+
+## 4. 页头配方（所有内容页原样复用）
+
+```html
+<div style="display:flex;flex-direction:column;gap:17px;padding-bottom:31px;border-bottom:1px solid #D9E1DC">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="width:13px;height:13px;border-radius:50%;background:#2FAE72"></div>
+    <p style="font-size:24px;line-height:1;font-weight:600;letter-spacing:2.4px;color:#3C6B52">眉标</p>
+  </div>
+  <h1 style="font-size:56px;line-height:1.35;letter-spacing:-1.2px;font-weight:800;color:#141C18">页面标题</h1>
+  <p style="font-size:24px;line-height:1.7;color:#4A544E">副标题（没有就整段删）</p>
+</div>
+```
+
+- 高度：有副标题 **205px** = 24 + 17 + 76 + 17 + 41 + 31；无眉标的页删掉第一行 → 164px。
+- 眉标左缩进恒为 77px（= 页面内距），**不要**给眉标额外加 padding。
+- 圆点是真圆点 `div`（13×13 + `border-radius:50%`），不是文字 `●`。
+- 标题永远左对齐、永不居中；副标题可用 `padding-left` 做二级缩进（封面用了 86）。
+
+---
+
+## 5. 八种版式
+
+每种都写在「页头 205 + 主体 746」之上；"主体"这一层写 `flex:1`，漏写就会下半截空出来。
+
+### 5.1 页头（骨架，18 页里有 16 页带）
+
+- **用途**：所有内容页的开场：眉标归类 → 标题立论 → 副标题补一句限定。
+- **结构**：`section > [页头块] + [主体块(flex:1)]`。
+- **尺寸**：见 §4。eyebrow `label 24/600/2.4px`（`#3C6B52`）；h1 `title 56/800/−1.2px`（`#141C18`）；
+  sub `caption 24/400/1.7`（`#4A544E`）。
+- **可变量**：文本、是否有 sub、主体内容。
+- **禁止**：改行距/字距；给 h1 加第二个字号；把分类线写成 `<hr>`（会多占一层高度）。
+
+### 5.2 双栏图文（06 时代变革、16 Token 计划、17 结语；02 About Me 是它的照片变体）
+
+- **用途**：左图承载情绪/证据，右栏承载论证。
+- **结构**：`主体 = grid[ 左列 | 右列 ]`，`align-items:center`。
+- **尺寸**：左列宽 **768 / 792 / 960 / 564**（视图片比例选），`gap:67`；图片写死 px + `object-fit:cover`
+  （照片）或 `contain`（插画/海报），`border-radius:17–24`；右栏正文 `body 25/1.75`，段间距 24–26。
+- **可变量**：左列宽（768/792/960/564 四选一）、图片高、右栏段落数。
+- **禁止**：图片用 `%` 宽度；右栏用 `ul` 且每项自带背景；左右栏各自 `padding` 造成中线偏移。
+
+### 5.3 2×2 卡片（04 传统路径）
+
+- **用途**：并列四个同构概念。
+- **结构**：`主体 = grid[ 1fr 1fr × 2 行 ]`，`gap:43`；每卡 `flex column` + `justify-content:center`。
+- **尺寸**：卡片 `padding:48px 53px`、`border-radius:24px`、底色 `#EAECEA`（第二张 `#E8EDEA`、第三张 `#E5EEE8`、
+  第四张强调色 `#DFF1E6`）；标题行 `gap:22px`，编号 `label 24/1.2px/#63736B`，图标方块 50×50 `radius:13` 白底 + `<x-icon>` 36px；
+  标题 `card 41`；正文 `body 25/1.75`，`padding-left:42px` 与标题错位对齐。
+- **可变量**：张数（4 → 2 时把 `grid-template-columns` 改 `1fr`）、强调卡是哪一张。
+- **禁止**：卡片写死高度（应由 `grid` 的 `1fr` 撑满）；标题里塞 `<svg>`（文本元素只允许 `b/i/u/a/span`）。
+
+### 5.4 四行列表（05 当代大学生的困境）
+
+- **用途**：并列 4 条互不平行的论点，每条一段话。
+- **结构**：`主体 = 4 × row`，每行 `grid[ 41px | 310px | 1fr ]`，`column-gap:29px`，`align-items:center`；
+  行间 1px 下边框（最后一行不要）。
+- **尺寸**：编号 `label 24/#63736B`；标题 `card 41`（带图标时图标 36px、与文字 `gap:16`）；正文 `body 25/1.75`（`#5A645E`）。
+- **可变量**：行数、标题列宽（310 可放大到 360，正文随之变窄）。
+- **禁止**：用 `<ul>` 做（要单行内三列对齐，`ul` 表达不了）；给行加背景色。
+
+### 5.5 三节点流程（10 IPO 学习法）
+
+- **用途**：表达有先后顺序的三步。
+- **结构**：`主体 = grid[ 1fr | 67px | 1fr | 67px | 1fr ]`，`align-items:stretch`；箭头格 `flex center` 放一个 `→`。
+- **尺寸**：节点 `padding:41px 48px`、`min-height:238px`、`border-radius:24px`、`flex center`；
+  中间节点用薄荷底 `#E5EEE8`；节点标题 `card 41`；英文小字 `lead 30`；箭头 `caption 24`（`#A7B3AC`）。
+- **可变量**：步骤数（4 步就加一个箭头格）、是否强调中间节点。
+- **禁止**：箭头用 `<x-shape kind="arrow-right">`（会和文字基线对不齐）；节点用 `height` 写死导致文字溢出。
+
+### 5.6 案例双卡（08/09 学习、12/13 社区案例、15 校园支持）
+
+- **用途**：两张大截图 + 一行说明，做"证据展示"。
+- **结构**：`主体 = grid[ 1fr 1fr ]`，`gap:29`；卡片 `flex column`：截图 → 说明行。
+- **尺寸**：卡片 `padding:19px 19px 29px`、`radius:22px`、底 `#EAECEA`；截图 `border-radius:14px`，`object-fit:cover`；
+  说明行 `padding:31px 10px 0`、`align-items:center`、`gap:16–22`；标题 `lead 30`（编号 `label 24/#17754A`）；
+  描述 `caption 24/1.7`；右侧胶囊按钮 `background:#BFF2D2`、`radius:999px`、`padding:11px 22px`、文字 `label 24/#0B4A32`。
+- **可变量**：截图高度（学习页 502 / 社区案例 538 / 校园支持 480）；胶囊里的图标可省。
+- **禁止**：标题写固定 `width`（会把描述挤成两行）；截图包一层 `%` 宽容器。
+
+### 5.7 左图右三步（11 实践、14 门槛）
+
+- **用途**：左边一个对比面板/插画，右边三条可执行步骤。
+- **结构**：`主体 = grid[ 672px | 1fr ]` 或 `[ 564px | 1fr ]`，`gap:77 / 62`，`align-items:center`；
+  右侧三条 `flex column`，每条 `padding:26px 0`，行间 1px 上边框、最后一条 1px 下边框。
+- **尺寸**：步骤编号 `label 24/#17754A`；步骤标题 `lead 30/800`；正文 `body 25/1.75`；小标签 `padding:5px 18px`、`radius:8px`、
+  底 `#DFF1E6`、字 `caption 24/#0B4A32`。
+- **可变量**：左列 672（双面板）或 564（窄图）；步骤数。
+- **禁止**：步骤行用 `margin` 分隔；编号用圆点代替 01/02/03。
+
+### 5.8 居中大图（18 FAQ）
+
+- **用途**：一页只放一张证据图，让观众读图。
+- **结构**：`主体 = flex，align-items:center，justify-content:center`；页头无眉标（164 高）。
+- **尺寸**：图片写死 `width:1548px;height:619px`（按原图 2.5:1 比例）配 `object-fit:contain`；不要 `max-width:%`。
+- **可变量**：图片宽高与比例。
+- **禁止**：图片超出 746 主体高；用 `width:100%`。
+
+### 5.9 高亮（薄荷划线）配方
+
+原版把高亮挂在 inline `span` 上：背景框 ≈ **1.41em**（PingFang 的 `normal` 行高），在行框里居中，stop 取 55–60% → 绿带恒为 **0.564em**。
+
+本格式里 `span` 不能带 `background`，只能挂块级 `p/h*`；块级背景框 = **行高 L**。所以 stop 必须按 L 换算，**不能照抄某个百分比**：
+
+```
+P1 = ((L − 1.41) / 2 + 0.60 × 1.41) / L × 100
+P2 = min(100, ((L − 1.41) / 2 + 1.41) / L × 100)
+```
+
+| line-height | P1 … P2 | 用于 |
+| --- | --- | --- |
+| 1.4 | 60% … 100% | card 41 / label |
+| 1.5 | 59% … 97% | lead 30 |
+| 1.7 | 58% … 91% | caption 24 |
+| 1.75 | 58% … 90% | body 25 |
+| 1.8 | 58% … 89% | body 25（松） |
+| 1.85 | 58% … 88% | body 25（更松） |
+
+- 写法：`background:linear-gradient(180deg,transparent P1%,#BFF2D2 P1%,#BFF2D2 P2%,transparent P2%);padding:0px 4px 0px 4px`
+- **自检**：渲染后量「绿带像素高 ÷ 字号」，应 ≈ **0.56**（±0.03）。偏大 → P2 拍到了 100%；偏小 → P1 抬太高（这是最初 45%…86% 写法的错：带子薄了近 1/3、位置还高了 13 个点）。
+- 一行放不下的整段高亮要按自然断行拆块，每块 `align-self:flex-start`；否则块级背景会把行尾空白也涂上，出现「绿带拖尾」。
+
+### 5.10 链接样式
+
+格式里 inline `<a>` **只能拿到一条 plain underline**：不能设线宽、颜色、偏移，直接给 `<a>` 写 `text-decoration` 会被判 unsupported。所以下划线的颜色要靠 **anchor 的 `color`**，正文颜色放进内层 `<span>`：
+
+```html
+<a href="https://…" style="color:#2FAE72"><span style="color:#0B4A32">文字</span></a>
+```
+
+- 效果：深色文字 + 1px 品牌绿下划线（观感接近原版那条 2px 薄荷下划线）。
+- **必须**给 `<a>` 设 `color`：不设会渲染成浏览器默认蓝 `#0000EE`，一眼出戏。
+- **不要**用 `<u>` 包链接：`<u>` 的下划线会和 `<a>` 自带的那条叠成双线。
+- 胶囊（`查看作品` / `了解详情`）里的链接同样按这个写法，不要另做一套。
+- 备选下划线色：`#A6ECC0` 更淡（远看几乎无线）、`#BFF2D2` 在米白底上基本看不见——只在确定投影环境很好时用。
+
+**站点层（`release/site` 与 PDF）的额外约定**（`tools/build-site.mjs` 统一处理，deck 源文件不用管）：
+
+- 所有 `http(s)` 外链自动补 `target="_blank" rel="noopener noreferrer"` → **新标签页打开**，不顶掉演示页。
+- 全局 `.slide a{text-decoration:none}`，只在 hover 时出现下划线 → 页面上那条 underline 会消失，视觉更干净。
+- 「后缀箭头」统一用 `了解详情 ↗` 结构：`<p><a href><span>了解详情</span></a></p>` + **22px 内联 ↗ SVG**（`aria-label="打开链接"`，`stroke` 同色）。
+  不要用图标字体的 `Link`（观感太重，已从全篇移除）。
+- 胶囊 CTA（第 3 页知乎链接）：`#DFF1E6` 底 + `1px solid #BFE4CD` + `border-radius:999px` + `padding:18px 30px`，
+  与副标题放在**同一 flex 行**、`align-items:center` 垂直居中，并与内容区右边留 110px（不要贴边）。
+
+### 5.11 三卡图文（第 7、8 页「AI 之变」）
+
+```html
+<div style="display:grid; gap:24px; grid-template-columns:1fr 1fr 1fr; align-items:center; flex:1">
+  <div style="display:flex; flex-direction:column; gap:30px; padding:18px 18px 24px;
+              background:#ffffff; border:1px solid #d9e1dc; border-radius:20px">
+    <div style="height:360px; display:flex; flex-direction:column; flex:0 0 auto;
+                border-radius:14px; overflow:hidden">
+      <img src="/_blob/<id>" alt="…" style="width:536px; height:360px; object-fit:contain">
+    </div>
+    <div style="height:200px; display:flex; flex-direction:column; gap:10px; flex:0 0 auto;
+                padding:16px 0 0; border-top:1px solid #d9e1dc">
+      <div style="display:flex; flex-direction:row; gap:12px; align-items:baseline">
+        <p style="…24px; font-weight:800; letter-spacing:2.4px; color:#17754a">01</p>
+        <h3 style="…30px; font-weight:800; color:#141c18">图片创作</h3>
+      </div>
+      <p style="padding:0 0 0 46px; …24px; line-height:1.65; color:#5a645e">描述…</p>
+    </div>
+  </div>
+  …
+</div>
+```
+
+- `align-items:center`：三卡整体**垂直居中**，不要拉满整页（拉满会在卡底留一大片空）。
+- 图区固定 `536×360`，图片一律 **`object-fit:contain`**：截图类素材用 `cover` 会切掉边上内容（地址栏、二维码、边栏），宁可留白。
+- 需要和白色卡面区分开的图（第 7 页 01 图片创作）：图容器再加 `background:#E7EFE8; border:1px solid #d9e1dc`。
+- 图与文案之间：卡片 `gap:30px` + 文案块 `border-top:1px solid #d9e1dc; padding:16px 0 0`。
+- 描述不再另行缩进之外的样式；`01/02/03` 编号与标题同一基线，描述缩进 `46px` 对齐标题文字。
+- 附注小字（tip）：`22px`，图标 22px 灰 `#8a968f` + 前缀 + 绿色链接 `22px #17754a` + 20px 灰 ↗，**不缩进**。
+
+### 5.12 视频卡（`data-video`）
+
+```html
+<img data-video-sound="on" src="/_blob/<静帧>" data-video="/_blob/<mp4>"
+     alt="…" style="width:536px; height:360px; object-fit:contain">
+```
+
+- 静帧必须是**视频里的干净帧**（`ffmpeg -ss 2 -frames:v 1`），不要用自带播放按钮的截图 —— 会和播放器叠成「两个播放按钮」。
+- **一律静音**（无论写不写 `data-video-sound`）：站点播放层固定 `muted = true`，需要声音可点放大后手动开。
+- 方向键**不驱动**视频（没有内置动画步骤）；要做动画必须逐元素显式定义。
+- 站点播放层行为：进入该页自动循环播放（静音）；`←/→/↑/↓` 一律翻页，不干预播放；点视频 = 进放大视图（放大里点视频 = 播放/暂停，点其他处 = 关闭）。
+- 素材规格：`mp4(H.264)` 或 `webm`，**≤ 20MB**。4K 源压法：`ffmpeg -i src.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart out.mp4`（77s 4K → 720p 约 14MB）。
+- `artifact.mjs upload` **不收视频**（只收图片/字体）：mp4 手动放进 `project/assets/<32hex>.mp4`，并在 `project/assets/index.json` 里登记 `video/mp4`，`tools/asset-names.json` 里补语义名。
+
+### 另：封面（01）
+
+`padding:0px 115px`，`justify-content:center`，`align-items:flex-start`；正文块左移用一个
+**画了底色**的空 `div`（`width:360px;flex:none;background:#F7F8F5`）当左留白——空且未上色的定宽 div 会被格式丢弃。
+h1 `display 104`；副标题 `card 41` + `padding-left:86px`；讲者胶囊 `#DFF1E6/radius:999px/padding:17px 48px 17px 204px`，
+头像是胶囊内 `position:absolute;left:0;bottom:0;width:190px;height:167px`（向上溢出胶囊，**不要用负偏移**）；
+logo 用 `position:absolute;left:115px;top:65px`；插画 `right:0;bottom:67px;width:780px`，`mix-blend-mode:multiply`，
+且必须写在**第一个流子元素之前**（否则会盖住文字）。
+
+---
+
+## 6. 页码 → 版式对照
+
+| # | id | 版式 | 关键量 |
+| --- | --- | --- | --- |
+| 01 | cover | 封面 | 115 内距 / display 104 |
+| 02 | about-me | 双栏图文（照片） | 564 + 67，照片 564×672 |
+| 03 | preface | 页头 + 大图 | 图 1766 宽，`paragraph` 下加 CTA 按钮 |
+| 04 | path | 2×2 卡片 | gap 43 / radius 24 |
+| 05 | dilemma | 四行列表 | 41 / 310 / 1fr |
+| 06 | eras | 双栏图文 | 768 + 67 |
+| 07 | knowledge | 双栏图文（面板变体） | 1fr + 29 + 1fr，面板 padding 82×50 |
+| 08/09 | learn-1 / learn-2 | 案例双卡 | 截图 502 高 |
+| 10 | ipo | 三节点流程 | 1fr/67/1fr/67/1fr |
+| 11 | practice | 左图右三步 | 672 + 77 |
+| 12/13 | cases-1 / cases-2 | 案例双卡 | 截图 538 高 |
+| 14 | threshold | 左图右三步 | 564 + 62 |
+| 15 | campus | 案例双卡（大图变体） | 截图 480 高 |
+| 16 | campus-tokens | 双栏图文 | 960 + 67 |
+| 17 | farewell | 双栏图文 | 792 + 67，无眉标 |
+| 18 | faq | 居中大图 | 1548 × 619 |
+
+---
+
+## 7. 页面预算与溢出处理
+
+预算：**页头 205 + 主体 746 + 上下内距 129 = 1080**。主体放不下时**按顺序**处理：
+
+1. 压间距：先把组间 `padding-top` 和组内 `gap` 各减 4–8px（这是唯一可自由浮动的量）。
+2. 压内距：卡片内距 48×53 → 41×46。
+3. 删信息：删掉可省的副标题/图注（**本次重建不允许删文案，所以实际只走到第 2 步**）。
+4. 拆页：一页只讲一件事，拆成两页。
+5. **最后**才动字号，且不得低于 24。
+
+自检：内容底边不得越过 y=1018（1080 − 62）；越过就是溢出。
+
+---
+
+## 8. 常见错误清单
+
+| # | 错误写法 | 后果 | 正确写法 |
+| --- | --- | --- | --- |
+| 1 | `padding:67 77 62 77px` | 整条声明被丢弃 → 标题贴边、内容溢出 | 每个值都带单位：`padding:67px 77px 62px 77px` |
+| 2 | 主体容器漏写 `flex:1` | 页面下半截空出来 | `<div style="flex:1;…">` |
+| 3 | 定位宿主漏写 `position:relative` | 绝对定位子元素跑到画布左上角 | 父容器加 `position:relative` |
+| 4 | `<span class="mark">` 带背景渐变 | `span` 不能带背景，高亮消失 | 整段高亮 → 给该 `p` 设 `background:linear-gradient(…);padding:0px 4px`，stop 按 §5.9 的公式随行高换算；句中局部 → 拆两块并排 |
+| 4b | 高亮 stop 直接照抄 45%…86% | 绿带比原版薄 1/3、位置高 13 个点，看着像「横杠」不像记号笔 | 按 §5.9：厚度恒为 0.564em，`L=1.75` 时为 58%…90% |
+| 5 | `left:-6px` / `bottom:-20px` | 负偏移被夹成 0 并报警，头像位置全错 | 提到 section 级用画布坐标，或在宿主内 `left:0` 配合宿主自身偏移 |
+| 6 | `width:100%` 的图片 | 百分比宽度不被接受 → 图片塌成 0 或原尺寸 | 写死 px + `object-fit` |
+| 7 | 空且未上色的定宽 `div` 当留白 | 该 div 被丢弃，间距消失 | 给它 `background`（与页面同色）或改用 gap |
+| 8 | `margin` 调间距 | `margin` 是 no-op，完全不生效 | 父级 `gap` 或自身 `padding` |
+| 9 | 出现第七个字号（27/33/48） | 破坏字阶，观感不统一 | 归并到 24/25/30/41/56/104 |
+| 10 | 文本元素当 flex 容器（`<p>` 里放三块并排） | 子元素布局失效 | 外面包一层 `div` |
+| 11 | `<svg>` 放进 `<p>` 或 `h1–h3` | 不支持，图形丢失 | 用 `<x-icon name="…">`，作为 `div` 的流子元素 |
+| 12 | 行内元素（`span`）带内边距/背景当块用 | 行内元素不能做流子元素 | 提升为 `p`/`div` |
+
+---
+
+## 9. 验收清单
+
+- [ ] `artifact.mjs check` 报 `problems: 0`，且没有「排版」「警告」类 notes。
+- [ ] 18 页渲染到 1920×1080 后，内容底边 ≤ 1018，四边 8px 内无墨迹。
+- [ ] 每页字号只出现 24/25/30/41/56/104；同角色跨页同档。
+- [ ] 页头三行位置在 18 页里逐像素一致（左 77、上 67、间距 17、下内距 31）。
+- [ ] 三节点页箭头与节点垂直居中；案例页编号与标题基线对齐；引用块左侧绿条不高于文字。

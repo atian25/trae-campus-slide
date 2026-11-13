@@ -1,4 +1,5 @@
 # ---- 产物（不入库）----
+.tmp-test/
 release/
 
 # ---- 系统 ----
@@ -34,3 +35,12 @@ env/
 .vscode/
 .idea/
 *.swp
+
+# ---- Agent 工作树 ----
+.agents/
+
+# 待处理素材（视频等大文件不提交）
+slide/project/inbox/*
+
+# AI Works 发布产物（构建后静态页 + ZIP）
+aiworks-site/

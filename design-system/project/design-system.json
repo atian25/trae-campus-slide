@@ -1,0 +1,19 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": { "v": 1, "at": "2026-11-09T03:46:55Z" },
+  "title": "TRAE Campus",
+  "namespace": "traecampus",
+  "libraries": [],
+  "sections": {},
+  "groups": [],
+  "assetGroups": {},
+  "blobs": {},
+  "docs": { "readme": "project/README.md", "sections": [] },
+  "lastChange": {
+    "by": "天猪",
+    "at": "2026-11-09T03:50:00Z",
+    "via": "DeepSeek Harness",
+    "note": "从 TRAE Campus 幻灯片原版视觉令牌提炼"
+  }
+}

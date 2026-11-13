@@ -1,0 +1,87 @@
+{
+  "v": 4,
+  "attachments": {},
+  "cover": "cover",
+  "createdOnFiles": {
+    "at": "2026-11-09T03:40:00Z",
+    "v": 1
+  },
+  "designSystems": [
+    {
+      "artifact": "design-system",
+      "copiedAt": "2026-11-09T03:55:00Z",
+      "namespace": "traecampus",
+      "title": "TRAE Campus",
+      "version": null
+    }
+  ],
+  "faces": {
+    "noto-sans-sc": {
+      "family": "Noto Sans SC",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap"
+    }
+  },
+  "lists": "css",
+  "order": [
+    "cover",
+    "about-me",
+    "preface",
+    "path",
+    "dilemma",
+    "eras",
+    "ai-digital",
+    "ai-physical",
+    "knowledge",
+    "ipo",
+    "learn-1",
+    "learn-2",
+    "mindset",
+    "practice-2",
+    "cases-1",
+    "cases-2",
+    "competition",
+    "start",
+    "campus",
+    "campus-tokens",
+    "farewell",
+    "faq"
+  ],
+  "sections": {
+    "b6db08e8": {
+      "before": null,
+      "description": "与 AI 共存 - 学习",
+      "start": "knowledge"
+    },
+    "campus": {
+      "before": null,
+      "description": "与 AI 共存 - 资源",
+      "start": "campus"
+    },
+    "change": {
+      "before": null,
+      "description": "AI 改变了什么",
+      "start": "eras"
+    },
+    "close": {
+      "before": null,
+      "description": "结语",
+      "start": "farewell"
+    },
+    "old-path": {
+      "before": null,
+      "description": "当代大学生的困境",
+      "start": "preface"
+    },
+    "opening": {
+      "before": null,
+      "description": "封面：AI 时代的机遇和挑战",
+      "start": "cover"
+    },
+    "practice": {
+      "before": null,
+      "description": "与 AI 共存 - 实践",
+      "start": "practice-2"
+    }
+  },
+  "title": "AI 时代的机遇和挑战：今天的学生，如何走向明天的世界"
+}
