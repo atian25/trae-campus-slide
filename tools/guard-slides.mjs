@@ -133,7 +133,9 @@ for (const rel of files) {
   };
   const lostSvg = Math.max(0, prev.svgCount - cur.svgCount);
   // 文案是正常编辑对象：改句子必然「删旧加新」，只提示、不拦截
-  const lostHard = lost.图片.length + lost.图标.length + lost.链接.length + lost.CSS.length + lostSvg;
+  // 图片允许「替换」：数量没变少就是换了张图，不算丢失
+  const imgLoss = cur.imgs.size < prev.imgs.size ? (prev.imgs.size - cur.imgs.size) : 0;
+  const lostHard = imgLoss + lost.图标.length + lost.链接.length + lost.CSS.length + lostSvg;
   const total = lostHard;
 
   if (VERBOSE) {
