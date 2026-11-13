@@ -85,7 +85,8 @@ const deck = JSON.parse(fs.readFileSync(path.join(DECK, "project/deck.json"), "u
 const order = deck.order;
 if (!Array.isArray(order) || !order.length) throw new Error("deck.json 的 order 是空的");
 const title = deck.title || "AI 时代的机遇和挑战";
-const PDF_URL = encodeURI(`${title}.pdf`);   // 与构建产出的 PDF 同名，浏览器内联打开
+const BUILD_STAMP = Date.now().toString(36);   // 每次构建换一次，用来给 PDF 链接破缓存
+const PDF_URL = encodeURI(`${title}.pdf`) + `?v=${BUILD_STAMP}`;   // 与构建产出的 PDF 同名，浏览器内联打开
 
 // ---------- 图片：拷到 release/site/assets 并把 /_blob/<id> 换成相对路径 ----------
 fs.rmSync(SITE, { recursive: true, force: true });
