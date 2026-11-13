@@ -162,7 +162,7 @@ npm run deck:render              # 全部
 
 ## 9. 现状（2026-11-12）
 
-- `slide/`：**22 页**（新增第 7、8 页「AI 之变」两页；第 17、18 页改版）。页面顺序见 `project/deck.json` 的 `order`。
+- `slide/`：**23 页**（第 7 页是第 6 页 `eras` 的副本 `eras-2`，待改造；另有「AI 之变」两页）。顺序见 `project/deck.json` 的 `order`。
 - `design-system/`：TRAE Campus 设计系统（namespace `traecampus`，已装进 deck 的 `project/ds/traecampus/`）。
 - 验证/渲染脚本在 `tools/`，npm 脚本见 §3；`tools/render-slide.mjs` 会从本机 claude-slides 安装里读
   图标字体（Anthropicons-Variable）和字形表，不往仓库里拷字体。

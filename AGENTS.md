@@ -13,7 +13,7 @@
 ## slide/（幻灯片）与 design-system/
 
 - `slide/`：幻灯片本体，claude-slides 的 Slides artifact 格式（`project/deck.json` + 一页一个 HTML，
-  1920×1080 固定画布、全内联样式）。**22 页**，顺序见 `project/deck.json` 的 `order`。
+  1920×1080 固定画布、全内联样式）。**23 页**，顺序见 `project/deck.json` 的 `order`。
 - `design-system/`：TRAE Campus 设计系统（token + 组件预览），deck 里装了一份拷贝在 `slide/project/ds/traecampus/`。
 - **协作约定**（文案在编辑器里改、结构/样式交给 AI、编辑器会整页重写文件）见 [`slide/AGENTS.md`](slide/AGENTS.md)，
   在 `slide/` 下工作时先读它。
@@ -53,9 +53,9 @@
 
 ## 验收
 
-- `npm run deck:check` 的 `problems` 为 0，且没有任何 `排版` / 警告 note。
-- 改了版式就 `npm run deck:render`，检查页面内容不溢出（内容下沿 ≤ 1018px，安全线）。
-- 改完文案至少看一眼渲染图；不要在编辑器开着的同一页上做批量结构改动。
+- `npm run deck:check` 的 `problems` 为 0（**每次必做**，2 秒）。
+- 改了版式才 `npm run deck:render` 看溢出（内容下沿 ≤ 1018px）；纯文案改动不用渲染（见上面的「验证策略」）。
+- 不要在编辑器开着的同一页上做批量结构改动。
 
 ## 部署与验收（重要）
 
