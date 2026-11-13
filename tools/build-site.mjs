@@ -85,6 +85,7 @@ const deck = JSON.parse(fs.readFileSync(path.join(DECK, "project/deck.json"), "u
 const order = deck.order;
 if (!Array.isArray(order) || !order.length) throw new Error("deck.json 的 order 是空的");
 const title = deck.title || "AI 时代的机遇和挑战";
+const PDF_URL = encodeURI(`${title}.pdf`);   // 与构建产出的 PDF 同名，浏览器内联打开
 
 // ---------- 图片：拷到 release/site/assets 并把 /_blob/<id> 换成相对路径 ----------
 fs.rmSync(SITE, { recursive: true, force: true });
@@ -292,7 +293,7 @@ ${pages}
   <button type="button" data-act="tips" title="快捷键帮助" aria-label="快捷键帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"></circle></svg></button>
   <button type="button" data-act="overview" title="概览（O）" aria-label="概览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.6"></rect><rect x="13" y="4" width="7" height="7" rx="1.6"></rect><rect x="4" y="13" width="7" height="7" rx="1.6"></rect><rect x="13" y="13" width="7" height="7" rx="1.6"></rect></svg></button>
   <a class="ic" href="https://github.com/atian25/trae-campus-slide" target="_blank" rel="noopener" title="GitHub 仓库" aria-label="GitHub 仓库"><svg viewBox="0 0 16 16" fill="currentColor" stroke="none"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path></svg></a>
-  <a class="ic" href="deck.pdf" download title="下载 PDF" aria-label="下载 PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"></path><path d="m7.5 9.5 4.5 4.5 4.5-4.5"></path><path d="M5 20h14"></path></svg></a>
+  <a class="ic" href="${PDF_URL}" target="_blank" rel="noopener" title="查看 PDF（浏览器内打开）" aria-label="查看 PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"></path><path d="m7.5 9.5 4.5 4.5 4.5-4.5"></path><path d="M5 20h14"></path></svg></a>
   <button type="button" data-act="full" title="全屏（F）" aria-label="全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"></path></svg></button>
 </div>
 <div class="lb-mask" data-mask></div>
@@ -310,7 +311,7 @@ ${pages}
     <span class="ovl-size-label">240px</span>
     <span class="ovl-links">
       <a href="https://github.com/atian25/trae-campus-slide" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
-      <a href="deck.pdf" download>下载 PDF ↗</a>
+      <a href="${PDF_URL}" target="_blank" rel="noopener">查看 PDF ↗</a>
     </span>
   </div>
   <div class="ovl-grid"></div>
@@ -950,6 +951,4 @@ if (!fs.existsSync(PDF)) {
   process.exit(1);
 }
 const pdfMb = (fs.statSync(PDF).size / 1048576).toFixed(2);
-// 另存一份 ASCII 文件名，给控制条/概览的「下载 PDF」用（中文名做链接容易出错）
-fs.copyFileSync(PDF, path.join(SITE, "deck.pdf"));
-console.log(`pdf  -> release/site/${path.basename(PDF)}  ${pdfMb} MB  (+ deck.pdf)`);
+console.log(`pdf  -> release/site/${path.basename(PDF)}  ${pdfMb} MB`);
