@@ -274,8 +274,9 @@ P2 = min(100, ((L − 1.41) / 2 + 1.41) / L × 100)
 ```
 
 - 静帧必须是**视频里的干净帧**（`ffmpeg -ss 2 -frames:v 1`），不要用自带播放按钮的截图 —— 会和播放器叠成「两个播放按钮」。
-- `data-video-sound="on"` 才有声音；不写默认静音（浏览器自动播放策略下、被拦时会降级静音，画面照常）。
-- 站点播放层行为：进入该页自动循环播放；`→` 播放中 = 暂停，已暂停 = 翻页；点视频 = 进放大视图（放大里点视频 = 播放/暂停，点其他处 = 关闭）。
+- **一律静音**（无论写不写 `data-video-sound`）：站点播放层固定 `muted = true`，需要声音可点放大后手动开。
+- 方向键**不驱动**视频（没有内置动画步骤）；要做动画必须逐元素显式定义。
+- 站点播放层行为：进入该页自动循环播放（静音）；`←/→/↑/↓` 一律翻页，不干预播放；点视频 = 进放大视图（放大里点视频 = 播放/暂停，点其他处 = 关闭）。
 - 素材规格：`mp4(H.264)` 或 `webm`，**≤ 20MB**。4K 源压法：`ffmpeg -i src.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart out.mp4`（77s 4K → 720p 约 14MB）。
 - `artifact.mjs upload` **不收视频**（只收图片/字体）：mp4 手动放进 `project/assets/<32hex>.mp4`，并在 `project/assets/index.json` 里登记 `video/mp4`，`tools/asset-names.json` 里补语义名。
 

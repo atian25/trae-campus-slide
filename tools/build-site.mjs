@@ -284,9 +284,8 @@ ${pages}
 <div class="lb-mask" data-mask></div>
 <div class="lightbox" data-lb aria-hidden="true"><img alt=""><video class="lb-video" playsinline></video></div>
 <div class="tips" data-tips>
-  <div><b>→ / 空格</b>下一个动作（有视频先播，再翻页）</div>
-  <div><b>←</b>上一个动作（回上一页）</div>
-  <div><b>↑ ↓ / PgUp PgDn</b>直接翻页（跳过视频）</div>
+  <div><b>← → / 空格</b>上一页 / 下一页</div>
+  <div><b>↑ ↓ / PgUp PgDn</b>同上一页 / 下一页</div>
   <div><b>1-9</b>跳页 · <b>Home / End</b> 首尾页 · <b>O</b> 概览 · <b>F</b> 全屏</div>
 </div>
 <div class="ovl">
@@ -580,17 +579,10 @@ window.addEventListener('keydown', function (e) {
       e.preventDefault(); closeLightbox(); return;
     } else { return; }
   }
-  // 左右 = 「动作」语义（PPT 的下一动画 / 上一动画）
-  if (k === 'ArrowRight' || k === ' ') {
-    e.preventDefault();
-    if (toggleVideo()) return;      // 该页有视频：播放中→暂停；已暂停→翻页
-    step(1);
-  } else if (k === 'ArrowLeft' || (k === ' ' && e.shiftKey)) {
-    e.preventDefault(); stopVideo(); step(-1);
-  // 上下 / PgUp PgDn = 「直接翻页」语义（忽略视频动作）
-  } else if (k === 'ArrowDown' || k === 'PageDown') {
+  // 目前没有「动画步骤」，所有方向键/空格都是纯翻页（动画需要显式定义后才生效）
+  if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') {
     e.preventDefault(); stopVideo(); step(1);
-  } else if (k === 'ArrowUp' || k === 'PageUp') {
+  } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) {
     e.preventDefault(); stopVideo(); step(-1);
   } else if (k === 'Home') { e.preventDefault(); show(0, true); }
   else if (k === 'End') { e.preventDefault(); show(slides.length - 1, true); }
@@ -681,7 +673,7 @@ function startVideo() {
   v.setAttribute('src', img.getAttribute('data-video'));
   v.loop = true;
   v.playsInline = true;
-  v.muted = img.getAttribute('data-video-sound') !== 'on';
+  v.muted = true;   // 视频一律静音；需要声音时再显式定义
   v.setAttribute('aria-label', img.getAttribute('alt') || '');
   v.setAttribute('style', (img.getAttribute('style') || '') + ';display:block');
   v.style.objectFit = 'cover';
@@ -695,14 +687,6 @@ function startVideo() {
     if (again && again.catch) again.catch(function () {});
   });
 }
-function toggleVideo() {
-  // 播放中 → 暂停（不翻页）；已暂停 → 让位给翻页
-  if (!activeVideo) return false;
-  if (activeVideo.paused) { stopVideo(); return false; }
-  activeVideo.pause();
-  return true;
-}
-
 /* ---- 点击图片放大 ---- */
 const lb = document.querySelector('.lightbox');
 const lbImg = lb ? lb.querySelector('img') : null;
@@ -717,7 +701,7 @@ function openLightboxVideo(src) {
   v.src = src;
   v.controls = true;
   v.loop = false;
-  v.muted = false;
+  v.muted = true;
   const pr = v.play();
   if (pr && pr.catch) pr.catch(function () {});
   lb.setAttribute('data-on', '');

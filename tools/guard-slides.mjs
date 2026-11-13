@@ -75,9 +75,8 @@ function extract(html) {
     const tag = m[0];
     const src = (tag.match(/\bsrc="([^"]*)"/) || [])[1] || "";
     const vid = (tag.match(/\bdata-video="([^"]*)"/) || [])[1] || "";
-    const snd = (tag.match(/\bdata-video-sound="([^"]*)"/) || [])[1] || "";
-    const alt = (tag.match(/\balt="([^"]*)"/) || [])[1] || "";
-    out.imgs.add(`${src}|video:${vid}|sound:${snd}|alt:${alt}`);
+    // 只比「资源身份」：src + 视频地址。alt / data-video-sound 属于可改属性，不算丢失
+    out.imgs.add(`${src}|video:${vid}`);
   }
 
   // 图标名
