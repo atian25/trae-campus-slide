@@ -61,7 +61,7 @@ function changedFiles() {
 
 /** 从 slide HTML 里抽取「语义」集合 */
 function extract(html) {
-  const out = { texts: new Set(), imgs: new Set(), icons: new Set(), hrefs: new Set(), css: new Set(), svgCount: 0 };
+  const out = { texts: new Set(), imgs: new Set(), icons: new Set(), hrefs: new Set(), css: new Set(), cssProps: new Set(), svgCount: 0 };
 
   // 文案（去掉标签/属性，压缩空白）
   const textOnly = html.replace(/<svg[\s\S]*?<\/svg>/g, " ").replace(/<[^>]+>/g, "\n");
@@ -98,6 +98,7 @@ function extract(html) {
       if (!prop || !val) continue;
       if (CRITICAL_CSS.includes(prop) || prop.startsWith("border-") || prop.startsWith("background")) {
         out.css.add(`${prop}:${val}`);
+        out.cssProps.add(prop);
       }
     }
   }
@@ -135,6 +136,9 @@ for (const rel of files) {
   // 文案是正常编辑对象：改句子必然「删旧加新」，只提示、不拦截
   // 图片允许「替换」：数量没变少就是换了张图，不算丢失
   const imgLoss = cur.imgs.size < prev.imgs.size ? (prev.imgs.size - cur.imgs.size) : 0;
+  // CSS 只按「属性名」判丢失：contain → cover 这类值变化属正常改样式
+  const cssPropLoss = [...prev.cssProps].filter((p) => !cur.cssProps.has(p));
+  lost.CSS = cssPropLoss.map((p) => `${p}（整个属性消失）`);
   const lostHard = imgLoss + lost.图标.length + lost.链接.length + lost.CSS.length + lostSvg;
   const total = lostHard;
 
