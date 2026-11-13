@@ -7,7 +7,8 @@
 - **小改动 / 修复**：本地验证通过后（构建、关键尺寸截图或自测），直接 `git commit` 并 **`git push`**（push 会触发 GitHub Pages 发布，这是预期行为）。
 - **大改动 / 需要我拍板或调试的**（改版式、改文案结构、加依赖、改部署流程）：**先不要提交**，把改动留在工作区，并在回复里明确写出「未提交 + 原因 + 需要我确认什么」；等我确认后再提交 / 推送。
 - 提交信息用中文，一行说清「做了什么 / 为什么」，必要时补正文。
-- 提交前跑 `git status`，确认没有把 `.tmp-test/`、临时截图等带进去。
+- 提交前跑 `git status` / `npm run changes`，确认没有把 `.tmp-test/`、临时截图等带进去。
+- **并发保护**：别人可能同时在编辑器里改文案 —— 提交时只 `git add` 自己改的文件，不要 `git add -A`；改 slide 用带版本校验的 `edit`，不要用脚本整页重写。
 
 ## slide/（幻灯片）与 design-system/
 
@@ -30,6 +31,7 @@
 | `npm run doctor` | 体检：claude-slides 安装 / deck 格式 / 图标 / 资产 / 语义守卫 / check |
 | `npm run guard` | 语义守卫（**已自动**：pre-commit / `npm run site` 都会跑）；手动复核用 |
 | `npm run watch` | 后台监视 slide 页，编辑器一保存就检查语义，有问题弹 macOS 通知 |
+| `npm run changes` | 提交前看：哪些页变了、是「只改文字（人）」还是「结构/样式（AI）」 |
 | `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、

@@ -13,7 +13,8 @@
     "guard": "node tools/guard-slides.mjs",
     "guard:all": "node tools/guard-slides.mjs --all --verbose",
     "prepare": "git config core.hooksPath .githooks || true",
-    "watch": "node tools/watch-slides.mjs"
+    "watch": "node tools/watch-slides.mjs",
+    "changes": "node tools/changes.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"
