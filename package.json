@@ -13,7 +13,9 @@
     "guard": "node tools/guard-slides.mjs",
     "guard:all": "node tools/guard-slides.mjs --all --verbose",
     "prepare": "git config core.hooksPath .githooks || true",
-    "changes": "node tools/changes.mjs"
+    "changes": "node tools/changes.mjs",
+    "pptx": "node tools/build-pptx.mjs",
+    "pptx:editable": "node tools/build-pptx-editable.mjs"
   },
   "dependencies": {
     "sharp": "^0.34.4"

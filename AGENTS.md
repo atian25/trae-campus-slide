@@ -32,6 +32,8 @@
 | `npm run guard` | 语义守卫（**已自动**：pre-commit / `npm run site` 都会跑）；手动复核用 |
 | `npm run changes` | 提交前看：哪些页变了、是「只改文字（人）」还是「结构/样式（AI）」 |
 | `npm run preview` | 本地预览 `release/site`（127.0.0.1:8765）——**验收看这个，不是编辑器 Present** |
+| `npm run pptx` | 导出**图片版** pptx（每页 1920×1080 铺满，像素一致、不可改字） |
+| `npm run pptx:editable` | 导出**可编辑版** pptx（文字是真文本框；`-- --slides cover,eras` 可只出样张） |
 
 - 工具脚本在 `tools/`：`deck.mjs`（check/open/share/render）、`render-slide.mjs`（单页渲染）、
   `build-site.mjs`（站点 + PDF；播放层对齐 claude-slides 导出的 Web page：黑底一屏一页 / 竖屏纵向滚动 / 右下角页码 / f 全屏）、`serve.mjs`（本地预览）。
