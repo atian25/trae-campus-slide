@@ -54,7 +54,7 @@ const INJECT = `
 <script>
 (function () {
   var BLOCK = { div: 1, p: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, h6: 1, ul: 1, ol: 1, li: 1, table: 1, section: 1, header: 1, footer: 1 };
-  var SKIP = { img: 1, svg: 1, 'x-icon': 1, br: 1, aside: 1 };
+  var SKIP = { img: 1, video: 1, svg: 1, 'x-icon': 1, br: 1, aside: 1 };
   function num(v) { return parseFloat(v) || 0; }
   function hex(c) {
     if (!c) return null;
@@ -116,18 +116,25 @@ const INJECT = `
         };
       }
       function walk(el) {
+        var tag0 = el.tagName.toLowerCase();
+        var next0 = el.nextElementSibling;
+        // 媒体节点优先处理（被播放器隐藏的 img 也要能取到框）
+        if (tag0 === 'img') {
+          var vattr = el.getAttribute('data-video') || null;
+          var host0 = el;
+          if (vattr && next0 && next0.tagName.toLowerCase() === 'video') host0 = next0;
+          nodes.push(Object.assign({ kind: 'img', src: el.getAttribute('src'), fit: getComputedStyle(host0).objectFit || 'contain', video: vattr }, box(host0)));
+          return;
+        }
+        if (tag0 === 'video') {
+          nodes.push(Object.assign({ kind: 'img', src: el.getAttribute('poster'), fit: getComputedStyle(el).objectFit || 'contain', video: el.getAttribute('src') }, box(el)));
+          return;
+        }
         var st = style(el);
         if (st.display === 'none' || getComputedStyle(el).visibility === 'hidden') return;
         var r = el.getBoundingClientRect();
         if (r.width < 1 || r.height < 1) return;
-        var tag = el.tagName.toLowerCase();
-        if (SKIP[tag] && tag !== 'x-icon' && tag !== 'svg') { /* img/svg 另行处理 */ }
-
-        if (tag === 'img') {
-          nodes.push(Object.assign({ kind: 'img', src: el.getAttribute('src'), fit: getComputedStyle(el).objectFit }, box(el)));
-          return;
-        }
-        if (tag === 'svg' || tag === 'x-icon') {
+        if (tag0 === 'svg' || tag0 === 'x-icon') {
           nodes.push(Object.assign({ kind: 'icon' }, box(el)));
           return;
         }
@@ -143,7 +150,7 @@ const INJECT = `
           if (getComputedStyle(k).display === 'none') continue;
           kids.push(k);
         }
-        var hasLeaf = kids.some(function (k) { var t2 = k.tagName.toLowerCase(); return t2 === 'img' || t2 === 'svg' || t2 === 'x-icon'; });
+        var hasLeaf = kids.some(function (k) { var t2 = k.tagName.toLowerCase(); return t2 === 'img' || t2 === 'video' || t2 === 'svg' || t2 === 'x-icon'; });
         var hasBlockKid = hasLeaf || kids.some(function (k) { return BLOCK[k.tagName.toLowerCase()]; });
 
         if (!hasBlockKid) {

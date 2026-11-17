@@ -102,32 +102,32 @@ def add_rect(slide, n):
     except Exception: pass
     shp.text_frame.text = ""
 
-def add_highlight(slide, n):
-    """薄荷高亮：按行近似成浅绿细条，垫在文字后面"""
-    s = n.get('s') or 24
-    lh = n.get('lh') or s * 1.5
-    lines = max(1, round(n['h'] / lh))
-    for i in range(lines):
-        y = n['y'] + i * lh + s * 0.55
-        h = s * 0.42
-        if y + h > n['y'] + n['h'] + 2: 
-            h = max(2, n['y'] + n['h'] - y)
-        bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, E(n['x']), E(y), E(n['w']), E(h))
-        bar.fill.solid(); bar.fill.fore_color.rgb = rgb('bff2d2')
-        bar.line.fill.background()
-        bar.text_frame.text = ""
+def rr_pr(run):
+    return run._r.get_or_add_rPr()
+
+def set_highlight(run, hexs='bff2d2'):
+    """给文字加 PowerPoint 原生高亮（<a:highlight>），跟着文字走、可编辑"""
+    from pptx.oxml.ns import qn
+    rPr = rr_pr(run)
+    hl = rPr.find(qn('a:highlight'))
+    if hl is None:
+        hl = rPr.makeelement(qn('a:highlight'), {})
+        rPr.insert(0, hl)
+    for child in list(hl):
+        hl.remove(child)
+    clr = hl.makeelement(qn('a:srgbClr'), {'val': hexs})
+    hl.append(clr)
 
 def add_text(slide, n):
     pl, pr, pt, pb = n.get('pl') or 0, n.get('pr') or 0, n.get('pt') or 0, n.get('pb') or 0
+    lh = n.get('lh') or (n.get('s') or 24) * 1.5
+    # 单行判定放宽到 1.55 倍行高，避免 tag/胶囊这类矮框被误判成多行而换行
+    single = (n['h'] - pt - pb) <= lh * 1.55
     tb = slide.shapes.add_textbox(E(n['x'] + pl), E(n['y'] + pt), E(max(10, n['w'] - pl - pr)), E(max(10, n['h'] - pt - pb) + 6))
     tf = tb.text_frame
-    # 单行文字关掉自动换行（HTML 里它本来就不换行），多行段落才允许换行；
-    # 统一给一点宽度余量，抵消 PowerPoint 与浏览器的字宽差异
-    lines = max(1, round(n['h'] / (n.get('lh') or (n.get('s') or 24) * 1.5)))
-    tf.word_wrap = lines > 1
-    slack = 0 if lines == 1 else 0.03
+    tf.word_wrap = not single
     tf.margin_left = 0; tf.margin_right = 0; tf.margin_top = 0; tf.margin_bottom = 0
-    tf.vertical_anchor = MSO_ANCHOR.TOP
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE if single else MSO_ANCHOR.TOP
     p = tf.paragraphs[0]
     p.alignment = {'center': PP_ALIGN.CENTER, 'right': PP_ALIGN.RIGHT, 'justify': PP_ALIGN.JUSTIFY}.get(n.get('align') or 'left', PP_ALIGN.LEFT)
     if n.get('lh') and n.get('s'):
@@ -135,6 +135,8 @@ def add_text(slide, n):
     for r in n['runs']:
         run = p.add_run(); run.text = r['t']
         set_font(run, r.get('s') or n.get('s') or 24, r.get('b'), r.get('c'))
+        if n.get('grad'):
+            set_highlight(run)
 
 def add_pic(slide, rect_box, img_path, fit='cover', radius=0):
     iw, ih = Image.open(img_path).size
@@ -162,28 +164,36 @@ for sid in ids:
     for n in page['nodes']:
         if n['kind'] == 'rect':
             add_rect(s, n)
-    # 2) 再铺薄荷高亮条（要压在卡片底之上、文字之下）
-    for n in page['nodes']:
-        if n['kind'] == 'text' and n.get('grad'):
-            add_highlight(s, n)
     # 3) 最后文字/图片/图标
     for n in page['nodes']:
         if n['kind'] == 'text':
             add_text(s, n)
         elif n['kind'] == 'img':
             src = (n.get('src') or '').split('?')[0]
-            p = src if os.path.isabs(src) else os.path.join(site_dir, src)
-            if os.path.exists(p):
-                add_pic(s, n, p, 'cover' if n.get('fit') == 'cover' else 'contain')
+            poster = src if os.path.isabs(src) else os.path.join(site_dir, src)
+            vid = n.get('video')
+            if vid:
+                vpath = vid.split('?')[0]
+                if not os.path.isabs(vpath):
+                    vpath = os.path.join(site_dir, vpath)
+                if os.path.exists(vpath) and os.path.exists(poster):
+                    mv = s.shapes.add_movie(vpath, E(n['x']), E(n['y']), E(n['w']), E(n['h']),
+                                            poster_frame_image=poster, mime_type='video/mp4')
+                    mv.name = 'Video ' + os.path.basename(vpath)
+                    continue
+            if os.path.exists(poster):
+                add_pic(s, n, poster, 'cover' if n.get('fit') == 'cover' else 'contain')
         elif n['kind'] == 'icon':
             shot = os.path.join(render_dir, sid + '.png')
             if os.path.exists(shot):
                 im = Image.open(shot)
-                box = (int(n['x']), int(n['y']), int(n['x'] + n['w']), int(n['y'] + n['h']))
+                pad = 2
+                box = (int(n['x']) - pad, int(n['y']) - pad, int(n['x'] + n['w']) + pad, int(n['y'] + n['h']) + pad)
+                box = (max(0, box[0]), max(0, box[1]), min(im.width, box[2]), min(im.height, box[3]))
                 crop = im.crop(box)
                 tmp = os.path.join('/tmp', 'icon_' + sid + '_' + str(len(s.shapes)) + '.png')
                 crop.save(tmp)
-                s.shapes.add_picture(tmp, E(n['x']), E(n['y']), width=E(n['w']), height=E(n['h']))
+                s.shapes.add_picture(tmp, E(n['x'] - 2), E(n['y'] - 2), width=E(n['w'] + 4), height=E(n['h'] + 4))
 
 prs.save(out_file)
 print(len(ids), '页 →', out_file)
